@@ -28,22 +28,11 @@ func NewNetwork(name string) *Network {
 	return net
 }
 
-func (n *Network) newProc(name string) *Process {
-
-	proc := &Process{
-		name:    name,
-		network: n,
-	}
-
-	// Set up logging
-	return proc
-}
-
 func (n *Network) Run() {
 	defer fmt.Println(n.name)
 	for i := 0; i < 4; i++ {
 
-		proc := n.newProc("Sender" + strconv.Itoa(i))
+		proc := n.newProc("Sender"+strconv.Itoa(i), sender)
 		n.wg.Add(1)
 		go proc.Run(&n.wg)
 	}

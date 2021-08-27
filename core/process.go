@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -12,6 +11,7 @@ type Process struct {
 	//inPorts  map[string]*InPort
 	//outPorts map[string]*OutPort
 	logFile string
+	myFun   func()
 }
 
 /*
@@ -23,9 +23,23 @@ type Process interface {
 }
 */
 
+func (n *Network) newProc(name string, crun func()) *Process {
+
+	proc := &Process{
+		name:    name,
+		network: n,
+		myFun:   crun,
+	}
+
+	// Set up logging
+	return proc
+}
+
 func (p *Process) Run(wg *sync.WaitGroup) {
 
-	fmt.Println(p.name)
+	//fmt.Println(p.name)
+
+	p.myFun()
 
 	wg.Done()
 
