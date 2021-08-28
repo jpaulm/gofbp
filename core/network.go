@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"strconv"
+	//"strconv"
 	"sync"
 )
 
@@ -29,13 +29,13 @@ func NewNetwork(name string) *Network {
 }
 
 func (n *Network) Run() {
-	defer fmt.Println(n.name)
-	for i := 0; i < 4; i++ {
+	defer fmt.Println(n.name + "Done")
+	//for i := 0; i < 4; i++ {
 
-		proc := n.newProc("Sender"+strconv.Itoa(i), sender)
-		n.wg.Add(1)
-		go proc.Run(&n.wg)
-	}
+	proc := n.newProc("Sender", sender)
+	n.wg.Add(1)
+	go proc.Run(&n.wg)
+	//}
 
 	n.wg.Wait()
 }

@@ -11,24 +11,16 @@ type Process struct {
 	//inPorts  map[string]*InPort
 	//outPorts map[string]*OutPort
 	logFile string
-	myFun   func()
+	myFun   func(p *Process)
 }
 
-/*
-type Process interface {
-	Name() string
-	InPorts() map[string]*InPort
-	OutPorts() map[string]*OutPort
-	Run()
-}
-*/
-
-func (n *Network) newProc(name string, crun func()) *Process {
+func (n *Network) newProc(name string, cRun func(*Process)) *Process {
 
 	proc := &Process{
 		name:    name,
 		network: n,
-		myFun:   crun,
+		logFile: "",
+		myFun:   cRun,
 	}
 
 	// Set up logging
@@ -38,9 +30,15 @@ func (n *Network) newProc(name string, crun func()) *Process {
 func (p *Process) Run(wg *sync.WaitGroup) {
 
 	//fmt.Println(p.name)
-
-	p.myFun()
+	for {
+		p.myFun(p)
+		break
+	}
 
 	wg.Done()
+}
 
+func (p *Process) create(s string) {
+	var pt *Packet = new(Packet)
+	pt.contents = s
 }
