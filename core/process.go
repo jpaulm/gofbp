@@ -12,6 +12,8 @@ type Process struct {
 	//outPorts map[string]*OutPort
 	logFile string
 	myFun   func(p *Process)
+	inConn  *Connection
+	outConn *Connection
 }
 
 func (n *Network) newProc(name string, cRun func(*Process)) *Process {
@@ -38,7 +40,8 @@ func (p *Process) Run(wg *sync.WaitGroup) {
 	wg.Done()
 }
 
-func (p *Process) create(s string) {
+func (p *Process) create(s string) *Packet {
 	var pt *Packet = new(Packet)
 	pt.contents = s
+	return pt
 }

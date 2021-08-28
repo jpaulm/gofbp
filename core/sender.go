@@ -5,7 +5,7 @@ import (
 )
 
 func sender(p *Process) {
-	fmt.Println("Test")
-	var pt Packet = p.create("new IP")
-	p.Send(pt)
+	fmt.Println("Starting Sender")
+	var pt *Packet = p.create("new IP")
+	p.outConn.Send(pt)
 }

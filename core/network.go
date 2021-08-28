@@ -29,10 +29,12 @@ func NewNetwork(name string) *Network {
 }
 
 func (n *Network) Run() {
-	defer fmt.Println(n.name + "Done")
+	defer fmt.Println(n.name + " Done")
 	//for i := 0; i < 4; i++ {
 
 	proc := n.newProc("Sender", sender)
+	proc.outConn = n.newConnection()
+
 	n.wg.Add(1)
 	go proc.Run(&n.wg)
 	//}
