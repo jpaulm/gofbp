@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sync"
 
-	components "github.com/jpaulm/gofbp/src/components"
-	core "github.com/jpaulm/gofbp/src/core"
+	components "github.com/jpaulm/gofbp/components"
+	core "github.com/jpaulm/gofbp/core"
 )
 
 type Network struct {
@@ -33,7 +33,7 @@ func NewNetwork(name string) *Network {
 func (n *Network) Run() {
 	defer fmt.Println(n.name + " Done")
 
-	var sender func(*Process) = components.Sender(*core.Process)
+	var sender func(*Process) = components.Sender.Sender(*core.Process)
 	proc := n.newProc("Sender", sender)
 	proc.OutConn = n.newConnection()
 

@@ -3,7 +3,7 @@ package components
 import (
 	"fmt"
 
-	core "github.com/jpaulm/gofbp/src/core"
+	core "github.com/jpaulm/gofbp/core"
 )
 
 func Sender(p *core.Process) {

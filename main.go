@@ -3,10 +3,10 @@ package main
 import (
 	"runtime"
 
-	core "github.com/jpaulm/gofbp/src/core"
+	core "github.com/jpaulm/gofbp/core"
 )
 
-var cc chan int = make(chan int, 10)
+//var cc chan int = make(chan int, 10)
 
 func main() {
 	runtime.GOMAXPROCS(4)
