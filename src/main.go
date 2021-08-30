@@ -1,8 +1,9 @@
 package main
 
 import (
-	core "github.com/jpaulm/gofbp/src/core"
 	"runtime"
+
+	core "github.com/jpaulm/gofbp/src/core"
 )
 
 var cc chan int = make(chan int, 10)
