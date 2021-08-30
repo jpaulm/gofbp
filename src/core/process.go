@@ -13,7 +13,7 @@ type Process struct {
 	logFile   string
 	myFun     func(p *Process)
 	inConn    *Connection
-	outConn   *Connection
+	OutConn   *Connection
 	ownedPkts int
 }
 
@@ -41,7 +41,7 @@ func (p *Process) Run(wg *sync.WaitGroup) {
 	wg.Done()
 }
 
-func (p *Process) create(s string) *Packet {
+func (p *Process) Create(s string) *Packet {
 	var pt *Packet = new(Packet)
 	pt.contents = s
 	pt.owner = p

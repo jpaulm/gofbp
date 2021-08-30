@@ -31,7 +31,7 @@ func (n *Network) Run() {
 	defer fmt.Println(n.name + " Done")
 
 	proc := n.newProc("Sender", sender)
-	proc.outConn = n.newConnection()
+	proc.OutConn = n.newConnection()
 
 	n.wg.Add(1)
 	go proc.Run(&n.wg)

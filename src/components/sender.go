@@ -1,12 +1,13 @@
 package components
 
 import (
-	core "../core"
 	"fmt"
+
+	"github.com/jpaulm/gofbp/src/core"
 )
 
 func sender(p *core.Process) {
 	fmt.Println("Starting Sender")
-	var pkt *core.Packet = p.create("new IP")
-	p.outConn.Send(p, pkt)
+	var pkt *core.Packet = p.Create("new IP")
+	p.OutConn.Send(p, pkt)
 }
