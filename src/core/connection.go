@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"fmt"
@@ -24,12 +24,12 @@ func (n *Network) newConnection() *Connection {
 	return conn
 }
 
-func (c *Connection) Send(p *Packet) bool {
+func (p *Process) Send(c *Connection, pkt *Packet) bool {
 	c.mtx.Lock()
-	fmt.Println(p.contents)
-	c.slice[c.is] = *p
+	fmt.Println(pkt.contents)
+	c.slice[c.is] = *pkt
 	c.is = (c.is + 1) % len(c.slice)
-	p.owner = nil
+	pkt.owner = nil
 	c.mtx.Unlock()
 	return true
 }

@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"sync"
@@ -10,10 +10,11 @@ type Process struct {
 	network *Network
 	//inPorts  map[string]*InPort
 	//outPorts map[string]*OutPort
-	logFile string
-	myFun   func(p *Process)
-	inConn  *Connection
-	outConn *Connection
+	logFile   string
+	myFun     func(p *Process)
+	inConn    *Connection
+	outConn   *Connection
+	ownedPkts int
 }
 
 func (n *Network) newProc(name string, cRun func(*Process)) *Process {
@@ -43,5 +44,7 @@ func (p *Process) Run(wg *sync.WaitGroup) {
 func (p *Process) create(s string) *Packet {
 	var pt *Packet = new(Packet)
 	pt.contents = s
+	pt.owner = p
+	p.ownedPkts++
 	return pt
 }

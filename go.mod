@@ -1,3 +1,3 @@
-module github.com/jpaulm/gofbp
+module gofbp
 
 go 1.17
