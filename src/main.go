@@ -1,7 +1,7 @@
 package main
 
 import (
-	core "./core"
+	core "github.com/jpaulm/gofbp/src/core"
 	"runtime"
 )
 
