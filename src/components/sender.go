@@ -9,5 +9,5 @@ import (
 func sender(p *core.Process) {
 	fmt.Println("Starting Sender")
 	var pkt *core.Packet = p.Create("new IP")
-	p.OutConn.Send(p, pkt)
+	p.Send(p.OutConn, pkt)
 }
