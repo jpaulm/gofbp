@@ -3,9 +3,6 @@ package core
 import (
 	"fmt"
 	"sync"
-
-	components "github.com/jpaulm/gofbp/components"
-	core "github.com/jpaulm/gofbp/core"
 )
 
 type Network struct {
@@ -32,7 +29,7 @@ func NewNetwork(name string) *Network {
 func (n *Network) Run() {
 	defer fmt.Println(n.name + " Done")
 
-	var sendFun func(*Process) = components.sender.Execute(*Process)
+	var sendFun func(*Process) = Execute
 	proc := n.newProc("Sender", sendFun)
 	proc.OutConn = n.newConnection()
 
