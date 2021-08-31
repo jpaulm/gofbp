@@ -20,7 +20,6 @@ func NewNetwork(name string) *Network {
 	net := &Network{
 		name:  name,
 		procs: map[string]Process{},
-		//wg: new(sync.WaitGroup),
 	}
 
 	var wg sync.WaitGroup
@@ -33,8 +32,8 @@ func NewNetwork(name string) *Network {
 func (n *Network) Run() {
 	defer fmt.Println(n.name + " Done")
 
-	var sender func(*Process) = components.Sender.Sender(*core.Process)
-	proc := n.newProc("Sender", sender)
+	var sendFun func(*Process) = components.sender.Execute(*Process)
+	proc := n.newProc("Sender", sendFun)
 	proc.OutConn = n.newConnection()
 
 	n.wg.Add(1)

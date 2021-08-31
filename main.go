@@ -11,7 +11,7 @@ import (
 func main() {
 	runtime.GOMAXPROCS(4)
 
-	var net *core.Network = core.NewNetwork("test_net")
+	var net = core.NewNetwork("test_net")
 
 	net.Run()
 }
