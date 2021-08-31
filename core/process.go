@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -47,4 +48,10 @@ func (p *Process) Create(s string) *Packet {
 	pt.owner = p
 	p.ownedPkts++
 	return pt
+}
+
+func Execute(p *Process) {
+	fmt.Println("Starting Sender")
+	var pkt *Packet = p.Create("new IP")
+	p.Send(p.OutConn, pkt)
 }
