@@ -14,13 +14,11 @@ func main() {
 
 	var net *core.Network = core.NewNetwork("test_net")
 
-	//var p = comp.Process
-
 	var sender core.Component = comp.Sender
-	proc := net.NewProc("Sender", sender)
+	sender.Name = "Sender"
 
-	//var myFun = proc.Execute(*core.Process)
-	//proc.ProcFun = myFun
+	proc := net.NewProc(sender)
+
 	proc.OutConn = net.NewConnection()
 	net.Wg.Add(1)
 	go proc.Run(net.Wg)

@@ -28,14 +28,16 @@ func NewNetwork(name string) *Network {
 	return net
 }
 
-func (n *Network) NewProc(name string, s Component) *Process {
+func (n *Network) NewProc(s Component) *Process {
 
 	proc := &Process{
-		Name:    name,
 		Network: n,
 		logFile: "",
-		ProcFun: s.Execute,
+		//ProcFun: &s.Execute,
 	}
+
+	proc.Name = s.Name
+	proc.ProcFun = s.Execute
 
 	// Set up logging
 	return proc
