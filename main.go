@@ -3,7 +3,8 @@ package main
 import (
 	"runtime"
 
-	core "github.com/jpaulm/gofbp/core"
+	comp "github.com/jpaulm/gofbp/components/Sender"
+	"github.com/jpaulm/gofbp/core"
 )
 
 //var cc chan int = make(chan int, 10)
@@ -11,7 +12,19 @@ import (
 func main() {
 	runtime.GOMAXPROCS(4)
 
-	var net = core.NewNetwork("test_net")
+	var net *core.Network = core.NewNetwork("test_net")
+
+	//var p = comp.Process
+
+	proc := net.NewProc("Sender", comp.Process)
+
+	//var myFun = proc.Execute(*core.Process)
+	//proc.ProcFun = myFun
+	proc.OutConn = net.NewConnection()
+	net.Wg.Add(1)
+	go proc.Run(net.Wg)
+
+	net.Wg.Wait()
 
 	net.Run()
 }

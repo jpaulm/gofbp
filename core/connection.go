@@ -15,15 +15,6 @@ type Connection struct {
 	is, ir int
 }
 
-func (n *Network) newConnection() *Connection {
-
-	conn := &Connection{
-		network: n,
-	}
-	conn.slice = make([]Packet, 10, 10)
-	return conn
-}
-
 func (p *Process) Send(c *Connection, pkt *Packet) bool {
 	c.mtx.Lock()
 	fmt.Println(pkt.contents)

@@ -1,41 +1,27 @@
 package core
 
 import (
-	"fmt"
 	"sync"
 )
 
 type Process struct {
-	name string
+	Name string
 	//procs   map[string]Process
-	network *Network
+	Network *Network
 	//inPorts  map[string]*InPort
 	//outPorts map[string]*OutPort
 	logFile   string
-	myFun     func(p *Process)
+	ProcFun   func(p *Process)
 	inConn    *Connection
 	OutConn   *Connection
 	ownedPkts int
-}
-
-func (n *Network) newProc(name string, cRun func(*Process)) *Process {
-
-	proc := &Process{
-		name:    name,
-		network: n,
-		logFile: "",
-		myFun:   cRun,
-	}
-
-	// Set up logging
-	return proc
 }
 
 func (p *Process) Run(wg *sync.WaitGroup) {
 
 	//fmt.Println(p.name)
 	for {
-		p.myFun(p)
+		p.ProcFun(p)
 		break
 	}
 
@@ -48,10 +34,4 @@ func (p *Process) Create(s string) *Packet {
 	pt.owner = p
 	p.ownedPkts++
 	return pt
-}
-
-func Execute(p *Process) {
-	fmt.Println("Starting Sender")
-	var pkt *Packet = p.Create("new IP")
-	p.Send(p.OutConn, pkt)
 }
