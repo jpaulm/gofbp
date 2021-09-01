@@ -3,7 +3,7 @@ package main
 import (
 	"runtime"
 
-	comp "github.com/jpaulm/gofbp/components/Sender"
+	comp "github.com/jpaulm/gofbp/components/sender"
 	"github.com/jpaulm/gofbp/core"
 )
 
@@ -16,7 +16,8 @@ func main() {
 
 	//var p = comp.Process
 
-	proc := net.NewProc("Sender", comp.Process)
+	var sender core.Component = comp.Sender
+	proc := net.NewProc("Sender", sender)
 
 	//var myFun = proc.Execute(*core.Process)
 	//proc.ProcFun = myFun

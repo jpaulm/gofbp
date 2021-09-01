@@ -28,13 +28,13 @@ func NewNetwork(name string) *Network {
 	return net
 }
 
-func (n *Network) NewProc(name string, fn func(p *Process)) *Process {
+func (n *Network) NewProc(name string, s Component) *Process {
 
 	proc := &Process{
 		Name:    name,
 		Network: n,
 		logFile: "",
-		ProcFun: fn,
+		ProcFun: s.Execute,
 	}
 
 	// Set up logging
