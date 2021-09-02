@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	//"github.com/jpaulm/gofbp/components"
 	"sync"
 )
 
@@ -21,23 +20,18 @@ func NewNetwork(name string) *Network {
 		Wg:    new(sync.WaitGroup),
 	}
 
-	//var wg sync.WaitGroup
-	//net.wg = wg
-
 	// Set up logging
 	return net
 }
 
-func (n *Network) NewProc(s Component) *Process {
+func (n *Network) NewProc(x func(p *Process)) *Process {
 
 	proc := &Process{
 		Network: n,
 		logFile: "",
-		//ProcFun: &s.Execute,
 	}
 
-	proc.Name = s.Name
-	proc.ProcFun = s.Execute
+	proc.ProcFun = x
 
 	// Set up logging
 	return proc
@@ -54,13 +48,4 @@ func (n *Network) NewConnection() *Connection {
 
 func (n *Network) Run() {
 	defer fmt.Println(n.Name + " Done")
-
-	//var sendFun func(*Process) = components.Sender.Execute
-	//proc := n.newProc("Sender", sendFun)
-	//proc.OutConn = n.newConnection()
-
-	//n.wg.Add(1)
-	//go proc.Run(&n.wg)
-
-	//n.wg.Wait()
 }
