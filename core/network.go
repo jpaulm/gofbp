@@ -24,10 +24,6 @@ func NewNetwork(name string) *Network {
 	return net
 }
 
-func printSlice(s *list.List) {
-	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
-}
-
 func (n *Network) NewProc(x func(p *Process)) *Process {
 
 	proc := &Process{
@@ -37,8 +33,6 @@ func (n *Network) NewProc(x func(p *Process)) *Process {
 
 	proc.ProcFun = x
 	n.procs.PushFront(*proc)
-
-	printSlice(n.procs)
 
 	// Set up logging
 	return proc
@@ -57,7 +51,8 @@ func (n *Network) Run() {
 	defer fmt.Println(n.Name + " Done")
 	fmt.Println(n.Name + " Starting")
 	for e := n.procs.Front(); e != nil; e = e.Next() {
-		go e.Run(n)
+		var v = e.Value
+		go v.(*Process).Run(n)
 	}
 
 	n.Wg.Wait()
