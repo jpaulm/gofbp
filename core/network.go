@@ -3,6 +3,7 @@ package core
 import (
 	"container/list"
 	"fmt"
+	"reflect"
 	"sync"
 )
 
@@ -52,7 +53,10 @@ func (n *Network) Run() {
 	fmt.Println(n.Name + " Starting")
 	for e := n.procs.Front(); e != nil; e = e.Next() {
 		var v = e.Value
-		go v.(*Process).Run(n)
+		fmt.Printf("%T %T\n", e, v)
+
+		var w *Process = reflect.Addr(v.reflect.Value())
+		go w.Run(n)
 	}
 
 	n.Wg.Wait()

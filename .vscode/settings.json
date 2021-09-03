@@ -1,5 +1,5 @@
 {
-	//"go.inferGopath": false
+	"go.inferGopath": false
 	"options" :	"json=omitempty",
 	"promptForTags" :	false,
 	"tags" :	"json",
