@@ -21,9 +21,9 @@ func main() {
 
 	proc.OutConn = net.NewConnection()
 
-	net.Wg.Add(1)
-	go proc.Run(net.Wg)
-	net.Wg.Wait()
+	//net.Wg.Add(1)
+	// go proc.Run(net)
+	//net.Wg.Wait()
 
 	net.Run()
 }

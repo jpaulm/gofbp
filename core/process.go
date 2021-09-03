@@ -1,8 +1,8 @@
 package core
 
-import (
-	"sync"
-)
+//import (
+//	"sync"
+//)
 
 type Process struct {
 	Name string
@@ -17,15 +17,16 @@ type Process struct {
 	ownedPkts int
 }
 
-func (p *Process) Run(wg *sync.WaitGroup) {
-
+func (p *Process) Run(net *Network) {
+	net.Wg.Add(1)
 	//fmt.Println(p.name)
-	for {
+	for i := 0; i < 4; i++ {
 		p.ProcFun(p)
-		break
 	}
 
-	wg.Done()
+	net.Wg.Done()
+
+	//wg.Done()
 }
 
 func (p *Process) Create(s string) *Packet {

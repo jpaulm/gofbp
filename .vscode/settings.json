@@ -1,3 +1,10 @@
 {
-	"go.inferGopath": false
+	//"go.inferGopath": false
+	"options" :	"json=omitempty",
+	"promptForTags" :	false,
+	"tags" :	"json",
+	"template" :	"",
+	"transform" :	"snakecase",
+	// Show variable values inline in editor while debugging.
+  "debug.inlineValues": true,  
 }

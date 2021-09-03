@@ -11,9 +11,9 @@ type Connection struct {
 	network *Network
 	//inPorts  map[string]*InPort
 	//outPorts map[string]*OutPort
-	mtx    sync.Mutex
-	slice  []Packet
-	is, ir int
+	mtx      sync.Mutex
+	pktArray []Packet
+	is, ir   int
 }
 
 func (p *Process) Send(c *Connection, pkt *Packet) bool {
@@ -22,8 +22,8 @@ func (p *Process) Send(c *Connection, pkt *Packet) bool {
 	v := reflect.ValueOf(pkt.contents)
 	s := v.String()
 	fmt.Println("Sending " + s)
-	c.slice[c.is] = *pkt
-	c.is = (c.is + 1) % len(c.slice)
+	c.pktArray[c.is] = *pkt
+	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
 	c.mtx.Unlock()
 	return true
