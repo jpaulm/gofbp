@@ -18,13 +18,13 @@ type Process struct {
 }
 
 func (p *Process) Run(net *Network) {
-	net.Wg.Add(1)
+	//net.Wg.Add(1)
 	//fmt.Println(p.name)
+	defer net.Wg.Done()
+
 	for i := 0; i < 4; i++ {
 		p.ProcFun(p)
 	}
-
-	net.Wg.Done()
 
 	//wg.Done()
 }

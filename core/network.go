@@ -1,15 +1,21 @@
 package core
 
 import (
-	"container/list"
 	"fmt"
-	"reflect"
 	"sync"
 )
 
+/********
+
+  Going to give up on Lists - I suspect a bug in the Golang driver
+
+*/
+
 type Network struct {
-	Name  string
-	procs *list.List
+	Name string
+	//procList *list.List
+	procList []*Process
+	procNo   int
 	//driver  Process
 	logFile string
 	Wg      *sync.WaitGroup
@@ -20,7 +26,8 @@ func NewNetwork(name string) *Network {
 		Name: name,
 		Wg:   new(sync.WaitGroup),
 	}
-	net.procs = list.New()
+	//net.procList = list.New()
+	net.procList = make([]*Process, 10, 200) // I assume it will take up 200 slots - ugghh!
 	// Set up logging
 	return net
 }
@@ -33,7 +40,8 @@ func (n *Network) NewProc(x func(p *Process)) *Process {
 	}
 
 	proc.ProcFun = x
-	n.procs.PushFront(*proc)
+	n.procList[n.procNo] = proc
+	n.procNo++
 
 	// Set up logging
 	return proc
@@ -51,13 +59,10 @@ func (n *Network) NewConnection() *Connection {
 func (n *Network) Run() {
 	defer fmt.Println(n.Name + " Done")
 	fmt.Println(n.Name + " Starting")
-	for e := n.procs.Front(); e != nil; e = e.Next() {
-		var v = e.Value
-		fmt.Printf("%T %T\n", e, v)
-
-		var w *Process = reflect.Addr(v.reflect.Value())
-		go w.Run(n)
+	for i := 0; i < n.procNo; i++ {
+		n.Wg.Add(1)
+		go n.procList[i].Run(n)
+		//n.Wg.Done()
 	}
-
 	n.Wg.Wait()
 }
