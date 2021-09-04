@@ -22,13 +22,17 @@ type Connection struct {
 }
 
 func (p *Process) Send(c *Connection, pkt *Packet) bool {
+	if pkt.owner != p {
+		panic("Sending packet not owned by this process")
+	}
 	c.condNF.L.Lock()
 	v := reflect.ValueOf(pkt.Contents) // display contents - assume string
 	s := v.String()
-	fmt.Println("Sending " + s)
+	fmt.Println(p.Name + " Sending " + s)
 	for (c.ir == c.is) && (c.pktArray[c.is] != nil) { // connection is full
 		c.condNF.Wait()
 	}
+	fmt.Println(p.Name + " Sent " + s)
 	c.pktArray[c.is] = pkt
 	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
@@ -40,18 +44,21 @@ func (p *Process) Send(c *Connection, pkt *Packet) bool {
 
 func (p *Process) Receive(c *Connection) *Packet {
 
-	if (c.ir == c.is) && (c.pktArray[c.is] == nil) && c.closed {
-		return nil
-	}
-
 	c.condNE.L.Lock()
-	//v := reflect.ValueOf(pkt.contents)  // display contents - assume string
-	//s := v.String()
-	//fmt.Println("Sending " + s)
+	fmt.Println(p.Name + " Receiving ")
 	if (c.ir == c.is) && (c.pktArray[c.is] == nil) { // connection is empty
+		if c.closed {
+			c.condNF.Broadcast()
+			c.condNE.L.Unlock()
+			return nil
+		}
 		c.condNE.Wait()
 	}
 	pkt := c.pktArray[c.ir]
+	c.pktArray[c.ir] = nil
+	v := reflect.ValueOf(pkt.Contents) // display contents - assume string
+	s := v.String()
+	fmt.Println(p.Name + " Received " + s)
 	c.ir = (c.ir + 1) % len(c.pktArray)
 	pkt.owner = p
 	p.ownedPkts++

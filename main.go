@@ -13,10 +13,12 @@ func main() {
 	var net *core.Network = core.NewNetwork("test_net")
 
 	proc := net.NewProc(comp.Execute)
+	proc.Name = "Sender"
 
 	proc.OutConn = net.NewConnection(10)
 
 	proc2 := net.NewProc(comp2.Execute)
+	proc2.Name = "Receiver"
 
 	proc2.InConn = proc.OutConn
 

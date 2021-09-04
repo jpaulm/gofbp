@@ -19,7 +19,7 @@ func Execute(p *core.Process) {
 		}
 		v := reflect.ValueOf(pkt.Contents) // display contents - assume string
 		s := v.String()
-		fmt.Println("Received " + s)
+		fmt.Println("Output: " + s)
 	}
 	fmt.Println("Receiver ended")
 }
