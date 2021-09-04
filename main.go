@@ -20,7 +20,7 @@ func main() {
 
 	proc.OutConn = net.NewConnection(6)
 
-	proc2 := net.NewProc(comp2.Execute)  // note the different import keys!
+	proc2 := net.NewProc(comp2.Execute)  
 	proc2.Name = "Receiver"
 
 	proc2.InConn = proc.OutConn
