@@ -32,9 +32,10 @@ func NewNetwork(name string) *Network {
 	return net
 }
 
-func (n *Network) NewProc(x func(p *Process)) *Process {
+func (n *Network) NewProc(nm string, x func(p *Process)) *Process {
 
 	proc := &Process{
+		Name:    nm,
 		Network: n,
 		logFile: "",
 	}

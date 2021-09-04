@@ -31,7 +31,10 @@ func (p *Process) Run(net *Network) {
 		p.InConn.closed = true
 	}
 	if p.OutConn != nil {
-		p.OutConn.closed = true
+		p.OutConn.UpStrmCnt--
+		if p.OutConn.UpStrmCnt == 0 {
+			p.OutConn.closed = true
+		}
 	}
 
 	if p.ownedPkts > 0 {

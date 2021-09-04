@@ -12,13 +12,13 @@ type Connection struct {
 	network *Network
 	//inPorts  map[string]*InPort
 	//outPorts map[string]*OutPort
-	pktArray []*Packet
-	is, ir   int // send index and receive index
-	mtx      sync.Mutex
-	condNE   *sync.Cond
-	condNF   *sync.Cond
-	closed   bool
-	//l        sync.Locker
+	pktArray  []*Packet
+	is, ir    int // send index and receive index
+	mtx       sync.Mutex
+	condNE    *sync.Cond
+	condNF    *sync.Cond
+	closed    bool
+	UpStrmCnt int
 }
 
 func (p *Process) Send(c *Connection, pkt *Packet) bool {
