@@ -10,11 +10,11 @@ import (
 var Name string = "Sender"
 
 func Execute(p *core.Process) {
-	fmt.Println("Sender started")
+	fmt.Println(p.Name + " started")
 	var pkt *core.Packet
-	for i := 0; i < 25; i++ {
-		pkt = p.Create("IP - # " + strconv.Itoa(i))
+	for i := 0; i < 15; i++ {
+		pkt = p.Create("IP - # " + strconv.Itoa(i) + " (" + p.Name + ")")
 		p.Send(p.OutConn, pkt)
 	}
-	fmt.Println("Sender ended")
+	fmt.Println(p.Name + " ended")
 }

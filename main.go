@@ -15,12 +15,16 @@ func main() {
 	proc := net.NewProc(comp.Execute)
 	proc.Name = "Sender"
 
-	proc.OutConn = net.NewConnection(10)
+	proc1a := net.NewProc(comp.Execute)
+	proc1a.Name = "Sender2"
+
+	proc.OutConn = net.NewConnection(6)
 
 	proc2 := net.NewProc(comp2.Execute)
 	proc2.Name = "Receiver"
 
 	proc2.InConn = proc.OutConn
+	proc1a.OutConn = proc.OutConn // 2 outputs feeding 1 input (legal in FBP)
 
 	net.Run()
 }

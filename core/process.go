@@ -33,6 +33,10 @@ func (p *Process) Run(net *Network) {
 	if p.OutConn != nil {
 		p.OutConn.closed = true
 	}
+
+	if p.ownedPkts > 0 {
+		panic(p.Name + "deactivated without disposing of all owned packets")
+	}
 	//wg.Done()
 }
 
@@ -42,4 +46,8 @@ func (p *Process) Create(s string) *Packet {
 	pkt.owner = p
 	p.ownedPkts++
 	return pkt
+}
+
+func (p *Process) Discard(pkt *Packet) {
+	p.ownedPkts--
 }
