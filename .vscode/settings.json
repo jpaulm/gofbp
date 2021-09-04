@@ -6,5 +6,17 @@
 	"template" :	"",
 	"transform" :	"snakecase",
 	// Show variable values inline in editor while debugging.
-  "debug.inlineValues": true,  
+ 	 "debug.inlineValues": true,  
+ 	 "editor.acceptSuggestionOnCommitCharacter": false,
+	"editor.quickSuggestions": { "other": false, "comments": false, "strings": false },
+
+    // Controls if suggestions should be accepted with "Enter" - in addition to "Tab". Helps to avoid ambiguity between inserting new lines and accepting suggestions.
+    "editor.acceptSuggestionOnEnter": "off",
+
+    // Controls the delay in ms after which quick suggestions will show up.
+    "editor.quickSuggestionsDelay": 10,
+
+    // Enable word based suggestions
+    "editor.wordBasedSuggestions": false
+
 }

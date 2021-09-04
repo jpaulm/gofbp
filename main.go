@@ -1,6 +1,7 @@
 package main
 
 import (
+	comp2 "github.com/jpaulm/gofbp/components/receiver"
 	comp "github.com/jpaulm/gofbp/components/sender"
 	"github.com/jpaulm/gofbp/core"
 	"runtime"
@@ -13,7 +14,11 @@ func main() {
 
 	proc := net.NewProc(comp.Execute)
 
-	proc.OutConn = net.NewConnection()
+	proc.OutConn = net.NewConnection(10)
+
+	proc2 := net.NewProc(comp2.Execute)
+
+	proc2.InConn = proc.OutConn
 
 	net.Run()
 }

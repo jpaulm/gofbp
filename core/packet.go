@@ -1,7 +1,7 @@
 package core
 
 type Packet struct {
-	contents interface{}
+	Contents interface{}
 	pktType  int
 	owner    *Process
 }

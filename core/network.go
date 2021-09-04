@@ -9,7 +9,7 @@ import (
 
   Going to give up on Lists - I suspect a bug in the Golang driver
 
-*/
+***********/
 
 type Network struct {
 	Name string
@@ -47,12 +47,16 @@ func (n *Network) NewProc(x func(p *Process)) *Process {
 	return proc
 }
 
-func (n *Network) NewConnection() *Connection {
+func (n *Network) NewConnection(cap int) *Connection {
 
 	conn := &Connection{
 		network: n,
 	}
-	conn.pktArray = make([]Packet, 10, 10)
+
+	conn.mtx = sync.Mutex{}
+	conn.condNE = sync.NewCond(&conn.mtx)
+	conn.condNF = sync.NewCond(&conn.mtx)
+	conn.pktArray = make([]*Packet, cap, cap)
 	return conn
 }
 
