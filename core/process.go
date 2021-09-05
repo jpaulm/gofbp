@@ -29,10 +29,12 @@ func (p *Process) Run(net *Network) {
 		p.InConn.closed = true
 	}
 	if p.OutConn != nil {
+		p.OutConn.mtx.Lock()
 		p.OutConn.UpStrmCnt--
 		if p.OutConn.UpStrmCnt == 0 {
 			p.OutConn.closed = true
 		}
+		p.OutConn.mtx.Unlock()
 	}
 
 	if p.ownedPkts > 0 {
