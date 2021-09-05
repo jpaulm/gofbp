@@ -19,9 +19,7 @@ type Process struct {
 }
 
 func (p *Process) Run(net *Network) {
-	//net.Wg.Add(1)
 	//fmt.Println(p.name)
-	defer net.Wg.Done()
 
 	//for i := 0; i < 4; i++ {
 	p.ProcFun(p)
@@ -40,7 +38,6 @@ func (p *Process) Run(net *Network) {
 	if p.ownedPkts > 0 {
 		panic(p.Name + "deactivated without disposing of all owned packets")
 	}
-	//wg.Done()
 }
 
 func (p *Process) Create(s string) *Packet {
