@@ -19,11 +19,9 @@ type Process struct {
 }
 
 func (p *Process) Run(net *Network) {
-	//fmt.Println(p.name)
 
-	//for i := 0; i < 4; i++ {
 	p.ProcFun(p)
-	//}
+
 	p.done = true
 	if p.InConn != nil {
 		p.InConn.closed = true

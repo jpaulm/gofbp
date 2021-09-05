@@ -61,12 +61,18 @@ func (n *Network) Run() {
 
 	var wg sync.WaitGroup
 	defer wg.Wait()
+
+	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
+	// reactivated many times during the process "run"
+
 	for _, proc := range n.procList {
 		proc := proc
 		wg.Add(1)
-		go func() {
+		go func() { // Process goroutine
 			defer wg.Done()
-			proc.Run(n)
+			for !proc.done {
+				proc.Run(n)
+			}
 		}()
 	}
 }

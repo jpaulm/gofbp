@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/jpaulm/gofbp/components/receiver"
-	"github.com/jpaulm/gofbp/components/sender"
+	"github.com/jpaulm/gofbp/components/test-rtns/receiver"
+	"github.com/jpaulm/gofbp/components/test-rtns/sender"
 	"github.com/jpaulm/gofbp/core"
 )
 
