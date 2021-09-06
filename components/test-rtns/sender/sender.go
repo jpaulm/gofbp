@@ -9,7 +9,7 @@ import (
 
 var Name string = "Sender"
 
-// var opt *core.OutPort
+var opt *core.OutPort
 
 //type Sender struct{ opt *core.OutPort }
 
