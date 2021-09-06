@@ -7,7 +7,7 @@ import (
 )
 
 type Component struct {
-	in *core.InPort
+	ipt *core.InPort
 }
 
 func New() *Component {
@@ -15,14 +15,14 @@ func New() *Component {
 }
 
 func (comp *Component) OpenPorts(p *core.Process) {
-	comp.in = p.OpenInPort("IN")
+	comp.ipt = p.OpenInPort("IN")
 }
 
 func (comp *Component) Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
 
 	for {
-		var pkt = p.Receive(comp.in.Conn)
+		var pkt = p.Receive(comp.ipt.Conn)
 		if pkt == nil {
 			break
 		}

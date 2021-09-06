@@ -26,13 +26,14 @@ func (p *Process) Send(c *Connection, pkt *Packet) bool {
 		panic("Sending packet not owned by this process")
 	}
 	c.condNF.L.Lock()
-	v := reflect.ValueOf(pkt.Contents) // display contents - assume string
-	s := v.String()
-	fmt.Println(p.Name + " Sending " + s)
+	//v := reflect.ValueOf(pkt.Contents) // display contents - assume string
+	//s := v.String()
+	//fmt.Println(p.Name + " Sending " + s)
+	fmt.Println(p.Name, "Sending", pkt.Contents)
 	for (c.ir == c.is) && (c.pktArray[c.is] != nil) { // connection is full
 		c.condNF.Wait()
 	}
-	fmt.Println(p.Name + " Sent " + s)
+	fmt.Println(p.Name+" Sent ", pkt.Contents)
 	c.pktArray[c.is] = pkt
 	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
