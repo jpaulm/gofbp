@@ -1,4 +1,4 @@
-package receiver
+package testrtn
 
 import (
 	"fmt"
@@ -6,19 +6,19 @@ import (
 	"github.com/jpaulm/gofbp/core"
 )
 
-type Component struct {
+type Receiver struct {
 	ipt *core.InPort
 }
 
-func New() *Component {
-	return &Component{}
+func NewReceiver() *Receiver {
+	return &Receiver{}
 }
 
-func (comp *Component) OpenPorts(p *core.Process) {
+func (comp *Receiver) OpenPorts(p *core.Process) {
 	comp.ipt = p.OpenInPort("IN")
 }
 
-func (comp *Component) Execute(p *core.Process) {
+func (comp *Receiver) Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
 
 	for {
