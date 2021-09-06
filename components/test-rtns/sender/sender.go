@@ -7,22 +7,24 @@ import (
 	"github.com/jpaulm/gofbp/core"
 )
 
-var Name string = "Sender"
-
-// var opt *core.OutPort
-
-type Sender struct{ opt *core.OutPort }
-
-func OpenPorts(p *core.Process) {
-	opt = p.OpenOutPort("OUT")
+type Component struct {
+	out *core.OutPort
 }
 
-func Execute(p *core.Process) {
+func New() *Component {
+	return &Component{}
+}
+
+func (comp *Component) OpenPorts(p *core.Process) {
+	comp.out = p.OpenOutPort("OUT")
+}
+
+func (comp *Component) Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
 	var pkt *core.Packet
 	for i := 0; i < 15; i++ {
 		pkt = p.Create("IP - # " + strconv.Itoa(i) + " (" + p.Name + ")")
-		p.Send(opt.Conn, pkt)
+		p.Send(comp.out.Conn, pkt)
 	}
 	fmt.Println(p.Name + " ended")
 }
