@@ -11,6 +11,11 @@ import (
 
 ***********/
 
+type Component interface {
+	OpenPorts(*Process)
+	Execute(*Process)
+}
+
 type Network struct {
 	Name     string
 	procs    map[string]*Process
@@ -29,16 +34,15 @@ func NewNetwork(name string) *Network {
 	return net
 }
 
-func (n *Network) NewProc(nm string, x func(p *Process), y func(p *Process)) *Process {
+func (n *Network) NewProc(nm string, comp Component) *Process {
 
 	proc := &Process{
-		Name:    nm,
-		Network: n,
-		logFile: "",
+		Name:      nm,
+		Network:   n,
+		logFile:   "",
+		component: comp,
 	}
 
-	proc.ProcFun = x
-	proc.OpenPorts = y
 	n.procList = append(n.procList, proc)
 	n.procs[nm] = proc
 

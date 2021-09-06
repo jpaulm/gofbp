@@ -11,8 +11,7 @@ type Process struct {
 	inPorts   map[string]*InPort
 	outPorts  map[string]*OutPort
 	logFile   string
-	OpenPorts func(p *Process)
-	ProcFun   func(p *Process)
+	component Component
 	ownedPkts int
 	done      bool
 }
@@ -26,10 +25,10 @@ func (p *Process) OpenOutPort(s string) *OutPort {
 }
 
 func (p *Process) Run(net *Network) {
-	p.OpenPorts(p)
+	p.component.OpenPorts(p)
 
 	for !p.done {
-		p.ProcFun(p)
+		p.component.Execute(p)
 		p.done = true // fudge
 	}
 
