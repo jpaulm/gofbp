@@ -12,8 +12,8 @@ import (
 ***********/
 
 type Network struct {
-	Name string
-	//procList *list.List
+	Name     string
+	procs    map[string]*Process
 	procList []*Process
 	//driver  Process
 	logFile string
@@ -23,11 +23,13 @@ func NewNetwork(name string) *Network {
 	net := &Network{
 		Name: name,
 	}
-	// Set up logging
+
+	net.procs = make(map[string]*Process)
+
 	return net
 }
 
-func (n *Network) NewProc(nm string, x func(p *Process)) *Process {
+func (n *Network) NewProc(nm string, x func(p *Process), y func(p *Process)) *Process {
 
 	proc := &Process{
 		Name:    nm,
@@ -36,9 +38,13 @@ func (n *Network) NewProc(nm string, x func(p *Process)) *Process {
 	}
 
 	proc.ProcFun = x
+	proc.OpenPorts = y
 	n.procList = append(n.procList, proc)
+	n.procs[nm] = proc
 
-	// Set up logging
+	proc.inPorts = make(map[string]*InPort)
+	proc.outPorts = make(map[string]*OutPort)
+
 	return proc
 }
 
@@ -53,6 +59,27 @@ func (n *Network) NewConnection(cap int) *Connection {
 	conn.condNF = sync.NewCond(&conn.mtx)
 	conn.pktArray = make([]*Packet, cap, cap)
 	return conn
+}
+
+func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
+
+	ipt := p2.inPorts[in]
+	if ipt == nil {
+		ipt = new(InPort)
+		ipt.Name = in
+		p2.inPorts[in] = ipt
+		ipt.Conn = n.NewConnection(cap)
+	}
+
+	opt := p1.outPorts[out]
+	if opt != nil {
+		panic("Outport port already connected")
+	}
+	opt = new(OutPort)
+	p1.outPorts[out] = opt
+	opt.name = out
+	opt.Conn = ipt.Conn
+	opt.Conn.UpStrmCnt++
 }
 
 func (n *Network) Run() {
@@ -70,9 +97,7 @@ func (n *Network) Run() {
 		wg.Add(1)
 		go func() { // Process goroutine
 			defer wg.Done()
-			for !proc.done {
-				proc.Run(n)
-			}
+			proc.Run(n)
 		}()
 	}
 }

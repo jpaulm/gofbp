@@ -7,32 +7,44 @@ package core
 type Process struct {
 	Name string
 	//procs   map[string]Process
-	Network *Network
-	//inPorts  map[string]*InPort
-	//outPorts map[string]*OutPort
+	Network   *Network
+	inPorts   map[string]*InPort
+	outPorts  map[string]*OutPort
 	logFile   string
+	OpenPorts func(p *Process)
 	ProcFun   func(p *Process)
-	InConn    *Connection
-	OutConn   *Connection
 	ownedPkts int
 	done      bool
 }
 
+func (p *Process) OpenInPort(s string) *InPort {
+	return p.inPorts[s]
+}
+
+func (p *Process) OpenOutPort(s string) *OutPort {
+	return p.outPorts[s]
+}
+
 func (p *Process) Run(net *Network) {
+	p.OpenPorts(p)
 
-	p.ProcFun(p)
-
-	p.done = true
-	if p.InConn != nil {
-		p.InConn.closed = true
+	for !p.done {
+		p.ProcFun(p)
+		p.done = true // fudge
 	}
-	if p.OutConn != nil {
-		p.OutConn.mtx.Lock()
-		p.OutConn.UpStrmCnt--
-		if p.OutConn.UpStrmCnt == 0 {
-			p.OutConn.closed = true
+
+	//p.done = true
+	for _, v := range p.inPorts {
+		v.Conn.Close()
+	}
+
+	for _, v := range p.outPorts {
+		v.Conn.mtx.Lock()
+		v.Conn.UpStrmCnt--
+		if v.Conn.UpStrmCnt == 0 {
+			v.Conn.closed = true
 		}
-		p.OutConn.mtx.Unlock()
+		v.Conn.mtx.Unlock()
 	}
 
 	if p.ownedPkts > 0 {

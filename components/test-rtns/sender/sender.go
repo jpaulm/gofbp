@@ -9,12 +9,18 @@ import (
 
 var Name string = "Sender"
 
+var opt *core.OutPort
+
+func OpenPorts(p *core.Process) {
+	opt = p.OpenOutPort("OUT")
+}
+
 func Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
 	var pkt *core.Packet
 	for i := 0; i < 15; i++ {
 		pkt = p.Create("IP - # " + strconv.Itoa(i) + " (" + p.Name + ")")
-		p.Send(p.OutConn, pkt)
+		p.Send(opt.Conn, pkt)
 	}
 	fmt.Println(p.Name + " ended")
 }

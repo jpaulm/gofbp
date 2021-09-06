@@ -9,21 +9,14 @@ import (
 func main() {
 	var net *core.Network = core.NewNetwork("test_net")
 
-	proc := net.NewProc("Sender", sender.Execute)
-	//proc.Name = "Sender"
+	proc1 := net.NewProc("Sender", sender.Execute, sender.OpenPorts)
 
-	proc1a := net.NewProc("Sender2", sender.Execute)
-	//proc1a.Name = "Sender2"
+	proc1a := net.NewProc("Sender2", sender.Execute, sender.OpenPorts)
 
-	proc.OutConn = net.NewConnection(6)
+	proc2 := net.NewProc("Receiver", receiver.Execute, receiver.OpenPorts)
 
-	proc2 := net.NewProc("Receiver", receiver.Execute) // Note different import key!
-	//proc2.Name = "Receiver"
-
-	proc2.InConn = proc.OutConn
-	proc1a.OutConn = proc.OutConn // 2 outputs feeding 1 input (legal in FBP)
-
-	proc.OutConn.UpStrmCnt = 2
+	net.Connect(proc1, "OUT", proc2, "IN", 6)
+	net.Connect(proc1a, "OUT", proc2, "IN", 6)
 
 	net.Run()
 }

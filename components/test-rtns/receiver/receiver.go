@@ -9,11 +9,19 @@ import (
 
 var Name string = "Receiver"
 
+var ipt *core.InPort
+
+func OpenPorts(p *core.Process) {
+	ipt = p.OpenInPort("IN")
+}
+
 func Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
+
 	for {
 
-		var pkt = p.Receive(p.InConn)
+		//var pkt = p.Receive(p.InConn)
+		var pkt = p.Receive(ipt.Conn)
 		if pkt == nil {
 			break
 		}

@@ -66,3 +66,9 @@ func (p *Process) Receive(c *Connection) *Packet {
 	c.condNE.L.Unlock()
 	return pkt
 }
+
+func (c *Connection) Close() {
+	c.mtx.Lock()
+	c.closed = true
+	c.mtx.Unlock()
+}
