@@ -7,6 +7,7 @@ import (
 	"github.com/jpaulm/gofbp/core"
 )
 
+
 type Component struct {
 	out *core.OutPort
 }
@@ -14,6 +15,7 @@ type Component struct {
 func New() *Component {
 	return &Component{}
 }
+
 
 func (comp *Component) OpenPorts(p *core.Process) {
 	comp.out = p.OpenOutPort("OUT")
