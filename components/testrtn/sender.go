@@ -11,10 +11,6 @@ type Sender struct {
 	opt *core.OutPort
 }
 
-func NewSender() *Sender {
-	return &Sender{}
-}
-
 func (sender *Sender) OpenPorts(p *core.Process) {
 	sender.opt = p.OpenOutPort("OUT")
 }

@@ -10,10 +10,6 @@ type Receiver struct {
 	ipt *core.InPort
 }
 
-func NewReceiver() *Receiver {
-	return &Receiver{}
-}
-
 func (comp *Receiver) OpenPorts(p *core.Process) {
 	comp.ipt = p.OpenInPort("IN")
 }

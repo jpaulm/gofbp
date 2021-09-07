@@ -8,11 +8,11 @@ import (
 func main() {
 	var net *core.Network = core.NewNetwork("test_net")
 
-	proc1 := net.NewProc("Sender", testrtn.NewSender())
+	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
-	proc1a := net.NewProc("Sender2", testrtn.NewSender())
+	proc1a := net.NewProc("Sender2", &testrtn.Sender{})
 
-	proc2 := net.NewProc("Receiver", testrtn.NewReceiver())
+	proc2 := net.NewProc("Receiver", &testrtn.Receiver{})
 
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
 	net.Connect(proc1a, "OUT", proc2, "IN", 6)
