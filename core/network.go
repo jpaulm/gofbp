@@ -5,12 +5,6 @@ import (
 	"sync"
 )
 
-/********
-
-  Going to give up on Lists - I suspect a bug in the Golang driver
-
-***********/
-
 type Component interface {
 	OpenPorts(*Process)
 	Execute(*Process)
@@ -101,7 +95,9 @@ func (n *Network) Run() {
 		wg.Add(1)
 		go func() { // Process goroutine
 			defer wg.Done()
+			//if len(proc.inPorts) == 0 {
 			proc.Run(n)
+			//}
 		}()
 	}
 }

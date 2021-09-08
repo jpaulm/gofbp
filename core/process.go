@@ -7,13 +7,15 @@ package core
 type Process struct {
 	Name string
 	//procs   map[string]Process
-	Network   *Network
-	inPorts   map[string]*InPort
-	outPorts  map[string]*OutPort
-	logFile   string
-	component Component
-	ownedPkts int
-	done      bool
+	Network    *Network
+	inPorts    map[string]*InPort
+	outPorts   map[string]*OutPort
+	logFile    string
+	component  Component
+	ownedPkts  int
+	done       bool
+	allDrained bool
+	hasData    bool
 }
 
 func (p *Process) OpenInPort(s string) *InPort {
@@ -25,16 +27,42 @@ func (p *Process) OpenOutPort(s string) *OutPort {
 }
 
 func (p *Process) Run(net *Network) {
+
 	p.component.OpenPorts(p)
 
 	for !p.done {
-		p.component.Execute(p)
-		p.done = true // fudge
-	}
+		p.hasData = false
+		p.allDrained = true
+		for _, v := range p.inPorts {
+			v.Conn.mtx.Lock()
+			if !v.Conn.IsEmpty() {
+				p.hasData = true
+			}
+			if !v.Conn.closed {
+				p.allDrained = false
+			}
+			v.Conn.mtx.Unlock()
+		}
 
-	//p.done = true
+		if len(p.inPorts) == 0 || !p.allDrained {
+
+			p.component.Execute(p) // activate component Execute logic
+
+			if p.ownedPkts > 0 {
+				panic(p.Name + "deactivated without disposing of all owned packets")
+			}
+		}
+		if p.allDrained {
+			break
+		}
+	}
+	p.done = true
 	for _, v := range p.inPorts {
-		v.Conn.Close()
+		v.Conn.mtx.Lock()
+		if !(v.Conn.closed && !v.Conn.IsEmpty()) {
+			p.done = false
+		}
+		v.Conn.mtx.Unlock()
 	}
 
 	for _, v := range p.outPorts {
@@ -46,9 +74,6 @@ func (p *Process) Run(net *Network) {
 		v.Conn.mtx.Unlock()
 	}
 
-	if p.ownedPkts > 0 {
-		panic(p.Name + "deactivated without disposing of all owned packets")
-	}
 }
 
 func (p *Process) Create(s string) *Packet {

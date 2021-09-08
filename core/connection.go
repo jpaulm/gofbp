@@ -30,7 +30,7 @@ func (p *Process) Send(c *Connection, pkt *Packet) bool {
 	//s := v.String()
 	//fmt.Println(p.Name + " Sending " + s)
 	fmt.Println(p.Name, "Sending", pkt.Contents)
-	for (c.ir == c.is) && (c.pktArray[c.is] != nil) { // connection is full
+	for c.IsFull() { // connection is full
 		c.condNF.Wait()
 	}
 	fmt.Println(p.Name+" Sent ", pkt.Contents)
@@ -47,7 +47,7 @@ func (p *Process) Receive(c *Connection) *Packet {
 
 	c.condNE.L.Lock()
 	fmt.Println(p.Name + " Receiving ")
-	if (c.ir == c.is) && (c.pktArray[c.is] == nil) { // connection is empty
+	if c.IsEmpty() { // connection is empty
 		if c.closed {
 			c.condNF.Broadcast()
 			c.condNE.L.Unlock()
@@ -72,4 +72,12 @@ func (c *Connection) Close() {
 	c.mtx.Lock()
 	c.closed = true
 	c.mtx.Unlock()
+}
+
+func (c *Connection) IsEmpty() bool {
+	return c.ir == c.is && c.pktArray[c.is] == nil
+}
+
+func (c *Connection) IsFull() bool {
+	return c.ir == c.is && c.pktArray[c.is] != nil
 }
