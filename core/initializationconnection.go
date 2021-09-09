@@ -1,10 +1,5 @@
 package core
 
-import (
-	"fmt"
-	"reflect"
-)
-
 // https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
 
 type InitializationConnection struct {
@@ -13,29 +8,37 @@ type InitializationConnection struct {
 	fullName string
 }
 
-func (p *Process) Receive(c *Connection) *Packet {
+func (c *InitializationConnection) Lock()          { /* TODO */ }
+func (c *InitializationConnection) Unlock()        { /* TODO */ }
+func (c *InitializationConnection) IsEmpty() bool  { /* TODO */ return true }
+func (c *InitializationConnection) IsClosed() bool { /* TODO */ return true }
 
-	c.condNE.L.Lock()
-	fmt.Println(p.Name + " Receiving ")
-	if c.IsEmpty() { // connection is empty
-		if c.closed {
-			c.condNF.Broadcast()
-			c.condNE.L.Unlock()
-			return nil
+func (c *InitializationConnection) receive(p *Process) *Packet {
+	/* TODO */
+
+	/*
+		c.condNE.L.Lock()
+		fmt.Println(p.Name + " Receiving ")
+		if c.IsEmpty() { // connection is empty
+			if c.closed {
+				c.condNF.Broadcast()
+				c.condNE.L.Unlock()
+				return nil
+			}
+			c.condNE.Wait()
 		}
-		c.condNE.Wait()
-	}
-	pkt := c.pktArray[c.ir]
-	c.pktArray[c.ir] = nil
-	v := reflect.ValueOf(pkt.Contents) // display contents - assume string
-	s := v.String()
-	fmt.Println(p.Name + " Received " + s)
-	c.ir = (c.ir + 1) % len(c.pktArray)
-	pkt.owner = p
-	p.ownedPkts++
-	c.condNF.Broadcast()
-	c.condNE.L.Unlock()
-	return pkt
+		pkt := c.pktArray[c.ir]
+		c.pktArray[c.ir] = nil
+		v := reflect.ValueOf(pkt.Contents) // display contents - assume string
+		s := v.String()
+		fmt.Println(p.Name + " Received " + s)
+		c.ir = (c.ir + 1) % len(c.pktArray)
+		pkt.owner = p
+		p.ownedPkts++
+		c.condNF.Broadcast()
+		c.condNE.L.Unlock()
+	*/
+	return nil
 }
 
 /*

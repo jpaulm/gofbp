@@ -7,7 +7,7 @@ import (
 )
 
 type Receiver struct {
-	conn *core.Connection
+	conn core.Conn
 }
 
 func (comp *Receiver) OpenPorts(p *core.Process) {

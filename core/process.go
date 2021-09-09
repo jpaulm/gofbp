@@ -7,7 +7,7 @@ package core
 type Process struct {
 	Name       string
 	Network    *Network
-	inPorts    map[string]*Conn
+	inPorts    map[string]Conn
 	outPorts   map[string]*OutPort
 	logFile    string
 	component  Component
@@ -18,7 +18,7 @@ type Process struct {
 }
 
 //func (p *Process) OpenInPort(s string) *InPort {
-func (p *Process) OpenInPort(s string) *Conn {
+func (p *Process) OpenInPort(s string) Conn {
 	return p.inPorts[s]
 }
 
@@ -26,26 +26,32 @@ func (p *Process) OpenOutPort(s string) *OutPort {
 	return p.outPorts[s]
 }
 
-func (p *Process) Run(net *Network) {
+func (p *Process) Send(c *Connection, pkt *Packet) bool {
+	return c.send(p, pkt)
+}
 
+func (p *Process) Receive(c Conn) *Packet {
+	return c.receive(p)
+}
+
+func (p *Process) Run(net *Network) {
 	p.component.OpenPorts(p)
 
 	for !p.done {
 		p.hasData = false
 		p.allDrained = true
 		for _, v := range p.inPorts {
-			v.(*Connection).mtx.Lock()
+			v.Lock()
 			if !v.IsEmpty() {
 				p.hasData = true
 			}
-			if !v.closed {
+			if !v.IsClosed() {
 				p.allDrained = false
 			}
-			v.mtx.Unlock()
+			v.Unlock()
 		}
 
 		if len(p.inPorts) == 0 || !p.allDrained {
-
 			p.component.Execute(p) // activate component Execute logic
 
 			if p.ownedPkts > 0 {
@@ -58,11 +64,11 @@ func (p *Process) Run(net *Network) {
 	}
 	p.done = true
 	for _, v := range p.inPorts {
-		v.mtx.Lock()
-		if !(v.closed && !v.IsEmpty()) {
+		v.Lock()
+		if !(v.IsClosed() && !v.IsEmpty()) {
 			p.done = false
 		}
-		v.mtx.Unlock()
+		v.Unlock()
 	}
 
 	for _, v := range p.outPorts {

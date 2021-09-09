@@ -1,7 +1,11 @@
 package core
 
 type Conn interface {
-	Receive() *Packet {
-		if reflect.TypeOf
-	}
+	receive(p *Process) *Packet
+
+	Lock()
+	Unlock()
+
+	IsEmpty() bool
+	IsClosed() bool
 }

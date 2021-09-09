@@ -21,7 +21,7 @@ type Connection struct {
 	fullName  string
 }
 
-func (p *Process) Send(c *Connection, pkt *Packet) bool {
+func (c *Connection) send(p *Process, pkt *Packet) bool {
 	if pkt.owner != p {
 		panic("Sending packet not owned by this process")
 	}
@@ -40,8 +40,7 @@ func (p *Process) Send(c *Connection, pkt *Packet) bool {
 	return true
 }
 
-func (p *Process) Receive(c *Connection) *Packet {
-
+func (c *Connection) receive(p *Process) *Packet {
 	c.condNE.L.Lock()
 	fmt.Println(p.Name + " Receiving ")
 	if c.IsEmpty() { // connection is empty
@@ -75,6 +74,13 @@ func (c *Connection) IsEmpty() bool {
 	return c.ir == c.is && c.pktArray[c.is] == nil
 }
 
+func (c *Connection) IsClosed() bool {
+	return c.closed
+}
+
 func (c *Connection) IsFull() bool {
 	return c.ir == c.is && c.pktArray[c.is] != nil
 }
+
+func (c *Connection) Lock()   { c.mtx.Lock() }
+func (c *Connection) Unlock() { c.mtx.Unlock() }

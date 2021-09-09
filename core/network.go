@@ -40,14 +40,13 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	n.procList = append(n.procList, proc)
 	n.procs[nm] = proc
 
-	proc.inPorts = make(map[string]*Conn)
+	proc.inPorts = make(map[string]Conn)
 	proc.outPorts = make(map[string]*OutPort)
 
 	return proc
 }
 
 func (n *Network) NewConnection(cap int) *Connection {
-
 	conn := &Connection{
 		network: n,
 	}
@@ -69,14 +68,19 @@ func (n *Network) NewInitializationConnection() *InitializationConnection {
 }
 
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
-
-	var conn *Conn = p2.inPorts[in]
-	if conn == nil {
-		var conn2 = conn.(*Connection)
-		conn.(*Connection) = n.NewConnection(cap)
-		p2.inPorts[in] = conn
+	var conn *Connection
+	anyConn := p2.inPorts[in]
+	if anyConn == nil {
+		conn = n.NewConnection(cap)
 		conn.portName = in
 		conn.fullName = p2.Name + "." + in
+		p2.inPorts[in] = conn
+	} else {
+		var ok bool
+		conn, ok = anyConn.(*Connection)
+		if !ok {
+			panic(fmt.Sprintf("existing connection of type %T", anyConn))
+		}
 	}
 
 	opt := p1.outPorts[out]
