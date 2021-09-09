@@ -11,7 +11,7 @@ type Receiver struct {
 }
 
 func (comp *Receiver) OpenPorts(p *core.Process) {
-	comp.conn = p.OpenInPort("IN")
+	comp.conn = p.OpenInPort("IN").(*Connection)
 }
 
 func (comp *Receiver) Execute(p *core.Process) {

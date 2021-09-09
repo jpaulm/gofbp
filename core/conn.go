@@ -1,5 +1,7 @@
 package core
 
 type Conn interface {
-	Receive() *Packet
+	Receive() *Packet {
+		if reflect.TypeOf
+	}
 }
