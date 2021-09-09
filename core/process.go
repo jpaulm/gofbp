@@ -41,14 +41,12 @@ func (p *Process) Run(net *Network) {
 		p.hasData = false
 		p.allDrained = true
 		for _, v := range p.inPorts {
-			v.Lock()
 			if !v.IsEmpty() {
 				p.hasData = true
 			}
 			if !v.IsClosed() {
 				p.allDrained = false
 			}
-			v.Unlock()
 		}
 
 		if len(p.inPorts) == 0 || !p.allDrained {
@@ -62,22 +60,16 @@ func (p *Process) Run(net *Network) {
 			break
 		}
 	}
-	p.done = true
+
+	p.done = p.hasData && p.allDrained
 	for _, v := range p.inPorts {
-		v.Lock()
 		if !(v.IsClosed() && !v.IsEmpty()) {
 			p.done = false
 		}
-		v.Unlock()
 	}
 
 	for _, v := range p.outPorts {
-		v.Conn.mtx.Lock()
-		v.Conn.UpStrmCnt--
-		if v.Conn.UpStrmCnt == 0 {
-			v.Conn.closed = true
-		}
-		v.Conn.mtx.Unlock()
+		v.Conn.decUpstream()
 	}
 
 }

@@ -59,7 +59,6 @@ func (n *Network) NewConnection(cap int) *Connection {
 }
 
 func (n *Network) NewInitializationConnection() *InitializationConnection {
-
 	conn := &InitializationConnection{
 		network: n,
 	}
@@ -91,7 +90,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	p1.outPorts[out] = opt
 	opt.name = out
 	opt.Conn = conn
-	opt.Conn.UpStrmCnt++
+	conn.incUpstream()
 }
 
 func (n *Network) Initialize(initValue string, p2 *Process, in string) {

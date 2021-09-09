@@ -15,7 +15,7 @@ type Connection struct {
 	condNE    *sync.Cond
 	condNF    *sync.Cond
 	closed    bool
-	UpStrmCnt int
+	upStrmCnt int
 	portName  string
 	fullName  string
 }
@@ -42,7 +42,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 func (c *Connection) receive(p *Process) *Packet {
 	c.condNE.L.Lock()
 	fmt.Println(p.Name, "Receiving")
-	if c.IsEmpty() { // connection is empty
+	if c.isEmpty() { // connection is empty
 		if c.closed {
 			c.condNF.Broadcast()
 			c.condNE.L.Unlock()
@@ -61,23 +61,51 @@ func (c *Connection) receive(p *Process) *Packet {
 	return pkt
 }
 
+func (c *Connection) incUpstream() {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	c.upStrmCnt++
+}
+
+func (c *Connection) decUpstream() {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	c.upStrmCnt--
+	if c.upStrmCnt == 0 {
+		c.closed = true
+	}
+}
+
 func (c *Connection) Close() {
 	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
 	c.closed = true
-	c.mtx.Unlock()
 }
 
 func (c *Connection) IsEmpty() bool {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	return c.isEmpty()
+}
+
+func (c *Connection) isEmpty() bool {
 	return c.ir == c.is && c.pktArray[c.is] == nil
 }
 
 func (c *Connection) IsClosed() bool {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
 	return c.closed
 }
 
 func (c *Connection) IsFull() bool {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
 	return c.ir == c.is && c.pktArray[c.is] != nil
 }
-
-func (c *Connection) Lock()   { c.mtx.Lock() }
-func (c *Connection) Unlock() { c.mtx.Unlock() }
