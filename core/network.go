@@ -40,7 +40,7 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	n.procList = append(n.procList, proc)
 	n.procs[nm] = proc
 
-	proc.inPorts = make(map[string]*Connection)
+	proc.inPorts = make(map[string]*Conn)
 	proc.outPorts = make(map[string]*OutPort)
 
 	return proc
@@ -59,14 +59,21 @@ func (n *Network) NewConnection(cap int) *Connection {
 	return conn
 }
 
+func (n *Network) NewInitializationConnection() *InitializationConnection {
+
+	conn := &InitializationConnection{
+		network: n,
+	}
+
+	return conn
+}
+
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
 
-	conn := p2.inPorts[in]
+	var conn *Conn = p2.inPorts[in]
 	if conn == nil {
-		//ipt = new(InPort)
-		//ipt.Name = in
-		//p2.inPorts[in] = ipt
-		conn = n.NewConnection(cap)
+		var conn2 = conn.(*Connection)
+		conn.(*Connection) = n.NewConnection(cap)
 		p2.inPorts[in] = conn
 		conn.portName = in
 		conn.fullName = p2.Name + "." + in
@@ -81,6 +88,21 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	opt.name = out
 	opt.Conn = conn
 	opt.Conn.UpStrmCnt++
+}
+
+func (n *Network) Initialize(initValue string, p2 *Process, in string) {
+
+	//conn := p2.inPorts[in]
+	//if conn == nil {
+	//ipt = new(InPort)
+	//ipt.Name = in
+	//p2.inPorts[in] = ipt
+	conn := n.NewInitializationConnection()
+	p2.inPorts[in] = conn
+	conn.portName = in
+	conn.fullName = p2.Name + "." + in
+	//}
+
 }
 
 func (n *Network) Run() {

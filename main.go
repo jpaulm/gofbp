@@ -14,6 +14,8 @@ func main() {
 
 	proc2 := net.NewProc("Receiver", &testrtn.Receiver{})
 
+	net.Initialize("15", proc1, "COUNT")
+	net.Initialize("10", proc1a, "COUNT")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
 	net.Connect(proc1a, "OUT", proc2, "IN", 6)
 
