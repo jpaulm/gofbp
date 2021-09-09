@@ -13,7 +13,7 @@ type InitializationConnection struct {
 	fullName string
 }
 
-func (p *Process) ICReceive(c *Connection) *Packet {
+func (p *Process) Receive(c *Connection) *Packet {
 
 	c.condNE.L.Lock()
 	fmt.Println(p.Name + " Receiving ")
