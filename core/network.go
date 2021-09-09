@@ -40,7 +40,7 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	n.procList = append(n.procList, proc)
 	n.procs[nm] = proc
 
-	proc.inPorts = make(map[string]*InPort)
+	proc.inPorts = make(map[string]*Connection)
 	proc.outPorts = make(map[string]*OutPort)
 
 	return proc
@@ -61,12 +61,15 @@ func (n *Network) NewConnection(cap int) *Connection {
 
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
 
-	ipt := p2.inPorts[in]
-	if ipt == nil {
-		ipt = new(InPort)
-		ipt.Name = in
-		p2.inPorts[in] = ipt
-		ipt.Conn = n.NewConnection(cap)
+	conn := p2.inPorts[in]
+	if conn == nil {
+		//ipt = new(InPort)
+		//ipt.Name = in
+		//p2.inPorts[in] = ipt
+		conn = n.NewConnection(cap)
+		p2.inPorts[in] = conn
+		conn.portName = in
+		conn.fullName = p2.Name + "." + in
 	}
 
 	opt := p1.outPorts[out]
@@ -76,7 +79,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	opt = new(OutPort)
 	p1.outPorts[out] = opt
 	opt.name = out
-	opt.Conn = ipt.Conn
+	opt.Conn = conn
 	opt.Conn.UpStrmCnt++
 }
 

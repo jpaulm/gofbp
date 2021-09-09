@@ -7,8 +7,9 @@ package core
 type Process struct {
 	Name string
 	//procs   map[string]Process
-	Network    *Network
-	inPorts    map[string]*InPort
+	Network *Network
+	//inPorts    map[string]*InPort
+	inPorts    map[string]*Connection
 	outPorts   map[string]*OutPort
 	logFile    string
 	component  Component
@@ -18,7 +19,8 @@ type Process struct {
 	hasData    bool
 }
 
-func (p *Process) OpenInPort(s string) *InPort {
+//func (p *Process) OpenInPort(s string) *InPort {
+func (p *Process) OpenInPort(s string) *Connection {
 	return p.inPorts[s]
 }
 
@@ -34,14 +36,14 @@ func (p *Process) Run(net *Network) {
 		p.hasData = false
 		p.allDrained = true
 		for _, v := range p.inPorts {
-			v.Conn.mtx.Lock()
-			if !v.Conn.IsEmpty() {
+			v.mtx.Lock()
+			if !v.IsEmpty() {
 				p.hasData = true
 			}
-			if !v.Conn.closed {
+			if !v.closed {
 				p.allDrained = false
 			}
-			v.Conn.mtx.Unlock()
+			v.mtx.Unlock()
 		}
 
 		if len(p.inPorts) == 0 || !p.allDrained {
@@ -58,11 +60,11 @@ func (p *Process) Run(net *Network) {
 	}
 	p.done = true
 	for _, v := range p.inPorts {
-		v.Conn.mtx.Lock()
-		if !(v.Conn.closed && !v.Conn.IsEmpty()) {
+		v.mtx.Lock()
+		if !(v.closed && !v.IsEmpty()) {
 			p.done = false
 		}
-		v.Conn.mtx.Unlock()
+		v.mtx.Unlock()
 	}
 
 	for _, v := range p.outPorts {

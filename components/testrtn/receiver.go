@@ -7,18 +7,18 @@ import (
 )
 
 type Receiver struct {
-	ipt *core.InPort
+	conn *core.Connection
 }
 
 func (comp *Receiver) OpenPorts(p *core.Process) {
-	comp.ipt = p.OpenInPort("IN")
+	comp.conn = p.OpenInPort("IN")
 }
 
 func (comp *Receiver) Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
 
 	for {
-		var pkt = p.Receive(comp.ipt.Conn)
+		var pkt = p.Receive(comp.conn)
 		if pkt == nil {
 			break
 		}

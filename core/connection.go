@@ -19,6 +19,8 @@ type Connection struct {
 	condNF    *sync.Cond
 	closed    bool
 	UpStrmCnt int
+	portName  string
+	fullName  string
 }
 
 func (p *Process) Send(c *Connection, pkt *Packet) bool {
