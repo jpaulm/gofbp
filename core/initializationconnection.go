@@ -29,9 +29,7 @@ func (c *InitializationConnection) receive(p *Process) *Packet {
 		}
 		pkt := c.pktArray[c.ir]
 		c.pktArray[c.ir] = nil
-		v := reflect.ValueOf(pkt.Contents) // display contents - assume string
-		s := v.String()
-		fmt.Println(p.Name + " Received " + s)
+		fmt.Println(p.Name, "Received", pkt.Contents)
 		c.ir = (c.ir + 1) % len(c.pktArray)
 		pkt.owner = p
 		p.ownedPkts++

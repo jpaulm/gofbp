@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"reflect"
 	"sync"
 )
 
@@ -30,7 +29,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	for c.IsFull() { // connection is full
 		c.condNF.Wait()
 	}
-	fmt.Println(p.Name+" Sent ", pkt.Contents)
+	fmt.Println(p.Name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
 	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
@@ -42,7 +41,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 
 func (c *Connection) receive(p *Process) *Packet {
 	c.condNE.L.Lock()
-	fmt.Println(p.Name + " Receiving ")
+	fmt.Println(p.Name, "Receiving")
 	if c.IsEmpty() { // connection is empty
 		if c.closed {
 			c.condNF.Broadcast()
@@ -53,9 +52,7 @@ func (c *Connection) receive(p *Process) *Packet {
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
-	v := reflect.ValueOf(pkt.Contents) // display contents - assume string
-	s := v.String()
-	fmt.Println(p.Name + " Received " + s)
+	fmt.Println(p.Name, "Received", pkt.Contents)
 	c.ir = (c.ir + 1) % len(c.pktArray)
 	pkt.owner = p
 	p.ownedPkts++
