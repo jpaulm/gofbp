@@ -41,11 +41,11 @@ func (p *Process) Run(net *Network) {
 		p.hasData = false
 		p.allDrained = true
 		for _, v := range p.inPorts {
-			if !v.IsEmpty() {
-				p.hasData = true
-			}
 			if !v.IsClosed() {
 				p.allDrained = false
+			}
+			if !v.IsEmpty() {
+				p.hasData = true
 			}
 		}
 
