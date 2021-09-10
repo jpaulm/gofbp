@@ -47,21 +47,16 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 }
 
 func (n *Network) NewConnection(cap int) *Connection {
-	conn := &Connection{
+	return &Connection{
 		network: n,
+		packets: make(chan *Packet, cap),
 	}
-	conn.condNE.L = &conn.mtx
-	conn.condNF.L = &conn.mtx
-	conn.pktArray = make([]*Packet, cap, cap)
-	return conn
 }
 
 func (n *Network) NewInitializationConnection() *InitializationConnection {
-	conn := &InitializationConnection{
+	return &InitializationConnection{
 		network: n,
 	}
-
-	return conn
 }
 
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
