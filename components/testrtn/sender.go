@@ -8,7 +8,7 @@ import (
 )
 
 type Sender struct {
-	ipt *core.Conn
+	ipt core.Conn
 	opt *core.OutPort
 }
 
@@ -19,7 +19,7 @@ func (sender *Sender) OpenPorts(p *core.Process) {
 
 func (sender *Sender) Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
-	icpkt := p.Receive(sender.ipt).(*InitializationConnection)
+	icpkt := p.Receive(sender.ipt)
 	j, _ := strconv.Atoi(icpkt.Contents.(string))
 	p.Discard(icpkt)
 	var pkt *core.Packet
