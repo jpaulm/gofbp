@@ -102,6 +102,7 @@ func (n *Network) Initialize(initValue string, p2 *Process, in string) {
 	p2.inPorts[in] = conn
 	conn.portName = in
 	conn.fullName = p2.Name + "." + in
+	conn.value = initValue
 	//}
 
 }

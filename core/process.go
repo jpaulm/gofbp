@@ -1,9 +1,5 @@
 package core
 
-//import (
-//	"sync"
-//)
-
 type Process struct {
 	Name       string
 	Network    *Network
@@ -59,6 +55,12 @@ func (p *Process) Run(net *Network) {
 		if p.allDrained {
 			break
 		}
+		for _, v := range p.inPorts {
+			if v.GetType() == "InitializationConnection" {
+				v.ResetClosed()
+			}
+		}
+
 	}
 
 	p.done = p.hasData && p.allDrained

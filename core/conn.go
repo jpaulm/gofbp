@@ -5,4 +5,6 @@ type Conn interface {
 
 	IsEmpty() bool
 	IsClosed() bool
+	ResetClosed()
+	GetType() string
 }

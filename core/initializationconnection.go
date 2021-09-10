@@ -1,56 +1,44 @@
 package core
 
-// https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
+import "fmt"
 
 type InitializationConnection struct {
 	network  *Network
 	portName string
 	fullName string
+	closed   bool
+	value    string
 }
 
-func (c *InitializationConnection) Lock()          { /* TODO */ }
-func (c *InitializationConnection) Unlock()        { /* TODO */ }
-func (c *InitializationConnection) IsEmpty() bool  { /* TODO */ return true }
-func (c *InitializationConnection) IsClosed() bool { /* TODO */ return true }
+func (c *InitializationConnection) Lock()         { /* TODO */ }
+func (c *InitializationConnection) Unlock()       { /* TODO */ }
+func (c *InitializationConnection) IsEmpty() bool { /* TODO */ return true }
+
+//func (c *InitializationConnection) IsClosed() bool { /* TODO */ return true }
 
 func (c *InitializationConnection) receive(p *Process) *Packet {
-	/* TODO */
 
-	/*
-		c.condNE.L.Lock()
-		fmt.Println(p.Name + " Receiving ")
-		if c.IsEmpty() { // connection is empty
-			if c.closed {
-				c.condNF.Broadcast()
-				c.condNE.L.Unlock()
-				return nil
-			}
-			c.condNE.Wait()
-		}
-		pkt := c.pktArray[c.ir]
-		c.pktArray[c.ir] = nil
-		fmt.Println(p.Name, "Received", pkt.Contents)
-		c.ir = (c.ir + 1) % len(c.pktArray)
-		pkt.owner = p
-		p.ownedPkts++
-		c.condNF.Broadcast()
-		c.condNE.L.Unlock()
-	*/
-	return nil
-}
-
-/*
-func (c *Connection) Close() {
-	c.mtx.Lock()
+	if c.closed {
+		return nil
+	}
+	fmt.Println(p.Name, "Receiving IIP")
+	var pkt *Packet = new(Packet)
+	pkt.Contents = c.value
+	pkt.owner = p
+	p.ownedPkts++
 	c.closed = true
-	c.mtx.Unlock()
+	fmt.Println(p.Name, "Received IIP: ", pkt.Contents)
+	return pkt
 }
 
-func (c *Connection) IsEmpty() bool {
-	return c.ir == c.is && c.pktArray[c.is] == nil
+func (c *InitializationConnection) IsClosed() bool {
+	return c.closed
 }
 
-func (c *Connection) IsFull() bool {
-	return c.ir == c.is && c.pktArray[c.is] != nil
+func (c *InitializationConnection) ResetClosed() {
+	c.closed = false
 }
-*/
+
+func (c *InitializationConnection) GetType() string {
+	return "InitializationConnection"
+}

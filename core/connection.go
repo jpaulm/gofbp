@@ -107,3 +107,9 @@ func (c *Connection) IsFull() bool {
 
 	return c.ir == c.is && c.pktArray[c.is] != nil
 }
+
+func (c *Connection) ResetClosed() {}
+
+func (c *Connection) GetType() string {
+	return "Connection"
+}
