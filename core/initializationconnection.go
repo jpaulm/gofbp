@@ -10,11 +10,15 @@ type InitializationConnection struct {
 	value    string
 }
 
-func (c *InitializationConnection) Lock()         { /* TODO */ }
-func (c *InitializationConnection) Unlock()       { /* TODO */ }
-func (c *InitializationConnection) IsEmpty() bool { /* TODO */ return true }
+func (c *InitializationConnection) isDrained() bool {
+	// initialization connection can be considered always as drained,
+	// since it won't produce new values.
+	return true
+}
 
-//func (c *InitializationConnection) IsClosed() bool { /* TODO */ return true }
+func (c *InitializationConnection) IsEmpty() bool {
+	return !c.closed
+}
 
 func (c *InitializationConnection) receive(p *Process) *Packet {
 
@@ -35,7 +39,7 @@ func (c *InitializationConnection) IsClosed() bool {
 	return c.closed
 }
 
-func (c *InitializationConnection) ResetClosed() {
+func (c *InitializationConnection) resetForNextExecution() {
 	c.closed = false
 }
 

@@ -12,8 +12,8 @@ type Connection struct {
 	pktArray  []*Packet
 	is, ir    int // send index and receive index
 	mtx       sync.Mutex
-	condNE    *sync.Cond
-	condNF    *sync.Cond
+	condNE    sync.Cond
+	condNF    sync.Cond
 	closed    bool
 	upStrmCnt int
 	portName  string
@@ -26,7 +26,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	}
 	c.condNF.L.Lock()
 	fmt.Println(p.Name, "Sending", pkt.Contents)
-	for c.IsFull() { // connection is full
+	for c.isFull() { // connection is full
 		c.condNF.Wait()
 	}
 	fmt.Println(p.Name, "Sent", pkt.Contents)
@@ -85,6 +85,13 @@ func (c *Connection) Close() {
 	c.closed = true
 }
 
+func (c *Connection) isDrained() bool {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	return c.isEmpty() && c.closed
+}
+
 func (c *Connection) IsEmpty() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
@@ -103,14 +110,11 @@ func (c *Connection) IsClosed() bool {
 	return c.closed
 }
 
-func (c *Connection) IsFull() bool {
-	//c.mtx.Lock()
-	//defer c.mtx.Unlock()
-
+func (c *Connection) isFull() bool {
 	return c.ir == c.is && c.pktArray[c.is] != nil
 }
 
-func (c *Connection) ResetClosed() {}
+func (c *Connection) resetForNextExecution() {}
 
 func (c *Connection) GetType() string {
 	return "Connection"
