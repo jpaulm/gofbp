@@ -10,11 +10,7 @@ type InitializationConnection struct {
 	value    string
 }
 
-func (c *InitializationConnection) Lock()         { /* TODO */ }
-func (c *InitializationConnection) Unlock()       { /* TODO */ }
 func (c *InitializationConnection) IsEmpty() bool { /* TODO */ return true }
-
-//func (c *InitializationConnection) IsClosed() bool { /* TODO */ return true }
 
 func (c *InitializationConnection) receive(p *Process) *Packet {
 
