@@ -85,6 +85,13 @@ func (c *Connection) Close() {
 	c.closed = true
 }
 
+func (c *Connection) isDrained() bool {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	return c.isEmpty() && c.closed
+}
+
 func (c *Connection) IsEmpty() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
@@ -107,7 +114,7 @@ func (c *Connection) isFull() bool {
 	return c.ir == c.is && c.pktArray[c.is] != nil
 }
 
-func (c *Connection) ResetClosed() {}
+func (c *Connection) resetForNextExecution() {}
 
 func (c *Connection) GetType() string {
 	return "Connection"
