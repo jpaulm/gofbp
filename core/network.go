@@ -50,8 +50,10 @@ func (n *Network) NewConnection(cap int) *Connection {
 	conn := &Connection{
 		network: n,
 	}
-	conn.condNE.L = &conn.mtx
-	conn.condNF.L = &conn.mtx
+	//conn.condNE.L = &conn.mtx
+	//conn.condNF.L = &conn.mtx
+	conn.condNE = sync.NewCond(&conn.mtx)
+	conn.condNF = sync.NewCond(&conn.mtx)
 	conn.pktArray = make([]*Packet, cap, cap)
 	return conn
 }

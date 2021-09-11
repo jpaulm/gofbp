@@ -1,16 +1,17 @@
 package core
 
 type Process struct {
-	Name       string
-	Network    *Network
-	inPorts    map[string]Conn
-	outPorts   map[string]*OutPort
-	logFile    string
-	component  Component
-	ownedPkts  int
-	done       bool
-	allDrained bool
-	hasData    bool
+	Name         string
+	Network      *Network
+	inPorts      map[string]Conn
+	outPorts     map[string]*OutPort
+	logFile      string
+	component    Component
+	ownedPkts    int
+	done         bool
+	allDrained   bool
+	hasData      bool
+	selfStarting bool
 }
 
 //func (p *Process) OpenInPort(s string) *InPort {
@@ -33,6 +34,13 @@ func (p *Process) Receive(c Conn) *Packet {
 func (p *Process) Run(net *Network) {
 	p.component.OpenPorts(p)
 
+	p.selfStarting = true
+	for _, v := range p.inPorts {
+		if v.GetType() == "Connection" {
+			p.selfStarting = false
+		}
+	}
+
 	for !p.done {
 		p.hasData = false
 		p.allDrained = true
@@ -45,14 +53,15 @@ func (p *Process) Run(net *Network) {
 			}
 		}
 
-		if len(p.inPorts) == 0 || !p.allDrained {
-			p.component.Execute(p) // activate component Execute logic
+		//if /*p.selfStarting ||*/ !p.allDrained {
+		p.component.Execute(p) // activate component Execute logic
 
-			if p.ownedPkts > 0 {
-				panic(p.Name + "deactivated without disposing of all owned packets")
-			}
+		if p.ownedPkts > 0 {
+			panic(p.Name + "deactivated without disposing of all owned packets")
 		}
-		if p.allDrained {
+		//}
+
+		if p.allDrained || p.selfStarting {
 			break
 		}
 		for _, v := range p.inPorts {

@@ -5,13 +5,15 @@ import (
 	"sync"
 )
 
+// Based on https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
+
 type Connection struct {
 	network   *Network
 	pktArray  []*Packet
 	is, ir    int // send index and receive index
 	mtx       sync.Mutex
-	condNE    sync.Cond
-	condNF    sync.Cond
+	condNE    *sync.Cond
+	condNF    *sync.Cond
 	closed    bool
 	upStrmCnt int
 	portName  string
@@ -102,8 +104,8 @@ func (c *Connection) IsClosed() bool {
 }
 
 func (c *Connection) IsFull() bool {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	//c.mtx.Lock()
+	//defer c.mtx.Unlock()
 
 	return c.ir == c.is && c.pktArray[c.is] != nil
 }
