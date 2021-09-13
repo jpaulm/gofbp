@@ -8,4 +8,7 @@ type Conn interface {
 	IsEmpty() bool
 	IsClosed() bool
 	GetType() string
+
+	GetArray() []*Connection
+	SetArray(*Connection, int)
 }

@@ -46,3 +46,9 @@ func (c *InitializationConnection) resetForNextExecution() {
 func (c *InitializationConnection) GetType() string {
 	return "InitializationConnection"
 }
+
+func (c *InitializationConnection) GetArray() []*Connection {
+	return nil
+}
+
+func (c *InitializationConnection) SetArray(c2 *Connection, i int) {}

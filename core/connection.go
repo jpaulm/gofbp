@@ -18,6 +18,7 @@ type Connection struct {
 	upStrmCnt int
 	portName  string
 	fullName  string
+	array     []*Connection
 }
 
 func (c *Connection) send(p *Process, pkt *Packet) bool {
@@ -118,4 +119,12 @@ func (c *Connection) resetForNextExecution() {}
 
 func (c *Connection) GetType() string {
 	return "Connection"
+}
+
+func (c *Connection) GetArray() []*Connection {
+	return c.array
+}
+
+func (c *Connection) SetArray(c2 *Connection, i int) {
+	c.array[i] = c2
 }

@@ -2,6 +2,9 @@ package core
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -53,6 +56,7 @@ func (n *Network) NewConnection(cap int) *Connection {
 	conn.condNE.L = &conn.mtx
 	conn.condNF.L = &conn.mtx
 	conn.pktArray = make([]*Packet, cap, cap)
+	//conn.array = make([]*Conn)
 	return conn
 }
 
@@ -80,6 +84,17 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		}
 	}
 
+	if strings.Index(in, "[") > -1 {
+		if conn.array == nil {
+			conn.array = make([]*Connection, 0)
+		}
+		match := ""
+		re := regexp.MustCompile(`\[(*\d)\]`)
+		match = re.FindStringSubmatch(in)[0]
+		i, _ := strconv.Atoi(match)
+		conn = conn.array[i]
+	}
+
 	opt := p1.outPorts[out]
 	if opt != nil {
 		panic("Outport port already connected")
@@ -93,17 +108,12 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 
 func (n *Network) Initialize(initValue string, p2 *Process, in string) {
 
-	//conn := p2.inPorts[in]
-	//if conn == nil {
-	//ipt = new(InPort)
-	//ipt.Name = in
-	//p2.inPorts[in] = ipt
 	conn := n.NewInitializationConnection()
 	p2.inPorts[in] = conn
 	conn.portName = in
 	conn.fullName = p2.Name + "." + in
+
 	conn.value = initValue
-	//}
 
 }
 
