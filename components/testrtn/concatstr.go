@@ -7,7 +7,7 @@ import (
 )
 
 type ConcatStr struct {
-	ipt *core.InArrayPort
+	ipt *core.Conn
 	opt *core.OutPort
 }
 

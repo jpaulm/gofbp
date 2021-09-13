@@ -11,12 +11,11 @@ type Process struct {
 	done      bool
 }
 
-//func (p *Process) OpenInPort(s string) *InPort {
 func (p *Process) OpenInPort(s string) Conn {
 	return p.inPorts[s]
 }
 
-func (p *Process) OpenInArrayPort(s string) *InArrayPort {
+func (p *Process) OpenInArrayPort(s string) Conn {
 	return p.inPorts[s]
 }
 

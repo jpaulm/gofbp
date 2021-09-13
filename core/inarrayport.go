@@ -1,5 +1,7 @@
 package core
 
+var _ Conn = (*InArrayPort)(nil)
+
 type InArrayPort struct {
 	network *Network
 
@@ -8,6 +10,8 @@ type InArrayPort struct {
 	array    []*Connection
 	closed   bool
 }
+
+var _ Conn = (*InArrayPort)(nil)
 
 func (c *InArrayPort) isDrained() bool {
 	return false
