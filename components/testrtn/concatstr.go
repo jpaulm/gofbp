@@ -7,26 +7,22 @@ import (
 )
 
 type ConcatStr struct {
-	ipt core.Conn
+	ipt *core.InArrayPort
 	opt *core.OutPort
 }
 
 func (concatstr *ConcatStr) OpenPorts(p *core.Process) {
-	concatstr.ipt = p.OpenInPort("IN")
+	concatstr.ipt = p.OpenInArrayPort("IN")
 	concatstr.opt = p.OpenOutPort("OUT")
 }
 
 func (concatstr *ConcatStr) Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
 
-	if concatstr.ipt.GetArray() == nil {
-		panic("ConcatStr IN port should be array")
-	}
-
-	for i := 0; i < len(concatstr.ipt.GetArray()); i++ {
+	for i := 0; i < len(concatstr.ipt.array); i++ {
 
 		for {
-			var pkt = p.Receive(concatstr.ipt.GetArray()[i])
+			var pkt = p.Receive(concatstr.ipt.array[i])
 			if pkt == nil {
 				break
 			}

@@ -16,11 +16,9 @@ func (p *Process) OpenInPort(s string) Conn {
 	return p.inPorts[s]
 }
 
-//func (p *Process) OpenInPortArray(s string) *Connection {
-//	conn := p.inPorts[s]
-//	conn.array = []*Connection
-//	return conn
-//}
+func (p *Process) OpenInArrayPort(s string) *InArrayPort {
+	return p.inPorts[s]
+}
 
 func (p *Process) OpenOutPort(s string) *OutPort {
 	return p.outPorts[s]
