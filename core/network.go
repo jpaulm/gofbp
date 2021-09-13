@@ -69,30 +69,38 @@ func (n *Network) NewInitializationConnection() *InitializationConnection {
 }
 
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
+	var anyConn *Connection
+	if strings.Index(in, "[") > -1 {
+		anyConn := p2.inPorts[in]
+		if anyConn == nil {
+			var array = make([]*Connection, 0)
+			p2.inPorts[in] = array
+		}
+
+		match := ""
+		re := regexp.MustCompile(`\[(\d*)\]`)
+		match = re.FindStringSubmatch(in)[0]
+
+		i, err := strconv.Atoi(match)
+		if err != nil {
+			panic(fmt.Sprintf("Invalid index: ", match))
+		}
+		anyConn = array[i]
+	}
 	var conn *Connection
-	anyConn := p2.inPorts[in]
+	//anyConn := p2.inPorts[in]
 	if anyConn == nil {
 		conn = n.NewConnection(cap)
 		conn.portName = in
 		conn.fullName = p2.Name + "." + in
 		p2.inPorts[in] = conn
 	} else {
-		var ok bool
-		conn, ok = anyConn.(*Connection)
-		if !ok {
-			panic(fmt.Sprintf("existing connection of type %T", anyConn))
-		}
-	}
-
-	if strings.Index(in, "[") > -1 {
-		if conn.array == nil {
-			conn.array = make([]*Connection, 0)
-		}
-		match := ""
-		re := regexp.MustCompile(`\[(*\d)\]`)
-		match = re.FindStringSubmatch(in)[0]
-		i, _ := strconv.Atoi(match)
-		conn = conn.array[i]
+		//var ok bool
+		//conn, ok = anyConn.(*Connection)
+		//if !ok {
+		//	panic(fmt.Sprintf("existing connection of type %T", anyConn))
+		//}
+		conn = anyConn
 	}
 
 	opt := p1.outPorts[out]
