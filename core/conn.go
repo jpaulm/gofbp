@@ -9,6 +9,6 @@ type Conn interface {
 	IsClosed() bool
 	GetType() string
 
-	GetArray() []*Connection
-	SetArray(*Connection, int)
+	ArrayIndex(i int) Conn
+	ArrayLength() int
 }

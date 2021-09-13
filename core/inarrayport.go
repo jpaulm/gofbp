@@ -7,11 +7,9 @@ type InArrayPort struct {
 
 	portName string
 	fullName string
-	array    []*Connection
+	array    []Conn
 	closed   bool
 }
-
-var _ Conn = (*InArrayPort)(nil)
 
 func (c *InArrayPort) isDrained() bool {
 	return false
@@ -35,8 +33,10 @@ func (c *InArrayPort) GetType() string {
 	return "InArrayPort"
 }
 
-func (c *InArrayPort) GetArray() []*Connection {
-	return nil
+func (c *InArrayPort) ArrayIndex(i int) Conn {
+	return c.array[i]
 }
 
-func (c *InArrayPort) SetArray(c2 *Connection, i int) {}
+func (c *InArrayPort) ArrayLength() int {
+	return len(c.array)
+}

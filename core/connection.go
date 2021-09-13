@@ -121,10 +121,10 @@ func (c *Connection) GetType() string {
 	return "Connection"
 }
 
-func (c *Connection) GetArray() []*Connection {
-	return c.array
+func (c *Connection) ArrayIndex(i int) Conn {
+	return nil
 }
 
-func (c *Connection) SetArray(c2 *Connection, i int) {
-	c.array[i] = c2
+func (c *Connection) ArrayLength() int {
+	return 0
 }

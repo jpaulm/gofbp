@@ -68,7 +68,7 @@ func (n *Network) NewInitializationConnection() *InitializationConnection {
 	return conn
 }
 
-func (n *Network) NewInArrayPort() *InArrayPort {
+func (n *Network) NewInArrayPort() Conn {
 	conn := &InArrayPort{
 		network: n,
 	}
@@ -77,7 +77,8 @@ func (n *Network) NewInArrayPort() *InArrayPort {
 }
 
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
-	var anyConn *Connection
+	var anyConn Conn
+	var conn Conn
 	if strings.Index(in, "[") > -1 {
 		anyConn := p2.inPorts[in]
 		if anyConn == nil {
@@ -93,9 +94,9 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		if err != nil {
 			panic(fmt.Sprintf("Invalid index: ", match))
 		}
-		anyConn = anyConn.array[i]
+		conn = anyConn.ArrayIndex(i)
 	}
-	var conn *Connection
+
 	//anyConn := p2.inPorts[in]
 	if anyConn == nil {
 		conn = n.NewConnection(cap)

@@ -7,7 +7,7 @@ import (
 )
 
 type ConcatStr struct {
-	ipt *core.Conn
+	ipt core.Conn
 	opt *core.OutPort
 }
 
@@ -19,10 +19,10 @@ func (concatstr *ConcatStr) OpenPorts(p *core.Process) {
 func (concatstr *ConcatStr) Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
 
-	for i := 0; i < len(concatstr.ipt.array); i++ {
+	for i := 0; i < concatstr.ipt.ArrayLength(); i++ {
 
 		for {
-			var pkt = p.Receive(concatstr.ipt.array[i])
+			var pkt = p.Receive(concatstr.ipt.ArrayIndex(i))
 			if pkt == nil {
 				break
 			}
