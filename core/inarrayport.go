@@ -37,6 +37,10 @@ func (c *InArrayPort) GetArrayItem(i int) *Connection {
 	return c.array[i].(*Connection)
 }
 
+func (c *InArrayPort) SetArrayItem(c2 Conn, i int) {
+	c.array[i] = c2
+}
+
 func (c *InArrayPort) ArrayLength() int {
 	return len(c.array)
 }

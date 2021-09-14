@@ -121,9 +121,11 @@ func (c *Connection) GetType() string {
 	return "Connection"
 }
 
-func (c *Connection) GetArrayItem(i int) Conn {
+func (c *Connection) GetArrayItem(i int) *Connection {
 	return nil
 }
+
+func (c *Connection) SetArrayItem(c2 Conn, i int) {}
 
 func (c *Connection) ArrayLength() int {
 	return 0

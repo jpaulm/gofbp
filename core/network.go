@@ -78,9 +78,11 @@ func (n *Network) NewInArrayPort() *InArrayPort {
 
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
 
-	var conn Conn
+	var i int
+	var connxn Conn
+	var anyConn Conn
 	if strings.Index(in, "[") > -1 {
-		anyConn := p2.inPorts[in]
+		anyConn = p2.inPorts[in]
 		if anyConn == nil {
 			anyConn = n.NewInArrayPort()
 			p2.inPorts[in] = anyConn
@@ -94,24 +96,21 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		if err != nil {
 			panic(fmt.Sprintf("Invalid index: ", match))
 		}
-		conn = anyConn.GetArrayItem(i)
+		connxn = anyConn.GetArrayItem(i)
 	} else {
-		conn = p2.inPorts[in]
+		connxn = p2.inPorts[in]
 	}
 
-	if conn == nil {
+	if connxn == nil {
 		connxn := n.NewConnection(cap)
 		connxn.portName = in
 		connxn.fullName = p2.Name + "." + in
-		p2.inPorts[in] = connxn
-	} //else {
-	//var ok bool
-	//conn, ok = anyConn.(*Connection)
-	//if !ok {
-	//	panic(fmt.Sprintf("existing connection of type %T", anyConn))
-	//}
-	//conn = anyConn
-	//}
+		if anyConn == nil {
+			p2.inPorts[in] = connxn
+		} else {
+			anyConn.SetArrayItem(connxn, i)
+		}
+	}
 
 	opt := p1.outPorts[out]
 	if opt != nil {
@@ -120,8 +119,9 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	opt = new(OutPort)
 	p1.outPorts[out] = opt
 	opt.name = out
-	opt.Conn = connxn
-	connxn.incUpstream()
+	conn := connxn.(*Connection)
+	opt.Conn = conn
+	conn.incUpstream()
 }
 
 func (n *Network) Initialize(initValue string, p2 *Process, in string) {

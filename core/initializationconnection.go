@@ -47,9 +47,11 @@ func (c *InitializationConnection) GetType() string {
 	return "InitializationConnection"
 }
 
-func (c *InitializationConnection) GetArrayItem(i int) Conn {
+func (c *InitializationConnection) GetArrayItem(i int) *Connection {
 	return nil
 }
+
+func (c *InitializationConnection) SetArrayItem(c2 Conn, i int) {}
 
 func (c *InitializationConnection) ArrayLength() int {
 	return 0
