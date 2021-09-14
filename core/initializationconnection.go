@@ -51,7 +51,7 @@ func (c *InitializationConnection) GetArrayItem(i int) *Connection {
 	return nil
 }
 
-func (c *InitializationConnection) SetArrayItem(c2 Conn, i int) {}
+func (c *InitializationConnection) SetArrayItem(c2 *Connection, i int) {}
 
 func (c *InitializationConnection) ArrayLength() int {
 	return 0

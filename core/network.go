@@ -72,7 +72,7 @@ func (n *Network) NewInArrayPort() *InArrayPort {
 	conn := &InArrayPort{
 		network: n,
 	}
-
+	conn.array = make([]*Connection, 20) // set to 20 for now...
 	return conn
 }
 
@@ -90,7 +90,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 
 		match := ""
 		re := regexp.MustCompile(`\[(\d*)\]`)
-		match = re.FindStringSubmatch(in)[0]
+		match = re.FindStringSubmatch(in)[1]
 
 		i, err := strconv.Atoi(match)
 		if err != nil {

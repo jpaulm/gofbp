@@ -7,7 +7,7 @@ type InArrayPort struct {
 
 	portName string
 	fullName string
-	array    []Conn
+	array    []*Connection
 	closed   bool
 }
 
@@ -34,10 +34,10 @@ func (c *InArrayPort) GetType() string {
 }
 
 func (c *InArrayPort) GetArrayItem(i int) *Connection {
-	return c.array[i].(*Connection)
+	return c.array[i]
 }
 
-func (c *InArrayPort) SetArrayItem(c2 Conn, i int) {
+func (c *InArrayPort) SetArrayItem(c2 *Connection, i int) {
 	c.array[i] = c2
 }
 

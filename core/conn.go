@@ -10,6 +10,6 @@ type Conn interface {
 	GetType() string
 
 	GetArrayItem(i int) *Connection
-	SetArrayItem(c Conn, i int)
+	SetArrayItem(c *Connection, i int)
 	ArrayLength() int
 }
