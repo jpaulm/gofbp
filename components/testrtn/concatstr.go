@@ -22,7 +22,7 @@ func (concatstr *ConcatStr) Execute(p *core.Process) {
 	for i := 0; i < concatstr.ipt.ArrayLength(); i++ {
 
 		for {
-			var pkt = p.Receive(concatstr.ipt.ArrayIndex(i))
+			var pkt = p.Receive(concatstr.ipt.GetArrayItem(i))
 			if pkt == nil {
 				break
 			}

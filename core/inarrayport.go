@@ -1,6 +1,6 @@
 package core
 
-var _ Conn = (*InArrayPort)(nil)
+//var _ Conn = (*InArrayPort)(nil)
 
 type InArrayPort struct {
 	network *Network
@@ -33,8 +33,8 @@ func (c *InArrayPort) GetType() string {
 	return "InArrayPort"
 }
 
-func (c *InArrayPort) ArrayIndex(i int) Conn {
-	return c.array[i]
+func (c *InArrayPort) GetArrayItem(i int) *Connection {
+	return c.array[i].(*Connection)
 }
 
 func (c *InArrayPort) ArrayLength() int {

@@ -121,7 +121,7 @@ func (c *Connection) GetType() string {
 	return "Connection"
 }
 
-func (c *Connection) ArrayIndex(i int) Conn {
+func (c *Connection) GetArrayItem(i int) Conn {
 	return nil
 }
 

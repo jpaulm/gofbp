@@ -9,6 +9,6 @@ type Conn interface {
 	IsClosed() bool
 	GetType() string
 
-	ArrayIndex(i int) Conn
+	GetArrayItem(i int) Conn
 	ArrayLength() int
 }
