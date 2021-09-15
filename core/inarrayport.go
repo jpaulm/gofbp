@@ -34,10 +34,18 @@ func (c *InArrayPort) GetType() string {
 }
 
 func (c *InArrayPort) GetArrayItem(i int) *Connection {
+	if i >= len(c.array) {
+		return nil
+	}
 	return c.array[i]
 }
 
 func (c *InArrayPort) SetArrayItem(c2 *Connection, i int) {
+	if i >= len(c.array) {
+		// add to .array to fit c2
+		increaseBy := make([]*Connection, i-len(c.array)+1)
+		c.array = append(c.array, increaseBy...)
+	}
 	c.array[i] = c2
 }
 
