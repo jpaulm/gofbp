@@ -110,7 +110,14 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 			}
 		}
 	} else {
-		connxn = p2.inPorts[in].(*Connection)
+		if p2.inPorts[in] == nil {
+			connxn = n.NewConnection(cap)
+			connxn.portName = in
+			connxn.fullName = p2.Name + "." + in
+			p2.inPorts[in] = connxn
+		} else {
+			connxn = p2.inPorts[in].(*Connection)
+		}
 	}
 	opt := p1.outPorts[out]
 	if opt != nil {
