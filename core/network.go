@@ -78,40 +78,41 @@ func (n *Network) NewInArrayPort() *InArrayPort {
 
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
 
-	var i int
-	var connxn Conn
+	//var i int
+	var connxn *Connection
 	var anyConn Conn
 	if strings.Index(in, "[") > -1 {
-		anyConn = p2.inPorts[in]
+		//match := ""
+		re := regexp.MustCompile(`(.*)\[(\d*)\]`)
+		parts := re.FindStringSubmatch(in)
+		root := parts[1]
+		indx := parts[2]
+		i, err := strconv.Atoi(indx)
+		if err != nil {
+			panic(fmt.Sprintf("Invalid index: ", indx))
+		}
+		anyConn = p2.inPorts[root]
 		if anyConn == nil {
 			anyConn = n.NewInArrayPort()
-			p2.inPorts[in] = anyConn
+			p2.inPorts[root] = anyConn
 		}
 
-		match := ""
-		re := regexp.MustCompile(`\[(\d*)\]`)
-		match = re.FindStringSubmatch(in)[1]
-
-		i, err := strconv.Atoi(match)
-		if err != nil {
-			panic(fmt.Sprintf("Invalid index: ", match))
-		}
 		connxn = anyConn.GetArrayItem(i)
-	} else {
-		connxn = p2.inPorts[in]
-	}
 
-	if connxn == nil {
-		connxn := n.NewConnection(cap)
-		connxn.portName = in
-		connxn.fullName = p2.Name + "." + in
-		if anyConn == nil {
-			p2.inPorts[in] = connxn
-		} else {
-			anyConn.SetArrayItem(connxn, i)
+		if connxn == nil {
+			connxn := n.NewConnection(cap)
+			connxn.portName = in
+			connxn.fullName = p2.Name + "." + in
+			if anyConn == nil {
+				p2.inPorts[in] = connxn
+			} else {
+				anyConn.SetArrayItem(connxn, i)
+			}
 		}
-	}
 
+	} else {
+		connxn = p2.inPorts[in].(*Connection)
+	}
 	opt := p1.outPorts[out]
 	if opt != nil {
 		panic("Outport port already connected")
@@ -119,9 +120,9 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	opt = new(OutPort)
 	p1.outPorts[out] = opt
 	opt.name = out
-	conn := connxn.(*Connection)
-	opt.Conn = conn
-	conn.incUpstream()
+	//conn := connxn
+	opt.Conn = connxn
+	connxn.incUpstream()
 }
 
 func (n *Network) Initialize(initValue string, p2 *Process, in string) {
