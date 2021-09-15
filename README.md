@@ -2,4 +2,6 @@
 
 This repo is for early testing of GoFBP ideas and trial balloons! 
 
-Some new functions sketched in - not to be used yet!
+New test case working using ConcatStr.
+
+Way too much logging - have to make that optional - use a JSON file...?
