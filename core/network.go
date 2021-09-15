@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -77,48 +76,40 @@ func (n *Network) NewInArrayPort() *InArrayPort {
 }
 
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
+	inPort := parsePort(in)
 
-	//var i int
 	var connxn *Connection
 	var anyConn Conn
-	if strings.Index(in, "[") > -1 {
-		//match := ""
-		re := regexp.MustCompile(`(.*)\[(\d*)\]`)
-		parts := re.FindStringSubmatch(in)
-		root := parts[1]
-		indx := parts[2]
-		i, err := strconv.Atoi(indx)
-		if err != nil {
-			panic(fmt.Sprintf("Invalid index %q", indx))
-		}
-		anyConn = p2.inPorts[root]
+	if inPort.indexed {
+		anyConn = p2.inPorts[inPort.name]
 		if anyConn == nil {
 			anyConn = n.NewInArrayPort()
-			p2.inPorts[root] = anyConn
+			p2.inPorts[inPort.name] = anyConn
 		}
 
-		connxn = anyConn.GetArrayItem(i)
+		connxn = anyConn.GetArrayItem(inPort.index)
 
 		if connxn == nil {
 			connxn = n.NewConnection(cap)
-			connxn.portName = in
-			connxn.fullName = p2.Name + "." + in
+			connxn.portName = inPort.name
+			connxn.fullName = p2.Name + "." + inPort.name
 			if anyConn == nil {
-				p2.inPorts[in] = connxn
+				p2.inPorts[inPort.name] = connxn
 			} else {
-				anyConn.SetArrayItem(connxn, i)
+				anyConn.SetArrayItem(connxn, inPort.index)
 			}
 		}
 	} else {
-		if p2.inPorts[in] == nil {
+		if p2.inPorts[inPort.name] == nil {
 			connxn = n.NewConnection(cap)
-			connxn.portName = in
-			connxn.fullName = p2.Name + "." + in
-			p2.inPorts[in] = connxn
+			connxn.portName = inPort.name
+			connxn.fullName = p2.Name + "." + inPort.name
+			p2.inPorts[inPort.name] = connxn
 		} else {
-			connxn = p2.inPorts[in].(*Connection)
+			connxn = p2.inPorts[inPort.name].(*Connection)
 		}
 	}
+
 	opt := p1.outPorts[out]
 	if opt != nil {
 		panic("Outport port already connected")
@@ -129,6 +120,29 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	//conn := connxn
 	opt.Conn = connxn
 	connxn.incUpstream()
+}
+
+type portDefinition struct {
+	name    string
+	index   int
+	indexed bool
+}
+
+var rePort = regexp.MustCompile(`^(.+)\[(\d+)\]$`)
+
+func parsePort(in string) portDefinition {
+	matches := rePort.FindStringSubmatch(in)
+	if len(matches) == 0 {
+		return portDefinition{name: in}
+	}
+	root, indexStr := matches[1], matches[2]
+
+	index, err := strconv.Atoi(indexStr)
+	if err != nil {
+		panic(fmt.Sprintf("Invalid index in %q", in))
+	}
+
+	return portDefinition{name: root, index: index, indexed: true}
 }
 
 func (n *Network) Initialize(initValue string, p2 *Process, in string) {
