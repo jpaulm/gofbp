@@ -100,7 +100,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		connxn = anyConn.GetArrayItem(i)
 
 		if connxn == nil {
-			connxn := n.NewConnection(cap)
+			connxn = n.NewConnection(cap)
 			connxn.portName = in
 			connxn.fullName = p2.Name + "." + in
 			if anyConn == nil {
@@ -109,7 +109,6 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 				anyConn.SetArrayItem(connxn, i)
 			}
 		}
-
 	} else {
 		connxn = p2.inPorts[in].(*Connection)
 	}
