@@ -12,7 +12,12 @@ type InArrayPort struct {
 }
 
 func (c *InArrayPort) isDrained() bool {
-	return false
+	for _, v := range c.array {
+		if !v.isDrained() {
+			return false
+		}
+	}
+	return true
 }
 
 func (c *InArrayPort) IsEmpty() bool {

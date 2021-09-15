@@ -55,7 +55,6 @@ func (n *Network) NewConnection(cap int) *Connection {
 	conn.condNE.L = &conn.mtx
 	conn.condNF.L = &conn.mtx
 	conn.pktArray = make([]*Packet, cap, cap)
-	//conn.array = make([]*Conn)
 	return conn
 }
 
