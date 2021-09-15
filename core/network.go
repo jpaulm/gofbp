@@ -72,7 +72,7 @@ func (n *Network) NewInArrayPort() *InArrayPort {
 	conn := &InArrayPort{
 		network: n,
 	}
-	conn.array = make([]*Connection, 20) // set to 20 for now...
+
 	return conn
 }
 
@@ -89,7 +89,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		indx := parts[2]
 		i, err := strconv.Atoi(indx)
 		if err != nil {
-			panic(fmt.Sprintf("Invalid index: ", indx))
+			panic(fmt.Sprintf("Invalid index %q", indx))
 		}
 		anyConn = p2.inPorts[root]
 		if anyConn == nil {
