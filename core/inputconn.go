@@ -1,6 +1,6 @@
 package core
 
-type Conn interface {
+type InputConn interface {
 	receive(p *Process) *Packet
 	isDrained() bool
 	resetForNextExecution()

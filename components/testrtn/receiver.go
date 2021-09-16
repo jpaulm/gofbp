@@ -10,15 +10,15 @@ type Receiver struct {
 	conn core.Conn
 }
 
-func (comp *Receiver) OpenPorts(p *core.Process) {
-	comp.conn = p.OpenInPort("IN")
+func (receiver *Receiver) OpenPorts(p *core.Process) {
+	receiver.conn = p.OpenInPort("IN")
 }
 
-func (comp *Receiver) Execute(p *core.Process) {
+func (receiver *Receiver) Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
 
 	for {
-		var pkt = p.Receive(comp.conn)
+		var pkt = p.Receive(receiver.conn)
 		if pkt == nil {
 			break
 		}
@@ -27,4 +27,8 @@ func (comp *Receiver) Execute(p *core.Process) {
 	}
 
 	fmt.Println(p.Name + " ended")
+}
+
+func (receiver *Receiver) GetMustRun() bool {
+	return true
 }

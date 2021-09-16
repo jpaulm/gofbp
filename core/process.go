@@ -3,15 +3,15 @@ package core
 type Process struct {
 	Name      string
 	Network   *Network
-	inPorts   map[string]Conn
-	outPorts  map[string]*OutPort
+	inPorts   map[string]InputConn
+	outPorts  map[string]OutputConn
 	logFile   string
 	component Component
 	ownedPkts int
 	done      bool
 }
 
-func (p *Process) OpenInPort(s string) Conn {
+func (p *Process) OpenInPort(s string) InputConn {
 	return p.inPorts[s]
 }
 
@@ -19,7 +19,7 @@ func (p *Process) OpenInPort(s string) Conn {
 //	return p.inPorts[s]
 //}
 
-func (p *Process) OpenOutPort(s string) *OutPort {
+func (p *Process) OpenOutPort(s string) OutputConn {
 	return p.outPorts[s]
 }
 
@@ -27,7 +27,7 @@ func (p *Process) Send(c *Connection, pkt *Packet) bool {
 	return c.send(p, pkt)
 }
 
-func (p *Process) Receive(c Conn) *Packet {
+func (p *Process) Receive(c InputConn) *Packet {
 	return c.receive(p)
 }
 
@@ -45,7 +45,9 @@ func (p *Process) Run(net *Network) {
 	p.component.OpenPorts(p)
 
 	for !p.done {
+		//if p.component.GetMustRun(p) {
 		p.component.Execute(p) // activate component Execute logic
+		//}
 
 		if p.ownedPkts > 0 {
 			panic(p.Name + "deactivated without disposing of all owned packets")
@@ -62,7 +64,14 @@ func (p *Process) Run(net *Network) {
 	}
 
 	for _, v := range p.outPorts {
-		v.Conn.decUpstream()
+		if v.GetType() == "OutPort" {
+			v.(*OutPort).Conn.decUpstream()
+		} else {
+			for _, w := range v.(*OutArrayPort).array {
+				w.decUpstream()
+			}
+		}
+
 	}
 }
 

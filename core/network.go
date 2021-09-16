@@ -10,6 +10,7 @@ import (
 type Component interface {
 	OpenPorts(*Process)
 	Execute(*Process)
+	GetMustRun(*Process) bool
 }
 
 type Network struct {
@@ -42,8 +43,8 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	n.procList = append(n.procList, proc)
 	n.procs[nm] = proc
 
-	proc.inPorts = make(map[string]Conn)
-	proc.outPorts = make(map[string]*OutPort)
+	proc.inPorts = make(map[string]InputConn)
+	proc.outPorts = make(map[string]OutputConn)
 
 	return proc
 }
@@ -74,28 +75,39 @@ func (n *Network) NewInArrayPort() *InArrayPort {
 	return conn
 }
 
+func (n *Network) NewOutArrayPort() *OutArrayPort {
+	conn := &OutArrayPort{
+		network: n,
+	}
+
+	return conn
+}
+
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
+
 	inPort := parsePort(in)
+	outPort := parsePort(out)
 
 	var connxn *Connection
-	var anyConn Conn
+	var anyInConn InputConn
+
 	if inPort.indexed {
-		anyConn = p2.inPorts[inPort.name]
-		if anyConn == nil {
-			anyConn = n.NewInArrayPort()
-			p2.inPorts[inPort.name] = anyConn
+		anyInConn = p2.inPorts[inPort.name]
+		if anyInConn == nil {
+			anyInConn = n.NewInArrayPort()
+			p2.inPorts[inPort.name] = anyInConn
 		}
 
-		connxn = anyConn.GetArrayItem(inPort.index)
+		connxn = anyInConn.GetArrayItem(inPort.index)
 
 		if connxn == nil {
 			connxn = n.NewConnection(cap)
 			connxn.portName = inPort.name
 			connxn.fullName = p2.Name + "." + inPort.name
-			if anyConn == nil {
+			if anyInConn == nil {
 				p2.inPorts[inPort.name] = connxn
 			} else {
-				anyConn.SetArrayItem(connxn, inPort.index)
+				anyInConn.SetArrayItem(connxn, inPort.index)
 			}
 		}
 	} else {
@@ -109,15 +121,65 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		}
 	}
 
-	opt := p1.outPorts[out]
-	if opt != nil {
-		panic("Outport port already connected")
+	// connxn built; input port array built if necessary
+
+	var anyOutConn OutputConn
+
+	if outPort.indexed {
+		anyOutConn = p1.outPorts[outPort.name]
+		if anyOutConn == nil {
+			anyOutConn = n.NewOutArrayPort()
+			p1.outPorts[outPort.name] = anyOutConn
+		}
+		opt := new(OutPort)
+		p1.outPorts[out] = anyOutConn
+		opt.name = out
+		anyOutConn.SetArrayItem(opt, outPort.index)
+		opt.Conn = connxn
+		//connxn = anyOutConn.GetArrayItem(outPort.index)
+
+		/*
+			if connxn == nil {
+				connxn = n.NewConnection(cap)
+				connxn.portName = inPort.name
+				connxn.fullName = p2.Name + "." + inPort.name
+				if anyOutConn == nil {
+					p2.inPorts[inPort.name] = connxn
+				} else {
+					anyOutConn.SetArrayItem(connxn, inPort.index)
+				}
+			}
+		*/
+	} else {
+		//var opt OutputConn
+		opt := new(OutPort)
+		p1.outPorts[out] = opt
+		opt.name = out
+		opt.Conn = connxn
+
+		/*
+			if p1.outPorts[outPort.name] == nil {
+				connxn = n.NewConnection(cap)
+				connxn.portName = outPort.name
+				connxn.fullName = p1.Name + "." + outPort.name
+				p1.outPorts[outPort.name] = connxn
+			} else {
+				connxn = p1.outPorts[outPort.name].(*Connection)
+			}
+		*/
 	}
-	opt = new(OutPort)
-	p1.outPorts[out] = opt
-	opt.name = out
+
+	/*
+		opt := p1.outPorts[out]
+		if opt != nil {
+			panic("Outport port already connected")
+		}
+		opt = new(OutPort)
+		p1.outPorts[out] = opt
+		opt.name = out
+	*/
 	//conn := connxn
-	opt.Conn = connxn
+	//opt.Conn = connxn
 	connxn.incUpstream()
 }
 
