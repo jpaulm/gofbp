@@ -16,9 +16,9 @@ func main() {
 
 	proc2 := net.NewProc("RoundRobinSender", &testrtn.RoundRobinSender{})
 
-	proc3a := net.NewProc("Receiver", &testrtn.Receiver{})
-	proc3b := net.NewProc("Receiver", &testrtn.Receiver{})
-	proc3c := net.NewProc("Receiver", &testrtn.Receiver{})
+	proc3a := net.NewProc("Receiver1", &testrtn.Receiver{})
+	proc3b := net.NewProc("Receiver2", &testrtn.Receiver{})
+	proc3c := net.NewProc("Receiver3", &testrtn.Receiver{})
 
 	net.Initialize("15", proc1, "COUNT")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
