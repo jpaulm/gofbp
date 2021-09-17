@@ -32,7 +32,7 @@ func (rrsender *RoundRobinSender) Execute(p *core.Process) {
 
 		opt := rrsender.out.GetArrayItem(i)
 
-		p.Send(opt.Conn, pkt)
+		p.Send(opt, pkt)
 		i = (i + 1) % j
 	}
 

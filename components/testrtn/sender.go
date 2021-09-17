@@ -25,7 +25,7 @@ func (sender *Sender) Execute(p *core.Process) {
 	var pkt *core.Packet
 	for i := 0; i < j; i++ {
 		pkt = p.Create("IP - # " + strconv.Itoa(i) + " (" + p.Name + ")")
-		p.Send(sender.opt.(*core.OutPort).Conn, pkt)
+		p.Send(sender.opt.(*core.OutPort), pkt)
 	}
 	fmt.Println(p.Name + " ended")
 }

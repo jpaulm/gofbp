@@ -28,8 +28,8 @@ func (p *Process) OpenOutArrayPort(s string) OutputConn {
 	return p.outPorts[s]
 }
 
-func (p *Process) Send(c *Connection, pkt *Packet) bool {
-	return c.send(p, pkt)
+func (p *Process) Send(o *OutPort, pkt *Packet) bool {
+	return o.Conn.send(p, pkt)
 }
 
 func (p *Process) Receive(c InputConn) *Packet {
