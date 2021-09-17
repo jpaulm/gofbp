@@ -21,6 +21,8 @@ func (rrsender *RoundRobinSender) Execute(p *core.Process) {
 
 	var i = 0
 
+	j := rrsender.out.ArrayLength()
+
 	for {
 		var pkt = p.Receive(rrsender.ipt)
 		if pkt == nil {
@@ -31,7 +33,7 @@ func (rrsender *RoundRobinSender) Execute(p *core.Process) {
 		opt := rrsender.out.GetArrayItem(i)
 
 		p.Send(opt.Conn, pkt)
-		i++
+		i = (i + 1) % j
 	}
 
 	fmt.Println(p.Name + " ended")

@@ -7,12 +7,6 @@ import (
 	"sync"
 )
 
-type Component interface {
-	OpenPorts(*Process)
-	Execute(*Process)
-	//GetMustRun(*Process) bool
-}
-
 type Network struct {
 	Name     string
 	procs    map[string]*Process

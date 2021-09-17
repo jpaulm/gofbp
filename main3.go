@@ -6,7 +6,7 @@ import (
 	// "runtime"
 )
 
-func main() {
+func main3() {
 
 	// runtime.GOMAXPROCS(16)
 
