@@ -15,11 +15,15 @@ func (p *Process) OpenInPort(s string) InputConn {
 	return p.inPorts[s]
 }
 
-//func (p *Process) OpenInArrayPort(s string) Conn {
-//	return p.inPorts[s]
-//}
+func (p *Process) OpenInArrayPort(s string) InputConn {
+	return p.inPorts[s]
+}
 
-func (p *Process) OpenOutPort(s string) OutputConn {
+func (p *Process) OpenOutPort(s string) *OutPort {
+	return p.outPorts[s].(*OutPort)
+}
+
+func (p *Process) OpenOutArrayPort(s string) OutputConn {
 	return p.outPorts[s]
 }
 
@@ -68,7 +72,7 @@ func (p *Process) Run(net *Network) {
 			v.(*OutPort).Conn.decUpstream()
 		} else {
 			for _, w := range v.(*OutArrayPort).array {
-				w.decUpstream()
+				w.Conn.decUpstream()
 			}
 		}
 

@@ -8,15 +8,18 @@ import (
 
 type RoundRobinSender struct {
 	ipt core.InputConn
-	opt core.OutputConn
+	out core.OutputConn
 }
 
 func (rrsender *RoundRobinSender) OpenPorts(p *core.Process) {
 	rrsender.ipt = p.OpenInPort("IN")
+	rrsender.out = p.OpenOutArrayPort("OUT")
 }
 
 func (rrsender *RoundRobinSender) Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")
+
+	var i = 0
 
 	for {
 		var pkt = p.Receive(rrsender.ipt)
@@ -24,12 +27,16 @@ func (rrsender *RoundRobinSender) Execute(p *core.Process) {
 			break
 		}
 		fmt.Println("Output: ", pkt.Contents)
-		p.Discard(pkt)
+
+		opt := rrsender.out.GetArrayItem(i)
+
+		p.Send(opt.Conn, pkt)
+		i++
 	}
 
 	fmt.Println(p.Name + " ended")
 }
 
-func (rrsender *RoundRobinSender) GetMustRun() bool {
-	return true
-}
+//func (rrsender *RoundRobinSender) GetMustRun() bool {
+//	return true
+//}

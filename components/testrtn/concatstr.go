@@ -7,14 +7,13 @@ import (
 )
 
 type ConcatStr struct {
-	ipt core.InputConn
-	//opt     *core.OutPort
-	opt     core.OutputConn
+	ipt     core.InputConn
+	opt     *core.OutPort
 	MustRun bool
 }
 
 func (concatstr *ConcatStr) OpenPorts(p *core.Process) {
-	concatstr.ipt = p.OpenInPort("IN")
+	concatstr.ipt = p.OpenInArrayPort("IN")
 	concatstr.opt = p.OpenOutPort("OUT")
 }
 
@@ -28,7 +27,7 @@ func (concatstr *ConcatStr) Execute(p *core.Process) {
 			if conn == nil {
 				continue
 			}
-			var pkt = p.Receive(concatstr.ipt.GetArrayItem(i))
+			var pkt = p.Receive(conn)
 			if pkt == nil {
 				break
 			}
@@ -39,6 +38,6 @@ func (concatstr *ConcatStr) Execute(p *core.Process) {
 	fmt.Println(p.Name + " ended")
 }
 
-func (concatstr *ConcatStr) GetMustRun() bool {
-	return false
-}
+//func (concatstr *ConcatStr) GetMustRun() bool {
+//	return false
+//}

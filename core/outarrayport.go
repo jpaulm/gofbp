@@ -52,7 +52,6 @@ func (c *OutArrayPort) SetArrayItem(c2 *OutPort, i int) {
 		// add to .array to fit c2
 		increaseBy := make([]*OutPort, i-len(c.array)+1)
 		c.array = append(c.array, increaseBy...)
-
 	}
 	c.array[i] = c2
 }

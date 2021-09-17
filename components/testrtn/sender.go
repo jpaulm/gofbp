@@ -8,7 +8,7 @@ import (
 )
 
 type Sender struct {
-	ipt core.Conn
+	ipt core.InputConn
 	opt *core.OutPort
 }
 
@@ -30,6 +30,6 @@ func (sender *Sender) Execute(p *core.Process) {
 	fmt.Println(p.Name + " ended")
 }
 
-func (sender *Sender) GetMustRun() bool {
-	return false
-}
+//func (sender *Sender) GetMustRun() bool {
+//	return false
+//}
