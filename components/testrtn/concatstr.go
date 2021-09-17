@@ -8,7 +8,7 @@ import (
 
 type ConcatStr struct {
 	ipt     core.InputConn
-	opt     *core.OutPort
+	opt     core.OutputConn
 	MustRun bool
 }
 
@@ -32,7 +32,7 @@ func (concatstr *ConcatStr) Execute(p *core.Process) {
 				break
 			}
 			//fmt.Println("Output: ", pkt.Contents)
-			p.Send(concatstr.opt.Conn, pkt)
+			p.Send(concatstr.opt.(*core.OutPort).Conn, pkt)
 		}
 	}
 	fmt.Println(p.Name + " ended")
