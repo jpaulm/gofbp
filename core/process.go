@@ -9,6 +9,7 @@ type Process struct {
 	component Component
 	ownedPkts int
 	done      bool
+	MustRun   bool
 }
 
 func (p *Process) OpenInPort(s string) InputConn {
@@ -46,10 +47,10 @@ func (p *Process) allDrained() bool {
 }
 
 func (p *Process) Run(net *Network) {
-	p.component.OpenPorts(p)
+	p.component.Setup(p)
 
 	for !p.done {
-		//if p.component.GetMustRun(p) {
+		//if p.MustRun {
 		p.component.Execute(p) // activate component Execute logic
 		//}
 

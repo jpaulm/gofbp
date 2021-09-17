@@ -10,8 +10,9 @@ type Receiver struct {
 	ipt core.InputConn
 }
 
-func (receiver *Receiver) OpenPorts(p *core.Process) {
+func (receiver *Receiver) Setup(p *core.Process) {
 	receiver.ipt = p.OpenInPort("IN")
+	p.MustRun = true
 }
 
 func (receiver *Receiver) Execute(p *core.Process) {

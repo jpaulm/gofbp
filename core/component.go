@@ -1,7 +1,7 @@
 package core
 
 type Component interface {
-	OpenPorts(*Process)
+	Setup(*Process)
 	Execute(*Process)
 	//GetMustRun(*Process) bool
 }

@@ -12,7 +12,7 @@ type Sender struct {
 	opt core.OutputConn
 }
 
-func (sender *Sender) OpenPorts(p *core.Process) {
+func (sender *Sender) Setup(p *core.Process) {
 	sender.ipt = p.OpenInPort("COUNT")
 	sender.opt = p.OpenOutPort("OUT")
 }

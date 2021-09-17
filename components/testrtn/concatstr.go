@@ -12,7 +12,7 @@ type ConcatStr struct {
 	MustRun bool
 }
 
-func (concatstr *ConcatStr) OpenPorts(p *core.Process) {
+func (concatstr *ConcatStr) Setup(p *core.Process) {
 	concatstr.ipt = p.OpenInArrayPort("IN")
 	concatstr.opt = p.OpenOutPort("OUT")
 }

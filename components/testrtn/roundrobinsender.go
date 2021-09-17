@@ -11,7 +11,7 @@ type RoundRobinSender struct {
 	out core.OutputConn
 }
 
-func (rrsender *RoundRobinSender) OpenPorts(p *core.Process) {
+func (rrsender *RoundRobinSender) Setup(p *core.Process) {
 	rrsender.ipt = p.OpenInPort("IN")
 	rrsender.out = p.OpenOutArrayPort("OUT")
 }
