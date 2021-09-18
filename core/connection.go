@@ -79,8 +79,7 @@ func (c *Connection) decUpstream() {
 
 	c.upStrmCnt--
 	if c.upStrmCnt == 0 {
-		//c.closed = true
-		c.Close()
+		c.closed = true
 	}
 }
 
@@ -89,7 +88,7 @@ func (c *Connection) Close() {
 	defer c.mtx.Unlock()
 
 	c.closed = true
-	
+
 }
 
 func (c *Connection) isDrained() bool {
