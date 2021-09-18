@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 type InitializationConnection struct {
 	network  *Network
@@ -8,6 +11,7 @@ type InitializationConnection struct {
 	fullName string
 	closed   bool
 	value    string
+	mtx      sync.Mutex
 }
 
 func (c *InitializationConnection) isDrained() bool {
@@ -30,9 +34,18 @@ func (c *InitializationConnection) receive(p *Process) *Packet {
 	pkt.Contents = c.value
 	pkt.owner = p
 	p.ownedPkts++
-	c.closed = true
+	//c.closed = true
+	c.Close()
 	fmt.Println(p.Name, "Received IIP: ", pkt.Contents)
 	return pkt
+}
+
+func (c *InitializationConnection) Close() {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	c.closed = true
+
 }
 
 func (c *InitializationConnection) IsClosed() bool {

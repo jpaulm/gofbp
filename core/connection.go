@@ -28,7 +28,9 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	c.condNF.L.Lock()
 	fmt.Println(p.Name, "Sending", pkt.Contents)
 	for c.isFull() { // connection is full
+		p.status = suspSend
 		c.condNF.Wait()
+		p.status = active
 	}
 	fmt.Println(p.Name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
@@ -49,7 +51,9 @@ func (c *Connection) receive(p *Process) *Packet {
 			c.condNE.L.Unlock()
 			return nil
 		}
+		p.status = suspRecv
 		c.condNE.Wait()
+		p.status = active
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
@@ -75,7 +79,8 @@ func (c *Connection) decUpstream() {
 
 	c.upStrmCnt--
 	if c.upStrmCnt == 0 {
-		c.closed = true
+		//c.closed = true
+		c.Close()
 	}
 }
 
@@ -84,6 +89,7 @@ func (c *Connection) Close() {
 	defer c.mtx.Unlock()
 
 	c.closed = true
+	
 }
 
 func (c *Connection) isDrained() bool {

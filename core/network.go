@@ -7,10 +7,21 @@ import (
 	"sync"
 )
 
+type Status int
+
+const (
+	notStarted Status = iota
+	dormant
+	suspSend
+	suspRecv
+	active
+	terminated
+)
+
 type Network struct {
-	Name     string
-	procs    map[string]*Process
-	procList []*Process
+	Name  string
+	procs map[string]*Process
+	//procList []*Process
 	//driver  Process
 	logFile string
 }
@@ -34,7 +45,7 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 		component: comp,
 	}
 
-	n.procList = append(n.procList, proc)
+	//n.procList = append(n.procList, proc)
 	n.procs[nm] = proc
 
 	proc.inPorts = make(map[string]InputConn)
@@ -216,19 +227,32 @@ func (n *Network) Run() {
 	fmt.Println(n.Name + " Starting")
 
 	var wg sync.WaitGroup
-	defer wg.Wait()
+	//defer wg.Wait()
 
 	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
 	// reactivated many times during the process "run"
 
-	for _, proc := range n.procList {
+	wg.Add(len(n.procs))
+	for _, proc := range n.procs {
 		proc := proc
-		wg.Add(1)
+		//wg.Add(1)
 		go func() { // Process goroutine
 			defer wg.Done()
 			//if len(proc.inPorts) == 0 {
 			proc.Run(n)
 			//}
 		}()
+	}
+
+	wg.Wait()
+
+	for key, proc := range n.procs {
+		fmt.Println(key, " Status: ",
+			[]string{"notStarted",
+				"dormant",
+				"suspSend",
+				"suspRecv",
+				"active",
+				"terminated"}[proc.status])
 	}
 }

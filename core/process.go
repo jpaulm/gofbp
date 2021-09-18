@@ -10,7 +10,21 @@ type Process struct {
 	ownedPkts int
 	done      bool
 	MustRun   bool
+	status    Status
 }
+
+/*
+type Status int
+
+const (
+	notStarted Status = iota
+	dormant
+	suspSend
+	suspRecv
+	active
+	terminated
+)
+*/
 
 func (p *Process) OpenInPort(s string) InputConn {
 	return p.inPorts[s]
@@ -47,11 +61,14 @@ func (p *Process) allDrained() bool {
 }
 
 func (p *Process) Run(net *Network) {
+	p.status = notStarted
 	p.component.Setup(p)
 
-	for !p.done {
+	for {
 		//if p.MustRun {
+		p.status = active
 		p.component.Execute(p) // activate component Execute logic
+		p.status = dormant
 		//}
 
 		if p.ownedPkts > 0 {
@@ -76,8 +93,8 @@ func (p *Process) Run(net *Network) {
 				w.Conn.decUpstream()
 			}
 		}
-
 	}
+	p.status = terminated
 }
 
 func (p *Process) Create(s string) *Packet {
