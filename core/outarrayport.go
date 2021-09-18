@@ -47,13 +47,13 @@ func (c *OutArrayPort) GetArrayItem(i int) *OutPort {
 	return c.array[i]
 }
 
-func (c *OutArrayPort) SetArrayItem(c2 *OutPort, i int) {
-	if i >= len(c.array) {
+func (o *OutArrayPort) SetArrayItem(o2 *OutPort, i int) {
+	if i >= len(o.array) {
 		// add to .array to fit c2
-		increaseBy := make([]*OutPort, i-len(c.array)+1)
-		c.array = append(c.array, increaseBy...)
+		increaseBy := make([]*OutPort, i-len(o.array)+1)
+		o.array = append(o.array, increaseBy...)
 	}
-	c.array[i] = c2
+	o.array[i] = o2
 }
 
 func (c *OutArrayPort) ArrayLength() int {

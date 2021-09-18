@@ -91,7 +91,6 @@ func (n *Network) NewOutArrayPort() *OutArrayPort {
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
 
 	inPort := parsePort(in)
-	outPort := parsePort(out)
 
 	var connxn *Connection
 	var anyInConn InputConn
@@ -130,61 +129,29 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 
 	var anyOutConn OutputConn
 
+	outPort := parsePort(out)
+
 	if outPort.indexed {
 		anyOutConn = p1.outPorts[outPort.name]
 		if anyOutConn == nil {
 			anyOutConn = n.NewOutArrayPort()
 			p1.outPorts[outPort.name] = anyOutConn
 		}
+
 		opt := new(OutPort)
-		p1.outPorts[out] = anyOutConn
+		//p1.outPorts[out] = anyOutConn
 		opt.name = out
 		anyOutConn.SetArrayItem(opt, outPort.index)
 		opt.Conn = connxn
-		//connxn = anyOutConn.GetArrayItem(outPort.index)
 
-		/*
-			if connxn == nil {
-				connxn = n.NewConnection(cap)
-				connxn.portName = inPort.name
-				connxn.fullName = p2.Name + "." + inPort.name
-				if anyOutConn == nil {
-					p2.inPorts[inPort.name] = connxn
-				} else {
-					anyOutConn.SetArrayItem(connxn, inPort.index)
-				}
-			}
-		*/
 	} else {
 		//var opt OutputConn
 		opt := new(OutPort)
 		p1.outPorts[out] = opt
 		opt.name = out
 		opt.Conn = connxn
-
-		/*
-			if p1.outPorts[outPort.name] == nil {
-				connxn = n.NewConnection(cap)
-				connxn.portName = outPort.name
-				connxn.fullName = p1.Name + "." + outPort.name
-				p1.outPorts[outPort.name] = connxn
-			} else {
-				connxn = p1.outPorts[outPort.name].(*Connection)
-			}
-		*/
 	}
 
-	/*
-		opt := p1.outPorts[out]
-		if opt != nil {
-			panic("Outport port already connected")
-		}
-		opt = new(OutPort)
-		p1.outPorts[out] = opt
-		opt.name = out
-	*/
-	//conn := connxn
-	//opt.Conn = connxn
 	connxn.incUpstream()
 }
 
