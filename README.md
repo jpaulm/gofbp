@@ -12,4 +12,4 @@ Three test cases:
 - stream of IPs being distributed among several Receivers using RoundRobinSender - **currently there is a deadlock in this test case**
 
 
-Note: way too much logging - have to make that optional - use a JSON file...?
+Note: way too much logging - have to make that optional - use a JSON file...?  Issue raised for this...
