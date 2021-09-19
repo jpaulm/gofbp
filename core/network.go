@@ -24,6 +24,7 @@ type Network struct {
 	//procList []*Process
 	//driver  Process
 	logFile string
+	wg      sync.WaitGroup
 }
 
 func NewNetwork(name string) *Network {
@@ -108,6 +109,8 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 			connxn = n.NewConnection(cap)
 			connxn.portName = inPort.name
 			connxn.fullName = p2.Name + "." + inPort.name
+			connxn.downStrProc = p2
+			connxn.network = n
 			if anyInConn == nil {
 				p2.inPorts[inPort.name] = connxn
 			} else {
@@ -119,6 +122,8 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 			connxn = n.NewConnection(cap)
 			connxn.portName = inPort.name
 			connxn.fullName = p2.Name + "." + inPort.name
+			connxn.downStrProc = p2
+			connxn.network = n
 			p2.inPorts[inPort.name] = connxn
 		} else {
 			connxn = p2.inPorts[inPort.name].(*Connection)
@@ -204,25 +209,23 @@ func (n *Network) Run() {
 
 		proc.component.Setup(proc)
 
-		/*
-			proc.starting = true
-			if !proc.MustRun {
-				for _, conn := range proc.inPorts {
-					if conn.GetType() != "InitializationConnection" {
-						proc.starting = false
-					}
+		proc.starting = true
+		if !proc.MustRun {
+			for _, conn := range proc.inPorts {
+				if conn.GetType() != "InitializationConnection" {
+					proc.starting = false
 				}
 			}
-			if !proc.starting {
-				continue
-			}
-
-		*/
+		}
+		if !proc.starting {
+			continue
+		}
 
 		proc := proc
 		wg.Add(1)
 		go func() { // Process goroutine
 			defer wg.Done()
+
 			proc.Run(n)
 
 		}()

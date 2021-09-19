@@ -8,17 +8,18 @@ import (
 // Based on https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
 
 type Connection struct {
-	network   *Network
-	pktArray  []*Packet
-	is, ir    int // send index and receive index
-	mtx       sync.Mutex
-	condNE    sync.Cond
-	condNF    sync.Cond
-	closed    bool
-	upStrmCnt int
-	portName  string
-	fullName  string
-	array     []*Connection
+	network     *Network
+	pktArray    []*Packet
+	is, ir      int // send index and receive index
+	mtx         sync.Mutex
+	condNE      sync.Cond
+	condNF      sync.Cond
+	closed      bool
+	upStrmCnt   int
+	portName    string
+	fullName    string
+	array       []*Connection
+	downStrProc *Process
 }
 
 func (c *Connection) send(p *Process, pkt *Packet) bool {
@@ -37,6 +38,16 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
 	p.ownedPkts--
+	proc := c.downStrProc
+	if proc.status == notStarted {
+		c.network.wg.Add(1)
+		go func() { // Process goroutine
+			defer c.network.wg.Done()
+
+			proc.Run(c.network)
+
+		}()
+	}
 	c.condNE.Broadcast()
 	c.condNF.L.Unlock()
 	return true
