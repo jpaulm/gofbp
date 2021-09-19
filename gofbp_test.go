@@ -18,7 +18,7 @@ func TestMerge(t *testing.T) {
 	proc3 := net.NewProc("Receiver", &testrtn.Receiver{})
 
 	net.Initialize("15", proc1, "COUNT")
-	net.Initialize("15", proc2, "COUNT")
+	net.Initialize("10", proc2, "COUNT")
 	net.Connect(proc1, "OUT", proc3, "IN", 6)
 	net.Connect(proc2, "OUT", proc3, "IN", 6)
 

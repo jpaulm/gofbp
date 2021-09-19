@@ -45,7 +45,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 func (c *Connection) receive(p *Process) *Packet {
 	c.condNE.L.Lock()
 	fmt.Println(p.Name, "Receiving")
-	if c.isEmpty() { // connection is empty
+	for c.isEmpty() { // connection is empty
 		if c.closed {
 			c.condNF.Broadcast()
 			c.condNE.L.Unlock()
@@ -54,6 +54,11 @@ func (c *Connection) receive(p *Process) *Packet {
 		p.status = suspRecv
 		c.condNE.Wait()
 		p.status = active
+		//if c.isDrained() {
+		//	c.condNF.Broadcast()
+		//	c.condNE.L.Unlock()
+		//	return nil
+		//}
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
@@ -74,26 +79,30 @@ func (c *Connection) incUpstream() {
 }
 
 func (c *Connection) decUpstream() {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	//c.mtx.Lock()
+	//defer c.mtx.Unlock()
 
 	c.upStrmCnt--
 	if c.upStrmCnt == 0 {
-		c.closed = true
+		//c.closed = true
+		c.Close()
 	}
 }
 
 func (c *Connection) Close() {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	//c.mtx.Lock()
+	c.condNE.L.Lock()
+	//defer c.mtx.Unlock()
+	defer c.condNE.L.Unlock()
 
 	c.closed = true
+	c.condNE.Broadcast()
 
 }
 
 func (c *Connection) isDrained() bool {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	//c.mtx.Lock()
+	//defer c.mtx.Unlock()
 
 	return c.isEmpty() && c.closed
 }
