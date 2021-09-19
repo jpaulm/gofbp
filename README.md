@@ -1,6 +1,10 @@
 # gofbp 
 
-This repo is for early testing of GoFBP ideas and trial balloons! 
+## This repo holds the beginning of an FBP implementation in Go
+
+Features include:
+
+- delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
 
 
 Three test cases:
