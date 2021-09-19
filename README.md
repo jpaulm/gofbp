@@ -1,6 +1,6 @@
 # gofbp 
 
-## This repo holds the beginning of an FBP implementation in Go
+This repo holds the beginning of an FBP implementation in Go
 
 Features include:
 
