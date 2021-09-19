@@ -29,7 +29,3 @@ func (receiver *Receiver) Execute(p *core.Process) {
 
 	fmt.Println(p.Name + " ended")
 }
-
-//func (receiver *Receiver) GetMustRun() bool {
-//	return true
-//}

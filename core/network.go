@@ -199,15 +199,32 @@ func (n *Network) Run() {
 	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
 	// reactivated many times during the process "run"
 
-	wg.Add(len(n.procs))
+	//wg.Add(len(n.procs))
 	for _, proc := range n.procs {
+
+		proc.component.Setup(proc)
+
+		/*
+			proc.starting = true
+			if !proc.MustRun {
+				for _, conn := range proc.inPorts {
+					if conn.GetType() != "InitializationConnection" {
+						proc.starting = false
+					}
+				}
+			}
+			if !proc.starting {
+				continue
+			}
+
+		*/
+
 		proc := proc
-		//wg.Add(1)
+		wg.Add(1)
 		go func() { // Process goroutine
 			defer wg.Done()
-			//if len(proc.inPorts) == 0 {
 			proc.Run(n)
-			//}
+
 		}()
 	}
 

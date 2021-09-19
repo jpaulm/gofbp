@@ -37,7 +37,3 @@ func (concatstr *ConcatStr) Execute(p *core.Process) {
 	}
 	fmt.Println(p.Name + " ended")
 }
-
-//func (concatstr *ConcatStr) GetMustRun() bool {
-//	return false
-//}

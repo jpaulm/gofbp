@@ -38,7 +38,3 @@ func (rrsender *RoundRobinSender) Execute(p *core.Process) {
 
 	fmt.Println(p.Name + " ended")
 }
-
-//func (rrsender *RoundRobinSender) GetMustRun() bool {
-//	return true
-//}

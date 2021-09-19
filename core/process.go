@@ -9,22 +9,10 @@ type Process struct {
 	component Component
 	ownedPkts int
 	done      bool
+	starting  bool
 	MustRun   bool
 	status    Status
 }
-
-/*
-type Status int
-
-const (
-	notStarted Status = iota
-	dormant
-	suspSend
-	suspRecv
-	active
-	terminated
-)
-*/
 
 func (p *Process) OpenInPort(s string) InputConn {
 	return p.inPorts[s]
@@ -62,7 +50,7 @@ func (p *Process) allDrained() bool {
 
 func (p *Process) Run(net *Network) {
 	p.status = notStarted
-	p.component.Setup(p)
+	//p.component.Setup(p)
 
 	for {
 		//if p.MustRun {
@@ -72,7 +60,7 @@ func (p *Process) Run(net *Network) {
 		//}
 
 		if p.ownedPkts > 0 {
-			panic(p.Name + "deactivated without disposing of all owned packets")
+			panic(p.Name + " deactivated without disposing of all owned packets")
 		}
 
 		p.done = p.allDrained()
