@@ -1,9 +1,5 @@
 package core
 
-import (
-	"fmt"
-)
-
 type Process struct {
 	Name      string
 	Network   *Network
@@ -20,33 +16,47 @@ type Process struct {
 
 func (p *Process) OpenInPort(s string) InputConn {
 	if len(p.inPorts) == 0 {
-		fmt.Println(p.Name, "No input ports specified")
+		panic(p.Name + ": No input ports specified")
 	}
-	return p.inPorts[s]
+	in := p.inPorts[s]
+	if in == nil {
+		panic(p.Name + ": Port name not found (" + s + ")")
+	}
+	return in
 }
 
 func (p *Process) OpenInArrayPort(s string) InputConn {
 	if len(p.inPorts) == 0 {
-		fmt.Println(p.Name, "No input ports specified")
+		panic(p.Name + ": No input ports specified")
 	}
-	return p.inPorts[s]
+	in := p.inPorts[s]
+	if in == nil {
+		panic(p.Name + ": Port name not found (" + s + ")")
+	}
+	return in
 }
 
 func (p *Process) OpenOutPort(s string) OutputConn {
 	if len(p.outPorts) == 0 {
-		fmt.Println(p.Name, "No output ports specified")
-		return nil
+		panic(p.Name + ": No output ports specified")
 	}
-	return p.outPorts[s]
+	out := p.outPorts[s]
+	if out == nil {
+		panic(p.Name + ": Port name not found (" + s + ")")
+	}
+	return out
 
 }
 
 func (p *Process) OpenOutArrayPort(s string) OutputConn {
 	if len(p.outPorts) == 0 {
-		fmt.Println(p.Name, "No output ports specified")
-		return nil
+		panic(p.Name + ": No output ports specified")
 	}
-	return p.outPorts[s]
+	out := p.outPorts[s]
+	if out == nil {
+		panic(p.Name + ": Port name not found (" + s + ")")
+	}
+	return out
 }
 
 func (p *Process) Send(o *OutPort, pkt *Packet) bool {

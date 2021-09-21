@@ -11,31 +11,6 @@ type OutArrayPort struct {
 	closed   bool
 }
 
-/*
-func (c *OutArrayPort) isDrained() bool {
-	for _, v := range c.array {
-		if !v.isDrained() {
-			return false
-		}
-	}
-	return true
-}
-
-func (c *OutArrayPort) IsEmpty() bool {
-	return false
-}
-
-func (c *OutArrayPort) receive(p *Process) *Packet {
-	return nil
-}
-
-func (c *OutArrayPort) IsClosed() bool {
-	return c.closed
-}
-*/
-
-//func (c *OutArrayPort) resetForNextExecution() {}
-
 func (c *OutArrayPort) SetOptional(b bool) {}
 
 func (c *OutArrayPort) GetType() string {
