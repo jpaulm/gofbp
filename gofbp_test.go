@@ -15,7 +15,7 @@ func TestMerge(t *testing.T) {
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 	proc2 := net.NewProc("Sender2", &testrtn.Sender{})
 
-	proc3 := net.NewProc("Receiver", &testrtn.Receiver{})
+	proc3 := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
 
 	net.Initialize("15", proc1, "COUNT")
 	net.Initialize("10", proc2, "COUNT")
@@ -34,7 +34,7 @@ func TestConcat(t *testing.T) {
 
 	proc2 := net.NewProc("ConcatStr", &testrtn.ConcatStr{})
 
-	proc3 := net.NewProc("Receiver", &testrtn.Receiver{})
+	proc3 := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
 
 	net.Initialize("15", proc1, "COUNT")
 	net.Initialize("10", proc1a, "COUNT")
@@ -52,9 +52,9 @@ func TestRRDist(t *testing.T) {
 
 	proc2 := net.NewProc("RoundRobinSender", &testrtn.RoundRobinSender{})
 
-	proc3a := net.NewProc("Receiver1", &testrtn.Receiver{})
-	proc3b := net.NewProc("Receiver2", &testrtn.Receiver{})
-	proc3c := net.NewProc("Receiver3", &testrtn.Receiver{})
+	proc3a := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
+	proc3b := net.NewProc("Receiver1", &testrtn.Receiver{})
+	proc3c := net.NewProc("Receiver2", &testrtn.Receiver{})
 
 	net.Initialize("15", proc1, "COUNT")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)

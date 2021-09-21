@@ -12,8 +12,9 @@ type Receiver struct {
 
 func (receiver *Receiver) Setup(p *core.Process) {
 	receiver.ipt = p.OpenInPort("IN")
-	p.MustRun = true
 }
+
+func (Receiver) MustRun() {}
 
 func (receiver *Receiver) Execute(p *core.Process) {
 	fmt.Println(p.Name + " started")

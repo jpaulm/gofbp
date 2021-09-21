@@ -204,13 +204,10 @@ func (n *Network) Run() {
 	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
 	// reactivated many times during the process "run"
 
-	//wg.Add(len(n.procs))
 	for _, proc := range n.procs {
 
-		proc.component.Setup(proc)
-
 		proc.starting = true
-		if !proc.MustRun {
+		if !testMustRun(proc.component) {
 			for _, conn := range proc.inPorts {
 				if conn.GetType() != "InitializationConnection" {
 					proc.starting = false
@@ -242,4 +239,13 @@ func (n *Network) Run() {
 				"active",
 				"terminated"}[proc.status])
 	}
+}
+
+func testMustRun(comp Component) bool {
+	_, hasMustRun := comp.(ComponentWithMustRun)
+	if hasMustRun {
+		fmt.Printf("%T component has MustRun method\n", comp)
+		return true
+	}
+	return false
 }

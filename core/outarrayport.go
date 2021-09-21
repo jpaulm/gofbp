@@ -36,6 +36,8 @@ func (c *OutArrayPort) IsClosed() bool {
 
 //func (c *OutArrayPort) resetForNextExecution() {}
 
+func (c *OutArrayPort) SetOptional(b bool) {}
+
 func (c *OutArrayPort) GetType() string {
 	return "OutArrayPort"
 }

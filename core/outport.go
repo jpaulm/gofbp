@@ -1,8 +1,13 @@
 package core
 
 type OutPort struct {
-	name string
-	Conn *Connection
+	name     string
+	Conn     *Connection
+	optional bool
+}
+
+func (c *OutPort) SetOptional(b bool) {
+	c.optional = b
 }
 
 func (c *OutPort) GetType() string {

@@ -5,6 +5,7 @@ type OutputConn interface {
 
 	//IsEmpty() bool
 	//IsClosed() bool
+	SetOptional(b bool)
 	GetType() string
 
 	GetArrayItem(i int) *OutPort

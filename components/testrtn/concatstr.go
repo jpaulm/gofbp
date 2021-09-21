@@ -7,14 +7,14 @@ import (
 )
 
 type ConcatStr struct {
-	ipt     core.InputConn
-	opt     core.OutputConn
-	MustRun bool
+	ipt core.InputConn
+	opt core.OutputConn
 }
 
 func (concatstr *ConcatStr) Setup(p *core.Process) {
 	concatstr.ipt = p.OpenInArrayPort("IN")
 	concatstr.opt = p.OpenOutPort("OUT")
+	//concatstr.opt.SetOptional(true)
 }
 
 func (concatstr *ConcatStr) Execute(p *core.Process) {
