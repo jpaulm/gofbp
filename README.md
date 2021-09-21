@@ -24,5 +24,7 @@ To run them:
 - `go test -run RRDist -count=1`
 - `go test -run ShowFile -count=1`
 
+`go test` runs them all, in sequence
+
 
 Note: way too much logging - have to make that optional - use a JSON file...?  Issue raised for this...
