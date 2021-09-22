@@ -8,13 +8,12 @@ import (
 
 type WriteToConsole struct {
 	ipt core.InputConn
-	//opt core.OutputConn
+	opt core.OutputConn
 }
 
 func (writeToConsole *WriteToConsole) Setup(p *core.Process) {
 	writeToConsole.ipt = p.OpenInPort("IN")
-	//writeToConsole.opt = p.OpenOutPort("OUT")
-	//writeToConsole.opt.SetOptional(true)
+	writeToConsole.opt = p.OpenOutPort("OUT", "opt")
 }
 
 func (WriteToConsole) MustRun() {}
@@ -28,9 +27,11 @@ func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
 			break
 		}
 		fmt.Println(pkt.Contents)
-
-		//p.Send(writeToConsole.opt.(*core.OutPort), pkt)
-		p.Discard(pkt)
+		if writeToConsole.opt.GetType() == "OutPort" {
+			p.Send(writeToConsole.opt.(*core.OutPort), pkt)
+		} else {
+			p.Discard(pkt)
+		}
 	}
 
 	fmt.Println(p.Name + " ended")

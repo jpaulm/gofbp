@@ -17,9 +17,10 @@ func main() {
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 
 	proc2 := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
-
+	proc3 := net.NewProc("Discard", &testrtn.Discard{})
 	net.Initialize("C:\\Users\\Paul\\Documents\\GitHub\\gofbp\\.project", proc1, "FILENAME")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
+	net.Connect(proc2, "OUT", proc3, "IN", 6)
 
 	net.Run()
 }

@@ -36,27 +36,30 @@ func (p *Process) OpenInArrayPort(s string) InputConn {
 	return in
 }
 
-func (p *Process) OpenOutPort(s string) OutputConn {
+func (p *Process) OpenOutPort(s ...string) OutputConn {
 	if len(p.outPorts) == 0 {
-		panic(p.Name + ": No output ports specified")
+		opt := new(NullOutPort)
+		p.outPorts[s[0]] = opt
+		opt.name = s[0]
 	}
-	out := p.outPorts[s]
-	if out == nil {
-		panic(p.Name + ": Port name not found (" + s + ")")
+	out := p.outPorts[s[0]]
+
+	if len(s) == 2 && s[1] != "opt" {
+		panic(p.Name + ": Invalid 2nd param (" + s[1] + ")")
 	}
+
 	return out
 
 }
 
-func (p *Process) OpenOutArrayPort(s string) OutputConn {
+func (p *Process) OpenOutArrayPort(s ...string) OutputConn {
 	if len(p.outPorts) == 0 {
-		panic(p.Name + ": No output ports specified")
+		opt := new(NullOutPort)
+		p.outPorts[s[0]] = opt
+		opt.name = s[0]
 	}
-	out := p.outPorts[s]
-	if out == nil {
-		panic(p.Name + ": Port name not found (" + s + ")")
-	}
-	return out
+	return p.outPorts[s[0]]
+
 }
 
 func (p *Process) Send(o *OutPort, pkt *Packet) bool {
@@ -104,11 +107,13 @@ func (p *Process) Run(net *Network) {
 	}
 
 	for _, v := range p.outPorts {
-		if v.GetType() == "OutPort" {
-			v.(*OutPort).Conn.decUpstream()
-		} else {
-			for _, w := range v.(*OutArrayPort).array {
-				w.Conn.decUpstream()
+		if v.GetType() != "NullOutPort" {
+			if v.GetType() == "OutPort" {
+				v.(*OutPort).Conn.decUpstream()
+			} else {
+				for _, w := range v.(*OutArrayPort).array {
+					w.Conn.decUpstream()
+				}
 			}
 		}
 	}
