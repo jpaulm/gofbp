@@ -85,7 +85,7 @@ func (p *Process) allDrained() bool {
 }
 
 func (p *Process) Run(net *Network) {
-	p.status = Notstarted
+	p.status = Dormant
 
 	p.component.Setup(p)
 
