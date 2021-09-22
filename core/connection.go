@@ -42,7 +42,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	proc := c.downStrProc
 	//if proc.status == notStarted {
 	if atomic.CompareAndSwapInt32(&proc.status, Notstarted, Active) {
-		c.network.wg.Add(1)
+		//c.network.wg.Add(1)
 		go func() { // Process goroutine
 			defer c.network.wg.Done()
 

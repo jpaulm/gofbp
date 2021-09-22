@@ -202,10 +202,13 @@ func (n *Network) Run() {
 	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
 	// reactivated many times during the process "run"
 
+	wg.Add(len(n.procs))
+
 	for _, proc := range n.procs {
 
+		proc.status = Notstarted
 		proc.starting = true
-		if !testMustRun(proc.component) {
+		if proc.inPorts != nil && !isMustRun(proc.component) {
 			for _, conn := range proc.inPorts {
 				if conn.GetType() != "InitializationConnection" {
 					proc.starting = false
@@ -217,7 +220,7 @@ func (n *Network) Run() {
 		}
 
 		proc := proc
-		wg.Add(1)
+		//wg.Add(1)
 		go func() { // Process goroutine
 			defer wg.Done()
 
@@ -239,7 +242,7 @@ func (n *Network) Run() {
 	}
 }
 
-func testMustRun(comp Component) bool {
+func isMustRun(comp Component) bool {
 	_, hasMustRun := comp.(ComponentWithMustRun)
 	if hasMustRun {
 		fmt.Printf("%T component has MustRun method\n", comp)

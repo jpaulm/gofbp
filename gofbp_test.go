@@ -11,7 +11,7 @@ import (
 func TestMerge(t *testing.T) {
 	// runtime.GOMAXPROCS(16)
 
-	var net *core.Network = core.NewNetwork("test_net")
+	var net *core.Network = core.NewNetwork("Merge")
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 	proc2 := net.NewProc("Sender2", &testrtn.Sender{})
@@ -27,7 +27,7 @@ func TestMerge(t *testing.T) {
 }
 
 func TestConcat(t *testing.T) {
-	var net *core.Network = core.NewNetwork("test_net")
+	var net *core.Network = core.NewNetwork("Concat")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
@@ -47,7 +47,7 @@ func TestConcat(t *testing.T) {
 }
 
 func TestRRDist(t *testing.T) {
-	var net *core.Network = core.NewNetwork("test_net")
+	var net *core.Network = core.NewNetwork("RRDisp")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
@@ -72,7 +72,7 @@ func TestShowFile(t *testing.T) {
 
 	// runtime.GOMAXPROCS(16)
 
-	var net *core.Network = core.NewNetwork("test_net")
+	var net *core.Network = core.NewNetwork("ShowFile")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 
