@@ -18,7 +18,7 @@ Test cases as follows:
 
 - file being written to console
 
-To run them:
+To run them, position to your `GitHub\gofbp` directory, and do any of the following:
 
 - `go test -run Merge -count=1`
 - `go test -run Concat -count=1`
