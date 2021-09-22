@@ -3,15 +3,11 @@ package main
 import (
 	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
-	"runtime"
 )
 
-// RRDist
+//RR Sender
 
-func main2() {
-
-	// runtime.GOMAXPROCS(16)
-	runtime.SetMutexProfileFraction(1)
+func main4() {
 
 	var net *core.Network = core.NewNetwork("test_net")
 
@@ -19,9 +15,9 @@ func main2() {
 
 	proc2 := net.NewProc("RoundRobinSender", &testrtn.RoundRobinSender{})
 
-	proc3a := net.NewProc("Receiver1", &testrtn.Receiver{})
-	proc3b := net.NewProc("Receiver2", &testrtn.Receiver{})
-	proc3c := net.NewProc("Receiver3", &testrtn.Receiver{})
+	proc3a := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
+	proc3b := net.NewProc("Receiver1", &testrtn.Receiver{})
+	proc3c := net.NewProc("Receiver2", &testrtn.Receiver{})
 
 	net.Initialize("15", proc1, "COUNT")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
@@ -30,4 +26,5 @@ func main2() {
 	net.Connect(proc2, "OUT[2]", proc3c, "IN", 6)
 
 	net.Run()
+
 }

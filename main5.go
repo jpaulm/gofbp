@@ -7,7 +7,7 @@ import (
 
 // Concat
 
-func main() {
+func main5() {
 
 	var net *core.Network = core.NewNetwork("Concat")
 

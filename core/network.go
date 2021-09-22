@@ -7,15 +7,13 @@ import (
 	"sync"
 )
 
-type Status int
-
 const (
-	notStarted Status = iota
-	dormant
-	suspSend
-	suspRecv
-	active
-	terminated
+	Notstarted int32 = iota
+	Dormant
+	SuspSend
+	SuspRecv
+	Active
+	Terminated
 )
 
 type Network struct {

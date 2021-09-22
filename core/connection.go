@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 )
 
 // Based on https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
@@ -29,9 +30,9 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	c.condNF.L.Lock()
 	fmt.Println(p.Name, "Sending", pkt.Contents)
 	for c.isFull() { // connection is full
-		p.status = suspSend
+		p.status = SuspSend
 		c.condNF.Wait()
-		p.status = active
+		p.status = Active
 	}
 	fmt.Println(p.Name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
@@ -39,7 +40,8 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	pkt.owner = nil
 	p.ownedPkts--
 	proc := c.downStrProc
-	if proc.status == notStarted {
+	//if proc.status == notStarted {
+	if atomic.CompareAndSwapInt32(&proc.status, Notstarted, Active) {
 		c.network.wg.Add(1)
 		go func() { // Process goroutine
 			defer c.network.wg.Done()
@@ -62,9 +64,9 @@ func (c *Connection) receive(p *Process) *Packet {
 			c.condNE.L.Unlock()
 			return nil
 		}
-		p.status = suspRecv
+		p.status = SuspRecv
 		c.condNE.Wait()
-		p.status = active
+		p.status = Active
 		//if c.isDrained() {
 		//	c.condNF.Broadcast()
 		//	c.condNE.L.Unlock()
@@ -90,13 +92,13 @@ func (c *Connection) incUpstream() {
 }
 
 func (c *Connection) decUpstream() {
-	//c.mtx.Lock()
-	//defer c.mtx.Unlock()
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
 
 	c.upStrmCnt--
 	if c.upStrmCnt == 0 {
-		//c.closed = true
-		c.Close()
+		c.closed = true
+		//c.Close()
 	}
 }
 

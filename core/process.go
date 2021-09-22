@@ -1,5 +1,9 @@
 package core
 
+//import (
+//	"github.com/gofbp/core"
+//)
+
 type Process struct {
 	Name      string
 	Network   *Network
@@ -11,7 +15,7 @@ type Process struct {
 	done      bool
 	starting  bool
 	//MustRun   bool
-	status Status
+	status int32
 }
 
 func (p *Process) OpenInPort(s string) InputConn {
@@ -81,15 +85,15 @@ func (p *Process) allDrained() bool {
 }
 
 func (p *Process) Run(net *Network) {
-	p.status = notStarted
+	p.status = Notstarted
 
 	p.component.Setup(p)
 
 	for {
 		//if p.MustRun {
-		p.status = active
-		p.component.Execute(p) // activate component Execute logic
-		p.status = dormant
+		p.status = Active
+		p.component.Execute(p) // single "activation"
+		p.status = Dormant
 		//}
 
 		if p.ownedPkts > 0 {
@@ -117,7 +121,7 @@ func (p *Process) Run(net *Network) {
 			}
 		}
 	}
-	p.status = terminated
+	p.status = Terminated
 }
 
 func (p *Process) Create(s string) *Packet {
