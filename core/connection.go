@@ -45,7 +45,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	if atomic.CompareAndSwapInt32(&proc.status, Notstarted, Active) {
 		//c.network.wg.Add(1)
 
-		p = unsafe.Pointer(uintptr(proc.network.wg))
+		//p = unsafe.Pointer(uintptr(proc.network.wg))
 		go func() { // Process goroutine
 
 			defer proc.network.wg.Done()
