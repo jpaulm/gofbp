@@ -45,8 +45,8 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 		//c.network.wg.Add(1)
 
 		go func() { // Process goroutine
-			//defer c.network.wg.Done()
-			defer &proc.network.wg.Done()
+
+			defer proc.network.wg.Done()
 
 			proc.Run()
 

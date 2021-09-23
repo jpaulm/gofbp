@@ -22,13 +22,15 @@ type Network struct {
 	//procList []*Process
 	//driver  Process
 	logFile string
-	wg      sync.WaitGroup
+	wg      *sync.WaitGroup
 }
 
 func NewNetwork(name string) *Network {
 	net := &Network{
 		Name: name,
 	}
+
+	net.wg = new(sync.WaitGroup)
 
 	net.procs = make(map[string]*Process)
 
