@@ -2,7 +2,7 @@
 
 This repo holds the beginning of an FBP implementation in Go
 
-# Warning: Latest version crashes near the end of a run!
+Warning: Latest version crashes near the end of a run!
 
 Features include:
 
