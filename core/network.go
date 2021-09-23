@@ -223,7 +223,7 @@ func (n *Network) Run() {
 	for _, proc := range n.procs {
 
 		proc.status = Notstarted
-		proc.network = n
+		//proc.network = n
 		proc.starting = true
 		if proc.inPorts != nil && !isMustRun(proc.component) {
 			for _, conn := range proc.inPorts {

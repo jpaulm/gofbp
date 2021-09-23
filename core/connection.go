@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 	"sync/atomic"
+	"unsafe"
 )
 
 // Based on https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
@@ -44,6 +45,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	if atomic.CompareAndSwapInt32(&proc.status, Notstarted, Active) {
 		//c.network.wg.Add(1)
 
+		p = unsafe.Pointer(uintptr(proc.network.wg))
 		go func() { // Process goroutine
 
 			defer proc.network.wg.Done()
