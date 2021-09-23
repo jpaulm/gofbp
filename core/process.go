@@ -5,8 +5,8 @@ package core
 //)
 
 type Process struct {
-	Name      string
-	Network   *Network
+	name      string
+	network   *Network
 	inPorts   map[string]InputConn
 	outPorts  map[string]OutputConn
 	logFile   string
@@ -18,24 +18,28 @@ type Process struct {
 	status int32
 }
 
+func (p *Process) GetName() string {
+	return p.name
+}
+
 func (p *Process) OpenInPort(s string) InputConn {
 	if len(p.inPorts) == 0 {
-		panic(p.Name + ": No input ports specified")
+		panic(p.name + ": No input ports specified")
 	}
 	in := p.inPorts[s]
 	if in == nil {
-		panic(p.Name + ": Port name not found (" + s + ")")
+		panic(p.name + ": Port name not found (" + s + ")")
 	}
 	return in
 }
 
 func (p *Process) OpenInArrayPort(s string) InputConn {
 	if len(p.inPorts) == 0 {
-		panic(p.Name + ": No input ports specified")
+		panic(p.name + ": No input ports specified")
 	}
 	in := p.inPorts[s]
 	if in == nil {
-		panic(p.Name + ": Port name not found (" + s + ")")
+		panic(p.name + ": Port name not found (" + s + ")")
 	}
 	return in
 }
@@ -49,7 +53,7 @@ func (p *Process) OpenOutPort(s ...string) OutputConn {
 	out := p.outPorts[s[0]]
 
 	if len(s) == 2 && s[1] != "opt" {
-		panic(p.Name + ": Invalid 2nd param (" + s[1] + ")")
+		panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
 	}
 
 	return out
@@ -84,7 +88,7 @@ func (p *Process) allDrained() bool {
 	return true
 }
 
-func (p *Process) Run(net *Network) {
+func (p *Process) Run() {
 	p.status = Dormant
 
 	p.component.Setup(p)
@@ -97,7 +101,7 @@ func (p *Process) Run(net *Network) {
 		//}
 
 		if p.ownedPkts > 0 {
-			panic(p.Name + " deactivated without disposing of all owned packets")
+			panic(p.name + " deactivated without disposing of all owned packets")
 		}
 
 		p.done = p.allDrained()

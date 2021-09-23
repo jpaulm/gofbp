@@ -38,8 +38,8 @@ func NewNetwork(name string) *Network {
 func (n *Network) NewProc(nm string, comp Component) *Process {
 
 	proc := &Process{
-		Name:      nm,
-		Network:   n,
+		name:      nm,
+		network:   n,
 		logFile:   "",
 		component: comp,
 	}
@@ -106,7 +106,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		if connxn == nil {
 			connxn = n.NewConnection(cap)
 			connxn.portName = inPort.name
-			connxn.fullName = p2.Name + "." + inPort.name
+			connxn.fullName = p2.name + "." + inPort.name
 			connxn.downStrProc = p2
 			connxn.network = n
 			if anyInConn == nil {
@@ -119,7 +119,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		if p2.inPorts[inPort.name] == nil {
 			connxn = n.NewConnection(cap)
 			connxn.portName = inPort.name
-			connxn.fullName = p2.Name + "." + inPort.name
+			connxn.fullName = p2.name + "." + inPort.name
 			connxn.downStrProc = p2
 			connxn.network = n
 			p2.inPorts[inPort.name] = connxn
@@ -186,7 +186,7 @@ func (n *Network) Initialize(initValue string, p2 *Process, in string) {
 	conn := n.NewInitializationConnection()
 	p2.inPorts[in] = conn
 	conn.portName = in
-	conn.fullName = p2.Name + "." + in
+	conn.fullName = p2.name + "." + in
 
 	conn.value = initValue
 
@@ -204,9 +204,24 @@ func (n *Network) Run() {
 
 	wg.Add(len(n.procs))
 
+	defer func() {
+		wg.Wait()
+
+		for key, proc := range n.procs {
+			fmt.Println(key, " Status: ",
+				[]string{"notStarted",
+					"dormant",
+					"suspSend",
+					"suspRecv",
+					"active",
+					"terminated"}[proc.status])
+		}
+	}()
+
 	for _, proc := range n.procs {
 
 		proc.status = Notstarted
+		proc.network = n
 		proc.starting = true
 		if proc.inPorts != nil && !isMustRun(proc.component) {
 			for _, conn := range proc.inPorts {
@@ -224,22 +239,11 @@ func (n *Network) Run() {
 		go func() { // Process goroutine
 			defer wg.Done()
 
-			proc.Run(n)
+			proc.Run()
 
 		}()
 	}
 
-	wg.Wait()
-
-	for key, proc := range n.procs {
-		fmt.Println(key, " Status: ",
-			[]string{"notStarted",
-				"dormant",
-				"suspSend",
-				"suspRecv",
-				"active",
-				"terminated"}[proc.status])
-	}
 }
 
 func isMustRun(comp Component) bool {

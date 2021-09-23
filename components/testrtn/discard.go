@@ -19,7 +19,7 @@ func (discard *Discard) Setup(p *core.Process) {
 //func (Discard) MustRun() {}
 
 func (discard *Discard) Execute(p *core.Process) {
-	fmt.Println(p.Name + " started")
+	fmt.Println(p.GetName() + "	started")
 
 	for {
 		var pkt = p.Receive(discard.ipt)
@@ -32,5 +32,5 @@ func (discard *Discard) Execute(p *core.Process) {
 
 	}
 
-	fmt.Println(p.Name + " ended")
+	fmt.Println(p.GetName() + " ended")
 }

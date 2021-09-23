@@ -28,13 +28,13 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 		panic("Sending packet not owned by this process")
 	}
 	c.condNF.L.Lock()
-	fmt.Println(p.Name, "Sending", pkt.Contents)
+	fmt.Println(p.name, "Sending", pkt.Contents)
 	for c.isFull() { // connection is full
 		p.status = SuspSend
 		c.condNF.Wait()
 		p.status = Active
 	}
-	fmt.Println(p.Name, "Sent", pkt.Contents)
+	fmt.Println(p.name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
 	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
@@ -43,10 +43,12 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	//if proc.status == notStarted {
 	if atomic.CompareAndSwapInt32(&proc.status, Notstarted, Active) {
 		//c.network.wg.Add(1)
-		go func() { // Process goroutine
-			defer c.network.wg.Done()
 
-			proc.Run(c.network)
+		go func() { // Process goroutine
+			//defer c.network.wg.Done()
+			defer &proc.network.wg.Done()
+
+			proc.Run()
 
 		}()
 	}
@@ -57,7 +59,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 
 func (c *Connection) receive(p *Process) *Packet {
 	c.condNE.L.Lock()
-	fmt.Println(p.Name, "Receiving")
+	fmt.Println(p.name, "Receiving")
 	for c.isEmpty() { // connection is empty
 		if c.closed {
 			c.condNF.Broadcast()
@@ -75,7 +77,7 @@ func (c *Connection) receive(p *Process) *Packet {
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
-	fmt.Println(p.Name, "Received", pkt.Contents)
+	fmt.Println(p.name, "Received", pkt.Contents)
 	c.ir = (c.ir + 1) % len(c.pktArray)
 	pkt.owner = p
 	p.ownedPkts++

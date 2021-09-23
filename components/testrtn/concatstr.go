@@ -18,7 +18,7 @@ func (concatstr *ConcatStr) Setup(p *core.Process) {
 }
 
 func (concatstr *ConcatStr) Execute(p *core.Process) {
-	fmt.Println(p.Name + " started")
+	fmt.Println(p.GetName() + " started")
 
 	for i := 0; i < concatstr.ipt.ArrayLength(); i++ {
 
@@ -35,5 +35,5 @@ func (concatstr *ConcatStr) Execute(p *core.Process) {
 			p.Send(concatstr.opt.(*core.OutPort), pkt)
 		}
 	}
-	fmt.Println(p.Name + " ended")
+	fmt.Println(p.GetName() + " ended")
 }

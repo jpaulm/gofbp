@@ -18,7 +18,7 @@ func (sender *Sender) Setup(p *core.Process) {
 }
 
 func (sender *Sender) Execute(p *core.Process) {
-	fmt.Println(p.Name + " started")
+	fmt.Println(p.GetName() + " started")
 	icpkt := p.Receive(sender.ipt)
 	j, _ := strconv.Atoi(icpkt.Contents.(string))
 	p.Discard(icpkt)
@@ -27,5 +27,5 @@ func (sender *Sender) Execute(p *core.Process) {
 		pkt = p.Create("IP - # " + strconv.Itoa(i))
 		p.Send(sender.opt.(*core.OutPort), pkt)
 	}
-	fmt.Println(p.Name + " ended")
+	fmt.Println(p.GetName() + " ended")
 }

@@ -17,7 +17,7 @@ func (rrsender *RoundRobinSender) Setup(p *core.Process) {
 }
 
 func (rrsender *RoundRobinSender) Execute(p *core.Process) {
-	fmt.Println(p.Name + " started")
+	fmt.Println(p.GetName() + " started")
 
 	var i = 0
 
@@ -36,5 +36,5 @@ func (rrsender *RoundRobinSender) Execute(p *core.Process) {
 		i = (i + 1) % j
 	}
 
-	fmt.Println(p.Name + " ended")
+	fmt.Println(p.GetName() + " ended")
 }

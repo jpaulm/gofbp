@@ -29,14 +29,14 @@ func (c *InitializationConnection) receive(p *Process) *Packet {
 	if c.closed {
 		return nil
 	}
-	fmt.Println(p.Name, "Receiving IIP")
+	fmt.Println(p.name, "Receiving IIP")
 	var pkt *Packet = new(Packet)
 	pkt.Contents = c.value
 	pkt.owner = p
 	p.ownedPkts++
 	//c.closed = true
 	c.Close()
-	fmt.Println(p.Name, "Received IIP: ", pkt.Contents)
+	fmt.Println(p.name, "Received IIP: ", pkt.Contents)
 	return pkt
 }
 
