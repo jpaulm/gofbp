@@ -242,16 +242,8 @@ func (n *Network) Run() {
 			continue
 		}
 
-		proc := proc
-		//wg.Add(1)
-		go func() { // Process goroutine
-			defer wg.Done()
-
-			proc.Run()
-
-		}()
+		proc.ensureRunning()
 	}
-
 }
 
 func isMustRun(comp Component) bool {

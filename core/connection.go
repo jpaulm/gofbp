@@ -3,8 +3,6 @@ package core
 import (
 	"fmt"
 	"sync"
-	"sync/atomic"
-	"unsafe"
 )
 
 // Based on https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
@@ -40,22 +38,9 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
 	p.ownedPkts--
-	proc := c.downStrProc
-	//if proc.status == notStarted {
-	if atomic.CompareAndSwapInt32(&proc.status, Notstarted, Active) {
-		//c.network.wg.Add(1)
 
-		ptr := unsafe.Pointer(&proc.network.wg)
-		fmt.Println(ptr)
+	c.downStrProc.ensureRunning()
 
-		go func() { // Process goroutine
-
-			defer proc.network.wg.Done()
-
-			proc.Run()
-
-		}()
-	}
 	c.condNE.Broadcast()
 	c.condNF.L.Unlock()
 	return true
