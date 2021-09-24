@@ -2,15 +2,13 @@
 
 This repo holds the beginning of an FBP implementation in Go
 
-Warning: Latest version crashes near the end of a run!
-
 Features include:
 
 - delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
 - optional output ports - see https://github.com/jpaulm/gofbp/blob/master/components/testrtn/writetoconsole.go
 
 
-Test cases as follows:
+The following test cases are now working - thanks to Egon Elbre for all his help!
 
 - 2 Senders, one Receiver - merging first come, first served
 
