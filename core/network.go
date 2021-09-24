@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
+	"unsafe"
 )
 
 const (
@@ -15,6 +16,8 @@ const (
 	Active
 	Terminated
 )
+
+var wg sync.WaitGroup
 
 type Network struct {
 	Name  string
@@ -30,7 +33,10 @@ func NewNetwork(name string) *Network {
 		Name: name,
 	}
 
-	net.wg = new(sync.WaitGroup)
+	net.wg = &wg
+
+	ptr := unsafe.Pointer(&net.wg)
+	fmt.Println(ptr)
 
 	net.procs = make(map[string]*Process)
 

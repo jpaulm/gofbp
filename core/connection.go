@@ -45,7 +45,9 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	if atomic.CompareAndSwapInt32(&proc.status, Notstarted, Active) {
 		//c.network.wg.Add(1)
 
-		//p = unsafe.Pointer(uintptr(proc.network.wg))
+		ptr := unsafe.Pointer(&proc.network.wg)
+		fmt.Println(ptr)
+
 		go func() { // Process goroutine
 
 			defer proc.network.wg.Done()
@@ -71,11 +73,7 @@ func (c *Connection) receive(p *Process) *Packet {
 		p.status = SuspRecv
 		c.condNE.Wait()
 		p.status = Active
-		//if c.isDrained() {
-		//	c.condNF.Broadcast()
-		//	c.condNE.L.Unlock()
-		//	return nil
-		//}
+
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
