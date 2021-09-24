@@ -27,6 +27,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 		panic("Sending packet not owned by this process")
 	}
 	c.condNF.L.Lock()
+	defer c.condNF.L.Unlock()
 	fmt.Println(p.name, "Sending", pkt.Contents)
 	for c.isFull() { // connection is full
 		p.status = SuspSend
@@ -42,7 +43,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	c.downStrProc.ensureRunning()
 
 	c.condNE.Broadcast()
-	c.condNF.L.Unlock()
+
 	return true
 }
 

@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
-	"runtime"
+	//"runtime"
 )
 
 // RRDist
@@ -11,9 +11,9 @@ import (
 func main2() {
 
 	// runtime.GOMAXPROCS(16)
-	runtime.SetMutexProfileFraction(1)
+	//runtime.SetMutexProfileFraction(1)
 
-	var net *core.Network = core.NewNetwork("test_net")
+	var net *core.Network = core.NewNetwork("DistIPs")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
