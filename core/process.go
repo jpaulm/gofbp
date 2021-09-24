@@ -1,5 +1,7 @@
 package core
 
+import "sync/atomic"
+
 //import (
 //	"github.com/gofbp/core"
 //)
@@ -88,16 +90,29 @@ func (p *Process) allDrained() bool {
 	return true
 }
 
+func (p *Process) ensureRunning() {
+	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
+		return
+	}
+
+	p.network.wg.Add(1)
+	go func() { // Process goroutine
+		defer p.network.wg.Done()
+		p.Run()
+	}()
+}
+
 func (p *Process) Run() {
-	p.status = Dormant
+	atomic.StoreInt32(&p.status, Dormant)
+	defer atomic.StoreInt32(&p.status, Terminated)
 
 	p.component.Setup(p)
 
 	for {
 		//if p.MustRun {
-		p.status = Active
+		atomic.StoreInt32(&p.status, Active)
 		p.component.Execute(p) // single "activation"
-		p.status = Dormant
+		atomic.StoreInt32(&p.status, Dormant)
 		//}
 
 		if p.ownedPkts > 0 {
@@ -125,7 +140,6 @@ func (p *Process) Run() {
 			}
 		}
 	}
-	p.status = Terminated
 }
 
 func (p *Process) Create(s string) *Packet {

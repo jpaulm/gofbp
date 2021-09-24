@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
-	"unsafe"
 )
 
 const (
@@ -17,28 +16,20 @@ const (
 	Terminated
 )
 
-var wg sync.WaitGroup
-
 type Network struct {
 	Name  string
 	procs map[string]*Process
 	//procList []*Process
 	//driver  Process
 	logFile string
-	wg      *sync.WaitGroup
+	wg      sync.WaitGroup
 }
 
 func NewNetwork(name string) *Network {
 	net := &Network{
-		Name: name,
+		Name:  name,
+		procs: make(map[string]*Process),
 	}
-
-	net.wg = &wg
-
-	ptr := unsafe.Pointer(&net.wg)
-	fmt.Println(ptr)
-
-	net.procs = make(map[string]*Process)
 
 	return net
 }
@@ -204,16 +195,11 @@ func (n *Network) Run() {
 	defer fmt.Println(n.Name + " Done")
 	fmt.Println(n.Name + " Starting")
 
-	var wg sync.WaitGroup
-	//defer wg.Wait()
-
 	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
 	// reactivated many times during the process "run"
 
-	wg.Add(len(n.procs))
-
 	defer func() {
-		wg.Wait()
+		n.wg.Wait()
 
 		for key, proc := range n.procs {
 			fmt.Println(key, " Status: ",
@@ -227,7 +213,6 @@ func (n *Network) Run() {
 	}()
 
 	for _, proc := range n.procs {
-
 		proc.status = Notstarted
 		//proc.network = n
 		proc.starting = true
@@ -242,23 +227,11 @@ func (n *Network) Run() {
 			continue
 		}
 
-		proc := proc
-		//wg.Add(1)
-		go func() { // Process goroutine
-			defer wg.Done()
-
-			proc.Run()
-
-		}()
+		proc.ensureRunning()
 	}
-
 }
 
 func isMustRun(comp Component) bool {
 	_, hasMustRun := comp.(ComponentWithMustRun)
-	if hasMustRun {
-		fmt.Printf("%T component has MustRun method\n", comp)
-		return true
-	}
-	return false
+	return hasMustRun
 }

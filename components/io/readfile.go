@@ -22,9 +22,10 @@ func (readFile *ReadFile) Setup(p *core.Process) {
 func (readFile *ReadFile) Execute(p *core.Process) {
 	fmt.Println(p.GetName() + " started")
 	icpkt := p.Receive(readFile.ipt)
-	f, err := os.Open(icpkt.Contents.(string))
+	fname := icpkt.Contents.(string)
+	f, err := os.Open(fname)
 	if err != nil {
-		panic("Unable to read file: " + f.Name())
+		panic("Unable to read file: " + fname)
 	}
 	p.Discard(icpkt)
 
