@@ -16,14 +16,18 @@ The following test cases are now working - thanks to Egon Elbre for all his help
 
 - stream of IPs being distributed among several Receivers using RoundRobinSender 
 
-- file being written to console
+- file being written to console  (will have to change file reference in network)
+
+- file being copied              (ditto)
+
+- file records being selected    (ditto)
+- 
 
 To run them, position to your `GitHub\gofbp` directory, and do any of the following:
 
 - `go test -run Merge -count=1`
 - `go test -run Concat -count=1`
 - `go test -run RRDist -count=1`
-- `go test -run ShowFile -count=1`
 
 `go test` runs them all, in sequence
 
