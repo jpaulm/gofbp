@@ -30,6 +30,7 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run RRDist -count=1`
 - `go test -run CopyFile -count=1`
 - `go test -run DoSelect -count=1`
+- `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 
 `go test` runs them all, in sequence
 
@@ -43,6 +44,7 @@ testrtn folder:
 - selector.go
 - sender.go
 - writetoconsole.go 
+- writetoconsNL.go   (same, but written as a non-looper)
 
 io folder:
 - readfile.go
