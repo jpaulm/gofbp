@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/jpaulm/gofbp/components/io"
+	//"github.com/jpaulm/gofbp/components/io"
 	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
 )
@@ -62,24 +62,6 @@ func TestRRDist(t *testing.T) {
 	net.Connect(proc2, "OUT[0]", proc3a, "IN", 6)
 	net.Connect(proc2, "OUT[1]", proc3b, "IN", 6)
 	net.Connect(proc2, "OUT[2]", proc3c, "IN", 6)
-
-	net.Run()
-}
-
-func TestShowFile(t *testing.T) {
-
-	// ShowFile application
-
-	// runtime.GOMAXPROCS(16)
-
-	var net *core.Network = core.NewNetwork("ShowFile")
-
-	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
-
-	proc2 := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
-
-	net.Initialize("C:\\Users\\Paul\\Documents\\GitHub\\gofbp\\.project", proc1, "FILENAME")
-	net.Connect(proc1, "OUT", proc2, "IN", 6)
 
 	net.Run()
 }
