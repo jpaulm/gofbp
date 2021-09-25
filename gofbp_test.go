@@ -1,11 +1,12 @@
 package main
 
 import (
+	"os"
+	"testing"
+
 	"github.com/jpaulm/gofbp/components/io"
 	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
-	"os"
-	"testing"
 )
 
 func TestMerge(t *testing.T) {
@@ -104,6 +105,24 @@ func TestDoSelect(t *testing.T) {
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
 	net.Connect(proc2, "ACC", proc3a, "IN", 6)
 	net.Connect(proc2, "REJ", proc3b, "IN", 6)
+
+	net.Run()
+}
+
+func TestWriteToConsUsingNL(t *testing.T) {
+	// runtime.GOMAXPROCS(16)
+
+	var net *core.Network = core.NewNetwork("MergeToCons")
+
+	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
+	proc2 := net.NewProc("Sender2", &testrtn.Sender{})
+
+	proc3 := net.NewProc("WriteToConsNL", &testrtn.WriteToConsNL{})
+
+	net.Initialize("15", proc1, "COUNT")
+	net.Initialize("15", proc2, "COUNT")
+	net.Connect(proc1, "OUT", proc3, "IN", 6)
+	net.Connect(proc2, "OUT", proc3, "IN", 6)
 
 	net.Run()
 }
