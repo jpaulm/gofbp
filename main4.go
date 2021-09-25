@@ -4,6 +4,7 @@ import (
 	"github.com/jpaulm/gofbp/components/io"
 	//"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
+	"os"
 )
 
 // Concat
@@ -16,8 +17,13 @@ func main4() {
 
 	proc2 := net.NewProc("WriteFile", &io.WriteFile{})
 
-	net.Initialize("C:\\Users\\Paul\\Documents\\GitHub\\gofbp\\.project", proc1, "FILENAME")
-	net.Initialize("C:\\Users\\Paul\\Documents\\GitHub\\gofbp\\.project.copy", proc2, "FILENAME")
+	path, err := os.Getwd()
+	if err != nil {
+		panic("Can't find workspace directory")
+	}
+
+	net.Initialize(path+"\\testdata.txt", proc1, "FILENAME")
+	net.Initialize(path+"\\testdata.copy", proc2, "FILENAME")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
 
 	net.Run()

@@ -6,8 +6,6 @@ import (
 	//"runtime"
 )
 
-// RRDist
-
 func main2() {
 
 	// runtime.GOMAXPROCS(16)

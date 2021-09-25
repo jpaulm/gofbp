@@ -12,7 +12,7 @@ import (
 
 // Concat
 
-func main() {
+func main9() {
 	/*
 
 		var net *core.Network = core.NewNetwork("DoSelect")
