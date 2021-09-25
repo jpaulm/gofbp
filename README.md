@@ -5,6 +5,7 @@ This repo holds the beginning of an FBP implementation in Go
 Features include:
 
 - delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
+- the reason for `MustRun` is that components are not triggered if there is no data incoming on their input ports (apart from closing down downstream processes as appropriate;  some components however need to execute in spite of this, e.g. WriteFile, and counting components.
 - optional output ports - see https://github.com/jpaulm/gofbp/blob/master/components/testrtn/writetoconsole.go
 
 
