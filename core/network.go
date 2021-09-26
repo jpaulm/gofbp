@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
-	//"sync/atomic"
 )
 
 const (
@@ -219,8 +218,6 @@ func (n *Network) Run() {
 	defer n.wg.Wait()
 
 	for _, proc := range n.procs {
-		//proc.status = Notstarted
-		//atomic.StoreInt32(&proc.status, Notstarted)
 		//proc.network = n
 		proc.starting = true
 		if proc.inPorts != nil && !isMustRun(proc.component) {
