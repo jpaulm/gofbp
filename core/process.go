@@ -94,12 +94,13 @@ func (p *Process) allDrained() bool {
 }
 
 func (p *Process) ensureRunning() {
+	status := atomic.LoadInt32(&p.status)
 	fmt.Println(p.GetName(), []string{"notStarted",
 		"dormant",
 		"suspSend",
 		"suspRecv",
 		"active",
-		"terminated"}[p.status])
+		"terminated"}[status])
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		return
 	}
