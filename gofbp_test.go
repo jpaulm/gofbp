@@ -48,7 +48,7 @@ func TestConcat(t *testing.T) {
 }
 
 func TestRRDist(t *testing.T) {
-	var net *core.Network = core.NewNetwork("RRDisp")
+	var net *core.Network = core.NewNetwork("RRDist")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 

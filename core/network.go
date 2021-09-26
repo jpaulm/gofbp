@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
+	//"sync/atomic"
 )
 
 const (
@@ -41,6 +42,7 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 		network:   n,
 		logFile:   "",
 		component: comp,
+		status:    Notstarted,
 	}
 
 	//n.procList = append(n.procList, proc)
@@ -198,22 +200,29 @@ func (n *Network) Run() {
 	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
 	// reactivated many times during the process "run"
 
-	defer func() {
-		n.wg.Wait()
+	/*
+		defer func() {
+			n.wg.Wait()
 
-		for key, proc := range n.procs {
-			fmt.Println(key, " Status: ",
-				[]string{"notStarted",
-					"dormant",
-					"suspSend",
-					"suspRecv",
-					"active",
-					"terminated"}[proc.status])
-		}
-	}()
+			for key, proc := range n.procs {
+				fmt.Println(key, " Status: ",
+					[]string{"notStarted",
+						"dormant",
+						"suspSend",
+						"suspRecv",
+						"active",
+						"terminated"}[proc.status])
+			}
+		}()
+	*/
+
+	defer n.wg.Wait()
+
+	n.wg.Add(len(n.procs))
 
 	for _, proc := range n.procs {
-		proc.status = Notstarted
+		//proc.status = Notstarted
+		//atomic.StoreInt32(&proc.status, Notstarted)
 		//proc.network = n
 		proc.starting = true
 		if proc.inPorts != nil && !isMustRun(proc.component) {

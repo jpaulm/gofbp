@@ -1,6 +1,9 @@
 package core
 
-import "sync/atomic"
+import (
+	"fmt"
+	"sync/atomic"
+)
 
 //import (
 //	"github.com/gofbp/core"
@@ -91,12 +94,19 @@ func (p *Process) allDrained() bool {
 }
 
 func (p *Process) ensureRunning() {
+	fmt.Println(p.GetName(), []string{"notStarted",
+		"dormant",
+		"suspSend",
+		"suspRecv",
+		"active",
+		"terminated"}[p.status])
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		return
 	}
 
-	p.network.wg.Add(1)
+	//p.network.wg.Add(1)
 	go func() { // Process goroutine
+		//p.network.wg.Add(1)
 		defer p.network.wg.Done()
 		p.Run()
 	}()
