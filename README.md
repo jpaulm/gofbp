@@ -2,6 +2,8 @@
 
 This repo holds the beginning of an FBP implementation in Go
 
+_Currently there seems to be a transient race condition - shows up every so often!_
+
 Features include:
 
 - delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
