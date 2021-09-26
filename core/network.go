@@ -218,8 +218,6 @@ func (n *Network) Run() {
 
 	defer n.wg.Wait()
 
-	n.wg.Add(len(n.procs))
-
 	for _, proc := range n.procs {
 		//proc.status = Notstarted
 		//atomic.StoreInt32(&proc.status, Notstarted)

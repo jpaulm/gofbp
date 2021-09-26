@@ -104,9 +104,8 @@ func (p *Process) ensureRunning() {
 		return
 	}
 
-	//p.network.wg.Add(1)
+	p.network.wg.Add(1)
 	go func() { // Process goroutine
-		//p.network.wg.Add(1)
 		defer p.network.wg.Done()
 		p.Run()
 	}()
