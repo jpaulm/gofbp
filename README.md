@@ -24,6 +24,8 @@ The following test cases are now working - thanks to Egon Elbre for all his help
 - file being copied             
 
 - file records being selected    
+
+- force deadlock (https://github.com/jpaulm/gofbp/blob/master/main11.go - change to main.go to run)
  
 
 To run them, position to your `GitHub\gofbp` directory, and do any of the following:
