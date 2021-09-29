@@ -2,8 +2,6 @@
 
 This repo holds the beginning of an FBP implementation in Go
 
-_Currently there seems to be a transient race condition - shows up every so often!_
-
 Features include:
 
 - delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
@@ -37,7 +35,7 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run DoSelect -count=1`
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 
-`go test` runs them all, in sequence
+`go test` runs them all, in sequence - _note that the last test in this sequence is designed to crash!_
 
 The following components are available:
 
