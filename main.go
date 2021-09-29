@@ -6,7 +6,7 @@ import (
 	// "runtime"
 )
 
-// Merge application
+// Force Deadlock
 
 func main() {
 

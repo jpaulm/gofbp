@@ -5,16 +5,16 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
+	//"time"
 )
 
 const (
 	Notstarted int32 = iota
-	Started
-	//Dormant
-	//SuspSend
-	//SuspRecv
-	//Active
-	//Terminated
+	Active
+	Dormant
+	SuspSend
+	SuspRecv
+	Terminated
 )
 
 type Network struct {
@@ -42,7 +42,7 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 		network:   n,
 		logFile:   "",
 		component: comp,
-		//status:    Notstarted,
+		status:    Notstarted,
 	}
 
 	//n.procList = append(n.procList, proc)
@@ -207,10 +207,11 @@ func (n *Network) Run() {
 			for key, proc := range n.procs {
 				fmt.Println(key, " Status: ",
 					[]string{"notStarted",
+					"active",
 						"dormant",
 						"suspSend",
 						"suspRecv",
-						"active",
+
 						"terminated"}[proc.status])
 			}
 		}()
@@ -219,6 +220,12 @@ func (n *Network) Run() {
 	n.wg.Add(len(n.procs))
 
 	defer n.wg.Wait()
+
+	//go func() {
+	//	for {
+	//		time.Sleep(100 * time.Millisecond)
+	//	}
+	//}()
 
 	for _, proc := range n.procs {
 		//proc.network = n
