@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 )
 
 // Based on https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
@@ -30,9 +31,9 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	defer c.condNF.L.Unlock()
 	fmt.Println(p.name, "Sending", pkt.Contents)
 	for c.isFull() { // connection is full
-		p.status = SuspSend
+		atomic.StoreInt32(&p.status, SuspSend)
 		c.condNF.Wait()
-		p.status = Active
+		atomic.StoreInt32(&p.status, Active)
 	}
 	fmt.Println(p.name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
@@ -57,9 +58,9 @@ func (c *Connection) receive(p *Process) *Packet {
 			c.condNF.Broadcast()
 			return nil
 		}
-		p.status = SuspRecv
+		atomic.StoreInt32(&p.status, SuspRecv)
 		c.condNE.Wait()
-		p.status = Active
+		atomic.StoreInt32(&p.status, Active)
 
 	}
 	pkt := c.pktArray[c.ir]
