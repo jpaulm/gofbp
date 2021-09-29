@@ -224,23 +224,24 @@ func (n *Network) Run() {
 
 	go func() {
 		for {
-			time.Sleep(100 * time.Millisecond)
-			t := 1
-			u := 1
+			time.Sleep(20 * time.Millisecond)
+			allTerminated := true
+			deadlockDetected := true
 			for _, proc := range n.procs {
 				status := atomic.LoadInt32(&proc.status)
 				if status != Terminated {
-					t = 0
-				}
-				if status == Active {
-					u = 0
+					allTerminated = false
+
+					if status == Active || status == Dormant {
+						deadlockDetected = false
+					}
 				}
 			}
-			if t == 1 {
+			if allTerminated {
 				fmt.Println("Run terminated")
 				return
 			}
-			if u == 1 {
+			if deadlockDetected {
 				fmt.Println("\nDeadlock detected!")
 				for key, proc := range n.procs {
 					fmt.Println(key, " Status: ",
