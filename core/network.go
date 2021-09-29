@@ -9,11 +9,12 @@ import (
 
 const (
 	Notstarted int32 = iota
-	Dormant
-	SuspSend
-	SuspRecv
-	Active
-	Terminated
+	Started
+	//Dormant
+	//SuspSend
+	//SuspRecv
+	//Active
+	//Terminated
 )
 
 type Network struct {
@@ -41,7 +42,7 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 		network:   n,
 		logFile:   "",
 		component: comp,
-		status:    Notstarted,
+		//status:    Notstarted,
 	}
 
 	//n.procList = append(n.procList, proc)

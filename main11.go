@@ -8,7 +8,7 @@ import (
 
 // Merge application
 
-func main() {
+func main11() {
 
 	// runtime.GOMAXPROCS(16)
 

@@ -1,7 +1,7 @@
 package core
 
 import (
-	"fmt"
+	//"fmt"
 	"sync/atomic"
 )
 
@@ -94,17 +94,22 @@ func (p *Process) allDrained() bool {
 }
 
 func (p *Process) ensureRunning() {
-	status := atomic.LoadInt32(&p.status)
-	fmt.Println(p.GetName(), []string{"notStarted",
-		"dormant",
-		"suspSend",
-		"suspRecv",
-		"active",
-		"terminated"}[status])
-	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
+	/*
+		status := atomic.LoadInt32(&p.status)
+		fmt.Println(p.GetName(), []string{"notStarted",
+			"dormant",
+			"suspSend",
+			"suspRecv",
+			"active",
+			"terminated"}[status])
+	*/
+	//if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
+	//	return
+	//}
+
+	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Started) {
 		return
 	}
-
 	//p.network.wg.Add(1)
 	go func() { // Process goroutine
 		defer p.network.wg.Done()
@@ -113,16 +118,16 @@ func (p *Process) ensureRunning() {
 }
 
 func (p *Process) Run() {
-	atomic.StoreInt32(&p.status, Dormant)
-	defer atomic.StoreInt32(&p.status, Terminated)
+	//atomic.StoreInt32(&p.status, Dormant)
+	//defer atomic.StoreInt32(&p.status, Terminated)
 
 	p.component.Setup(p)
 
 	for {
 		//if p.MustRun {
-		atomic.StoreInt32(&p.status, Active)
+		//atomic.StoreInt32(&p.status, Active)
 		p.component.Execute(p) // single "activation"
-		atomic.StoreInt32(&p.status, Dormant)
+		//atomic.StoreInt32(&p.status, Dormant)
 		//}
 
 		if p.ownedPkts > 0 {
