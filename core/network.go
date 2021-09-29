@@ -5,7 +5,8 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
-	//"time"
+	"sync/atomic"
+	"time"
 )
 
 const (
@@ -221,11 +222,40 @@ func (n *Network) Run() {
 
 	defer n.wg.Wait()
 
-	//go func() {
-	//	for {
-	//		time.Sleep(100 * time.Millisecond)
-	//	}
-	//}()
+	go func() {
+		for {
+			time.Sleep(100 * time.Millisecond)
+			t := 1
+			u := 1
+			for _, proc := range n.procs {
+				status := atomic.LoadInt32(&proc.status)
+				if status != Terminated {
+					t = 0
+				}
+				if status == Active {
+					u = 0
+				}
+			}
+			if t == 1 {
+				fmt.Println("Run terminated")
+				return
+			}
+			if u == 1 {
+				fmt.Println("\nDeadlock detected!")
+				for key, proc := range n.procs {
+					fmt.Println(key, " Status: ",
+						[]string{"notStarted",
+							"active",
+							"dormant",
+							"suspSend",
+							"suspRecv",
+							"terminated"}[proc.status])
+				}
+				panic("Deadlock!")
+			}
+
+		}
+	}()
 
 	for _, proc := range n.procs {
 		//proc.network = n
