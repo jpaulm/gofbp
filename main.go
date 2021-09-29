@@ -6,7 +6,6 @@ import (
 	// "runtime"
 )
 
-// Merge application
 
 func main() {
 
