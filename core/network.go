@@ -215,6 +215,8 @@ func (n *Network) Run() {
 		}()
 	*/
 
+	n.wg.Add(len(n.procs))
+
 	defer n.wg.Wait()
 
 	for _, proc := range n.procs {
