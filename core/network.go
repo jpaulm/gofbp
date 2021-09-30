@@ -232,7 +232,7 @@ func (n *Network) Run() {
 				if status != Terminated {
 					allTerminated = false
 
-					if status == Active || status == Dormant {
+					if status == Active || status == Dormant || status == Notstarted {
 						deadlockDetected = false
 					}
 				}
