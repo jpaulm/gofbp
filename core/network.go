@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
-	"sync/atomic"
+	//"sync/atomic"
 )
 
 const (
@@ -221,39 +221,41 @@ func (n *Network) Run() {
 
 	defer n.wg.Wait()
 
-	go func() {
-		for {
-			allTerminated := true
-			deadlockDetected := true
-			for _, proc := range n.procs {
-				status := atomic.LoadInt32(&proc.status)
-				if status != Terminated {
-					allTerminated = false
-					if status == Active || status == Dormant || status == Notstarted {
-						deadlockDetected = false
+	/*
+		go func() {
+			for {
+				allTerminated := true
+				deadlockDetected := true
+				for _, proc := range n.procs {
+					status := atomic.LoadInt32(&proc.status)
+					if status != Terminated {
+						allTerminated = false
+						if status == Active || status == Dormant || status == Notstarted {
+							deadlockDetected = false
+						}
 					}
 				}
-			}
-			if allTerminated {
-				fmt.Println("Run terminated")
-				return
-			}
-			if deadlockDetected {
-				fmt.Println("\nDeadlock detected!")
-				for key, proc := range n.procs {
-					fmt.Println(key, " Status: ",
-						[]string{"notStarted",
-							"active",
-							"dormant",
-							"suspSend",
-							"suspRecv",
-							"terminated"}[proc.status])
+				if allTerminated {
+					fmt.Println("Run terminated")
+					return
 				}
-				panic("Deadlock!")
-			}
+				if deadlockDetected {
+					fmt.Println("\nDeadlock detected!")
+					for key, proc := range n.procs {
+						fmt.Println(key, " Status: ",
+							[]string{"notStarted",
+								"active",
+								"dormant",
+								"suspSend",
+								"suspRecv",
+								"terminated"}[proc.status])
+					}
+					panic("Deadlock!")
+				}
 
-		}
-	}()
+			}
+		}()
+	*/
 
 	for _, proc := range n.procs {
 		//proc.network = n
