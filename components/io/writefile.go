@@ -48,7 +48,7 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 		}
 
 		if writeFile.opt.GetType() == "OutPort" {
-			p.Send(writeFile.opt.(*core.OutPort), pkt)
+			p.Send(writeFile.opt, pkt)
 		} else {
 			p.Discard(pkt)
 		}

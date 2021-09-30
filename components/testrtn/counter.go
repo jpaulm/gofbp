@@ -33,7 +33,7 @@ func (counter *Counter) Execute(p *core.Process) {
 		}
 		//fmt.Println(pkt.Contents)
 		if counter.opt.GetType() == "OutPort" {
-			p.Send(counter.opt.(*core.OutPort), pkt)
+			p.Send(counter.opt, pkt)
 		} else {
 			p.Discard(pkt)
 		}
@@ -42,7 +42,7 @@ func (counter *Counter) Execute(p *core.Process) {
 	}
 
 	pkt := p.Create(strconv.Itoa(count))
-	p.Send(counter.cnt.(*core.OutPort), pkt)
+	p.Send(counter.cnt, pkt)
 
 	fmt.Println(p.GetName() + " ended")
 }

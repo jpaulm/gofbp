@@ -8,6 +8,8 @@ type NullOutPort struct {
 
 func (c *NullOutPort) SetOptional(b bool) {}
 
+func (c *NullOutPort) send(*Process, *Packet) bool { panic("send on null port") }
+
 func (c *NullOutPort) GetType() string {
 	return "NullOutPort"
 }

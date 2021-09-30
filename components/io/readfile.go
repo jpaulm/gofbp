@@ -55,7 +55,7 @@ func (readFile *ReadFile) Execute(p *core.Process) {
 			break
 		}
 		pkt = p.Create(rec[:i])
-		p.Send(readFile.opt.(*core.OutPort), pkt)
+		p.Send(readFile.opt, pkt)
 		rec = rec[i+1:]
 	}
 	fmt.Println(p.GetName() + " ended")

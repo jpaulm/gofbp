@@ -2,8 +2,9 @@ package testrtn
 
 import (
 	"fmt"
-	"github.com/jpaulm/gofbp/core"
 	"strings"
+
+	"github.com/jpaulm/gofbp/core"
 )
 
 type Selector struct {
@@ -44,9 +45,9 @@ func (selector *Selector) Execute(p *core.Process) {
 		}
 
 		if 0 == strings.Compare(s[:i], param[:i]) {
-			p.Send(selector.opt1.(*core.OutPort), pkt)
+			p.Send(selector.opt1, pkt)
 		} else {
-			p.Send(selector.opt2.(*core.OutPort), pkt)
+			p.Send(selector.opt2, pkt)
 		}
 
 	}

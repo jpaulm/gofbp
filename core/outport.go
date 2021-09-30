@@ -6,6 +6,10 @@ type OutPort struct {
 	optional bool
 }
 
+func (c *OutPort) send(p *Process, pkt *Packet) bool {
+	return c.Conn.send(p, pkt)
+}
+
 func (c *OutPort) SetOptional(b bool) {
 	c.optional = b
 }
