@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
-	"time"
 )
 
 const (
@@ -224,14 +223,12 @@ func (n *Network) Run() {
 
 	go func() {
 		for {
-			time.Sleep(20 * time.Millisecond)
 			allTerminated := true
 			deadlockDetected := true
 			for _, proc := range n.procs {
 				status := atomic.LoadInt32(&proc.status)
 				if status != Terminated {
 					allTerminated = false
-
 					if status == Active || status == Dormant || status == Notstarted {
 						deadlockDetected = false
 					}
