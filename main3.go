@@ -12,7 +12,7 @@ func main3() {
 
 	// runtime.GOMAXPROCS(16)
 
-	var net *core.Network = core.NewNetwork("MergeToCons")
+	net := core.NewNetwork("MergeToCons")
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 	proc2 := net.NewProc("Sender2", &testrtn.Sender{})

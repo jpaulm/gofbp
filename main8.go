@@ -10,7 +10,7 @@ import (
 
 func main8() {
 
-	var net *core.Network = core.NewNetwork("DoSelect")
+	net := core.NewNetwork("DoSelect")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 	proc2 := net.NewProc("Select", &testrtn.Selector{})
