@@ -1,31 +1,35 @@
 package main
 
 import (
+	"os"
+
+	"github.com/jpaulm/gofbp/components/io"
 	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
 	// "runtime"
 )
 
-// Force Deadlock
-
 func main() {
 
-	// runtime.GOMAXPROCS(16)
+	net := core.NewNetwork("DoSelect")
 
-	net := core.NewNetwork("ForceDeadlock")
+	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
+	proc2 := net.NewProc("Select", &testrtn.Selector{})
+	proc3a := net.NewProc("WriteFile", &io.WriteFile{})
+	proc3b := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
 
-	proc1 := net.NewProc("Sender", &testrtn.Sender{})
-	proc2 := net.NewProc("Counter", &testrtn.Counter{})
-	proc3 := net.NewProc("Concat", &testrtn.ConcatStr{})
+	path, err := os.Getwd()
+	if err != nil {
+		panic("Can't find workspace directory")
+	}
 
-	proc4 := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
-
-	net.Initialize("15", proc1, "COUNT")
-
+	net.Initialize(path+"\\testdata.txt", proc1, "FILENAME")
+	net.Initialize("X", proc2, "PARAM")
+	net.Initialize(path+"\\testdata.copy", proc3a, "FILENAME")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
-	net.Connect(proc2, "OUT", proc3, "IN[1]", 6)
-	net.Connect(proc2, "COUNT", proc3, "IN[0]", 6)
-	net.Connect(proc3, "OUT", proc4, "IN", 6)
+	net.Connect(proc2, "ACC", proc3a, "IN", 6)
+	net.Connect(proc2, "REJ", proc3b, "IN", 6)
 
 	net.Run()
+
 }

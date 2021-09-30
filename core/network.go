@@ -200,23 +200,6 @@ func (n *Network) Run() {
 	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
 	// reactivated many times during the process "run"
 
-	/*
-		defer func() {
-			n.wg.Wait()
-
-			for key, proc := range n.procs {
-				fmt.Println(key, " Status: ",
-					[]string{"notStarted",
-					"active",
-						"dormant",
-						"suspSend",
-						"suspRecv",
-
-						"terminated"}[proc.status])
-			}
-		}()
-	*/
-
 	n.wg.Add(len(n.procs))
 
 	defer n.wg.Wait()
@@ -257,25 +240,26 @@ func (n *Network) Run() {
 		}()
 	*/
 
+	var canRun bool = false
 	for _, proc := range n.procs {
 		//proc.network = n
-		proc.starting = true
-		if proc.inPorts != nil && !isMustRun(proc.component) {
+		proc.selfStarting = true
+		if proc.inPorts != nil {
 			for _, conn := range proc.inPorts {
 				if conn.GetType() != "InitializationConnection" {
-					proc.starting = false
+					proc.selfStarting = false
 				}
 			}
 		}
-		if !proc.starting {
+		if !proc.selfStarting && !proc.isMustRun(proc.component) {
 			continue
 		}
 
 		proc.ensureRunning()
+		canRun = true
 	}
-}
-
-func isMustRun(comp Component) bool {
-	_, hasMustRun := comp.(ComponentWithMustRun)
-	return hasMustRun
+	if !canRun {
+		n.wg.Add(0 - len(n.procs))
+		panic("No process can start")
+	}
 }

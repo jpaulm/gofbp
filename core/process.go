@@ -10,15 +10,15 @@ import (
 //)
 
 type Process struct {
-	name      string
-	network   *Network
-	inPorts   map[string]InputConn
-	outPorts  map[string]OutputConn
-	logFile   string
-	component Component
-	ownedPkts int
-	done      bool
-	starting  bool
+	name         string
+	network      *Network
+	inPorts      map[string]InputConn
+	outPorts     map[string]OutputConn
+	logFile      string
+	component    Component
+	ownedPkts    int
+	done         bool
+	selfStarting bool // process has non-IIP input ports
 	//MustRun   bool
 	status int32
 }
@@ -94,16 +94,7 @@ func (p *Process) allDrained() bool {
 }
 
 func (p *Process) ensureRunning() {
-	/*
-		status := atomic.LoadInt32(&p.status)
-		fmt.Println(p.GetName(), []string{"notStarted",
-		"active",
-			"dormant",
-			"suspSend",
-			"suspRecv",
 
-			"terminated"}[status])
-	*/
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		return
 	}
@@ -122,7 +113,7 @@ func (p *Process) Run() {
 	p.component.Setup(p)
 
 	for {
-		//if p.MustRun {
+		//if p.isMustRun(p.component) || !p.selfStarting {
 		atomic.StoreInt32(&p.status, Active)
 		p.component.Execute(p) // single "activation"
 		atomic.StoreInt32(&p.status, Dormant)
@@ -153,6 +144,11 @@ func (p *Process) Run() {
 			}
 		}
 	}
+}
+
+func (p *Process) isMustRun(comp Component) bool {
+	_, hasMustRun := comp.(ComponentWithMustRun)
+	return hasMustRun
 }
 
 func (p *Process) Create(s string) *Packet {
