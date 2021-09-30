@@ -11,7 +11,7 @@ func main2() {
 	// runtime.GOMAXPROCS(16)
 	//runtime.SetMutexProfileFraction(1)
 
-	var net *core.Network = core.NewNetwork("DistIPs")
+	net := core.NewNetwork("DistIPs")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 

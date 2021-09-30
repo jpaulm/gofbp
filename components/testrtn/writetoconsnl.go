@@ -31,7 +31,7 @@ func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
 	}
 	fmt.Println(pkt.Contents)
 	if writeToConsole.opt.GetType() == "OutPort" {
-		p.Send(writeToConsole.opt.(*core.OutPort), pkt)
+		p.Send(writeToConsole.opt, pkt)
 	} else {
 		p.Discard(pkt)
 	}

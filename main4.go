@@ -3,15 +3,16 @@ package main
 import (
 	"github.com/jpaulm/gofbp/components/io"
 	//"github.com/jpaulm/gofbp/components/testrtn"
-	"github.com/jpaulm/gofbp/core"
 	"os"
+
+	"github.com/jpaulm/gofbp/core"
 )
 
 // Concat
 
 func main4() {
 
-	var net *core.Network = core.NewNetwork("CopyFile")
+	net := core.NewNetwork("CopyFile")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 

@@ -10,9 +10,7 @@ import (
 )
 
 func TestMerge(t *testing.T) {
-	// runtime.GOMAXPROCS(16)
-
-	var net *core.Network = core.NewNetwork("Merge")
+	net := core.NewNetwork("Merge")
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 	proc2 := net.NewProc("Sender2", &testrtn.Sender{})
@@ -28,7 +26,7 @@ func TestMerge(t *testing.T) {
 }
 
 func TestConcat(t *testing.T) {
-	var net *core.Network = core.NewNetwork("Concat")
+	net := core.NewNetwork("Concat")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
@@ -48,7 +46,7 @@ func TestConcat(t *testing.T) {
 }
 
 func TestRRDist(t *testing.T) {
-	var net *core.Network = core.NewNetwork("RRDist")
+	net := core.NewNetwork("RRDist")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
@@ -68,7 +66,7 @@ func TestRRDist(t *testing.T) {
 }
 
 func TestCopyFile(t *testing.T) {
-	var net *core.Network = core.NewNetwork("CopyFile")
+	net := core.NewNetwork("CopyFile")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 
@@ -87,7 +85,7 @@ func TestCopyFile(t *testing.T) {
 }
 
 func TestDoSelect(t *testing.T) {
-	var net *core.Network = core.NewNetwork("DoSelect")
+	net := core.NewNetwork("DoSelect")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 	proc2 := net.NewProc("Select", &testrtn.Selector{})
@@ -110,9 +108,7 @@ func TestDoSelect(t *testing.T) {
 }
 
 func TestWriteToConsUsingNL(t *testing.T) {
-	// runtime.GOMAXPROCS(16)
-
-	var net *core.Network = core.NewNetwork("MergeToCons")
+	net := core.NewNetwork("MergeToCons")
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 	proc2 := net.NewProc("Sender2", &testrtn.Sender{})
@@ -128,7 +124,7 @@ func TestWriteToConsUsingNL(t *testing.T) {
 }
 
 func TestForceDeadlock(t *testing.T) {
-	var net *core.Network = core.NewNetwork("ForceDeadlock")
+	net := core.NewNetwork("ForceDeadlock")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 	proc2 := net.NewProc("Counter", &testrtn.Counter{})

@@ -11,6 +11,8 @@ type OutArrayPort struct {
 	closed   bool
 }
 
+func (c *OutArrayPort) send(p *Process, pkt *Packet) bool { panic("send on array port") }
+
 func (c *OutArrayPort) SetOptional(b bool) {}
 
 func (c *OutArrayPort) GetType() string {

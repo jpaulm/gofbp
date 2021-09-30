@@ -12,7 +12,7 @@ func main() {
 
 	// runtime.GOMAXPROCS(16)
 
-	var net *core.Network = core.NewNetwork("ForceDeadlock")
+	net := core.NewNetwork("ForceDeadlock")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 	proc2 := net.NewProc("Counter", &testrtn.Counter{})

@@ -1,7 +1,7 @@
 package core
 
 type OutputConn interface {
-	//send(p *Process) *Packet
+	send(*Process, *Packet) bool
 
 	//IsEmpty() bool
 	//IsClosed() bool

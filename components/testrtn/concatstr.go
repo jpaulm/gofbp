@@ -32,7 +32,7 @@ func (concatstr *ConcatStr) Execute(p *core.Process) {
 				break
 			}
 			//fmt.Println("Output: ", pkt.Contents)
-			p.Send(concatstr.opt.(*core.OutPort), pkt)
+			p.Send(concatstr.opt, pkt)
 		}
 	}
 	fmt.Println(p.GetName() + " ended")

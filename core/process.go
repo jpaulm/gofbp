@@ -75,8 +75,8 @@ func (p *Process) OpenOutArrayPort(s ...string) OutputConn {
 
 }
 
-func (p *Process) Send(o *OutPort, pkt *Packet) bool {
-	return o.Conn.send(p, pkt)
+func (p *Process) Send(o OutputConn, pkt *Packet) bool {
+	return o.send(p, pkt)
 }
 
 func (p *Process) Receive(c InputConn) *Packet {
@@ -101,14 +101,13 @@ func (p *Process) ensureRunning() {
 			"dormant",
 			"suspSend",
 			"suspRecv",
-			
+
 			"terminated"}[status])
 	*/
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		return
 	}
 
-	
 	//p.network.wg.Add(1)
 	go func() { // Process goroutine
 		defer p.network.wg.Done()

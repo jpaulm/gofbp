@@ -9,7 +9,7 @@ import (
 
 func main5() {
 
-	var net *core.Network = core.NewNetwork("Concat")
+	net := core.NewNetwork("Concat")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
