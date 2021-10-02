@@ -38,9 +38,9 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 - `go test -run ForceDeadlock -count=1 -timeout 0s` 
 
-`go test` runs them all, in sequence...
+`go test gofbp_test.go -timeout 0s` runs them all, in sequence...
 
-Note that the last test in this sequence is designed to crash - _it is recommended to use the parameter `-timeout 0s` to see the stacktrace as soon as possible!_
+Note that the last test in this sequence (`ForceDeadlock`) is designed to crash - _it is recommended to use the parameter `-timeout 0s` to see the stacktrace as soon as possible!_
 
 The following components are available:
 
