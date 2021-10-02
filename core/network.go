@@ -242,7 +242,6 @@ func (n *Network) Run() {
 
 	var canRun bool = false
 	for _, proc := range n.procs {
-		//proc.network = n
 		proc.selfStarting = true
 		if proc.inPorts != nil {
 			for _, conn := range proc.inPorts {
@@ -251,7 +250,7 @@ func (n *Network) Run() {
 				}
 			}
 		}
-		if !proc.selfStarting && !proc.isMustRun(proc.component) {
+		if !proc.selfStarting {
 			continue
 		}
 

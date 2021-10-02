@@ -1,7 +1,7 @@
 package core
 
 import (
-	//"fmt"
+	"fmt"
 	"sync/atomic"
 )
 
@@ -10,15 +10,15 @@ import (
 //)
 
 type Process struct {
-	name         string
-	network      *Network
-	inPorts      map[string]InputConn
-	outPorts     map[string]OutputConn
-	logFile      string
-	component    Component
-	ownedPkts    int
-	done         bool
-	selfStarting bool // process has non-IIP input ports
+	name      string
+	network   *Network
+	inPorts   map[string]InputConn
+	outPorts  map[string]OutputConn
+	logFile   string
+	component Component
+	ownedPkts int
+	//done         bool
+	selfStarting bool // process has no non-IIP input ports
 	//MustRun   bool
 	status int32
 }
@@ -83,14 +83,23 @@ func (p *Process) Receive(c InputConn) *Packet {
 	return c.receive(p)
 }
 
-// allDrained returns whether any input port might return new data.
-func (p *Process) allDrained() bool {
+func (p *Process) allInputsClosed() bool {
+	allClosed := true
 	for _, v := range p.inPorts {
-		if !v.isDrained() {
-			return false
+		if v.GetType() == "InArrayPort" {
+			allClosed = true
+			for _, w := range v.(*InArrayPort).array {
+				if !w.isDrained() || !w.IsClosed() {
+					return false
+				}
+			}
+		} else {
+			if !v.isDrained() || !v.IsClosed() {
+				return false
+			}
 		}
 	}
-	return true
+	return allClosed
 }
 
 func (p *Process) ensureRunning() {
@@ -109,40 +118,47 @@ func (p *Process) ensureRunning() {
 func (p *Process) Run() {
 	atomic.StoreInt32(&p.status, Dormant)
 	defer atomic.StoreInt32(&p.status, Terminated)
+	defer fmt.Println(p.GetName(), " terminated")
 
 	p.component.Setup(p)
 
-	for {
-		//if p.isMustRun(p.component) || !p.selfStarting {
+	canRun := !p.allInputsClosed() || p.isMustRun(p.component)
+
+	for canRun {
+		// multiple activations, if necessary!
+		fmt.Println(p.GetName(), " activated")
 		atomic.StoreInt32(&p.status, Active)
 		p.component.Execute(p) // single "activation"
 		atomic.StoreInt32(&p.status, Dormant)
-		//}
+		fmt.Println(p.GetName(), " deactivated")
 
 		if p.ownedPkts > 0 {
 			panic(p.name + " deactivated without disposing of all owned packets")
 		}
 
-		p.done = p.allDrained()
-		if p.done {
-			break
+		if p.allInputsClosed() {
+			canRun = false
+		} else {
+			for _, v := range p.inPorts {
+				v.resetForNextExecution()
+			}
 		}
 
-		for _, v := range p.inPorts {
-			v.resetForNextExecution()
-		}
 	}
 
 	for _, v := range p.outPorts {
-		if v.GetType() != "NullOutPort" {
-			if v.GetType() == "OutPort" {
-				v.(*OutPort).Conn.decUpstream()
-			} else {
-				for _, w := range v.(*OutArrayPort).array {
-					w.Conn.decUpstream()
+		/*
+			if v.GetType() != "NullOutPort" {
+				if v.GetType() == "OutPort" {
+					v.(*OutPort).Conn.decUpstream()
+				} else {
+					for _, w := range v.(*OutArrayPort).array {
+						w.Conn.decUpstream()
+					}
 				}
 			}
-		}
+		*/
+		v.Close()
 	}
 }
 

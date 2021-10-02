@@ -11,19 +11,19 @@ type OutArrayPort struct {
 	closed   bool
 }
 
-func (c *OutArrayPort) send(p *Process, pkt *Packet) bool { panic("send on array port") }
+func (o *OutArrayPort) send(p *Process, pkt *Packet) bool { panic("send on array port") }
 
-func (c *OutArrayPort) SetOptional(b bool) {}
+func (o *OutArrayPort) SetOptional(b bool) {}
 
-func (c *OutArrayPort) GetType() string {
+func (o *OutArrayPort) GetType() string {
 	return "OutArrayPort"
 }
 
-func (c *OutArrayPort) GetArrayItem(i int) *OutPort {
-	if i >= len(c.array) {
+func (o *OutArrayPort) GetArrayItem(i int) *OutPort {
+	if i >= len(o.array) {
 		return nil
 	}
-	return c.array[i]
+	return o.array[i]
 }
 
 func (o *OutArrayPort) SetArrayItem(o2 *OutPort, i int) {
@@ -35,6 +35,12 @@ func (o *OutArrayPort) SetArrayItem(o2 *OutPort, i int) {
 	o.array[i] = o2
 }
 
-func (c *OutArrayPort) ArrayLength() int {
-	return len(c.array)
+func (o *OutArrayPort) ArrayLength() int {
+	return len(o.array)
+}
+
+func (o *OutArrayPort) Close() {
+	for _, v := range o.array {
+		v.Close()
+	}
 }

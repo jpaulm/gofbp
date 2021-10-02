@@ -30,6 +30,8 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	c.condNF.L.Lock()
 	defer c.condNF.L.Unlock()
 	fmt.Println(p.name, "Sending", pkt.Contents)
+	c.downStrProc.ensureRunning()
+	c.condNE.Broadcast()
 	for c.isFull() { // connection is full
 		atomic.StoreInt32(&p.status, SuspSend)
 		c.condNF.Wait()
@@ -40,11 +42,6 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
 	p.ownedPkts--
-
-	c.downStrProc.ensureRunning()
-
-	c.condNE.Broadcast()
-
 	return true
 }
 
@@ -89,6 +86,8 @@ func (c *Connection) decUpstream() {
 	if c.upStrmCnt == 0 {
 		c.closed = true
 		c.condNE.Broadcast()
+		c.downStrProc.ensureRunning()
+
 	}
 }
 
@@ -98,6 +97,7 @@ func (c *Connection) Close() {
 
 	c.closed = true
 	c.condNE.Broadcast()
+	c.downStrProc.ensureRunning()
 }
 
 func (c *Connection) isDrained() bool {

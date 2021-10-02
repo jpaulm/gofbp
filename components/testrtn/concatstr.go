@@ -1,8 +1,6 @@
 package testrtn
 
 import (
-	"fmt"
-
 	"github.com/jpaulm/gofbp/core"
 )
 
@@ -18,7 +16,7 @@ func (concatstr *ConcatStr) Setup(p *core.Process) {
 }
 
 func (concatstr *ConcatStr) Execute(p *core.Process) {
-	fmt.Println(p.GetName() + " started")
+	//fmt.Println(p.GetName() + " started")
 
 	for i := 0; i < concatstr.ipt.ArrayLength(); i++ {
 
@@ -35,5 +33,5 @@ func (concatstr *ConcatStr) Execute(p *core.Process) {
 			p.Send(concatstr.opt, pkt)
 		}
 	}
-	fmt.Println(p.GetName() + " ended")
+	//fmt.Println(p.GetName() + " ended")
 }

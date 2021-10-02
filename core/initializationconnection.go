@@ -15,9 +15,7 @@ type InitializationConnection struct {
 }
 
 func (c *InitializationConnection) isDrained() bool {
-	// initialization connection can be considered always as drained,
-	// since it won't produce new values.
-	return true
+	return c.closed
 }
 
 func (c *InitializationConnection) IsEmpty() bool {

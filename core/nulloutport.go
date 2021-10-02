@@ -23,3 +23,5 @@ func (c *NullOutPort) SetArrayItem(o *OutPort, i int) {}
 func (c *NullOutPort) ArrayLength() int {
 	return 0
 }
+
+func (c *NullOutPort) Close() {}

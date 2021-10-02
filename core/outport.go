@@ -6,24 +6,28 @@ type OutPort struct {
 	optional bool
 }
 
-func (c *OutPort) send(p *Process, pkt *Packet) bool {
-	return c.Conn.send(p, pkt)
+func (o *OutPort) send(p *Process, pkt *Packet) bool {
+	return o.Conn.send(p, pkt)
 }
 
-func (c *OutPort) SetOptional(b bool) {
-	c.optional = b
+func (o *OutPort) SetOptional(b bool) {
+	o.optional = b
 }
 
-func (c *OutPort) GetType() string {
+func (o *OutPort) GetType() string {
 	return "OutPort"
 }
 
-func (c *OutPort) GetArrayItem(i int) *OutPort {
+func (o *OutPort) GetArrayItem(i int) *OutPort {
 	return nil
 }
 
-func (c *OutPort) SetArrayItem(o *OutPort, i int) {}
+func (o *OutPort) SetArrayItem(op *OutPort, i int) {}
 
-func (c *OutPort) ArrayLength() int {
+func (o *OutPort) ArrayLength() int {
 	return 0
+}
+
+func (o *OutPort) Close() {
+	o.Conn.decUpstream()
 }
