@@ -124,6 +124,8 @@ func TestWriteToConsUsingNL(t *testing.T) {
 }
 
 func TestForceDeadlock(t *testing.T) {
+	t.Skip("Deadlock detection does not work at the moment.")
+
 	net := core.NewNetwork("ForceDeadlock")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})

@@ -1,60 +1,17 @@
 package main
 
 import (
-	//"fmt"
-	"fmt"
 	"testing"
 
 	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
 )
 
-/*
-type Kick struct {
-	opt core.OutputConn
-}
-
-func (kick *Kick) Setup(p *core.Process) {
-	kick.opt = p.OpenOutPort("OUT")
-}
-
-func (kick *Kick) Execute(p *core.Process) {
-	//fmt.Println(p.GetName() + " started")
-
-	var pkt = p.Create("Kicker IP")
-	p.Send(kick.opt, pkt)
-
-	//fmt.Println(p.GetName() + " ended")
-}
-*/
-type Bootstrap struct {
-	in  core.InputConn
-	out core.OutputConn
-}
-
 type Forward struct {
+	Limit int
+
 	in  core.InputConn
 	out core.OutputConn
-}
-
-func (c *Bootstrap) Setup(p *core.Process) {
-	c.in = p.OpenInPort("IN")
-	c.out = p.OpenOutPort("OUT")
-}
-
-//func (c *Bootstrap) MustRun() {}
-
-func (c *Bootstrap) Execute(p *core.Process) {
-	pkt := p.Create("token")
-	count := 0
-	for {
-		p.Send(c.out.(*core.OutPort), pkt)
-		pkt = p.Receive(c.in)
-		count++
-		if count%1000 == 0 {
-			fmt.Println(count)
-		}
-	}
 }
 
 func (c *Forward) Setup(p *core.Process) {
@@ -63,25 +20,32 @@ func (c *Forward) Setup(p *core.Process) {
 }
 
 func (c *Forward) Execute(p *core.Process) {
+	limit := 0
 	for {
 		pkt := p.Receive(c.in)
-		p.Send(c.out.(*core.OutPort), pkt)
+		if pkt == nil {
+			return
+		}
+		if limit++; c.Limit > 0 && limit > c.Limit {
+			p.Discard(pkt)
+			return
+		}
+		p.Send(c.out, pkt)
 	}
 }
 
-func TestDetectionBug(t *testing.T) {
-	var net *core.Network = core.NewNetwork("DetectionBug")
+func TestForwarding(t *testing.T) {
+	net := core.NewNetwork("Forwarding")
 
 	kick := net.NewProc("Kick", &testrtn.Kick{})
-	//boot := net.NewProc("Boot", &Bootstrap{})
-	boot := net.NewProc("Boot", &Forward{})
-	alpha := net.NewProc("Alpha", &Forward{})
+	alpha := net.NewProc("Alpha", &Forward{Limit: 5})
 	beta := net.NewProc("Beta", &Forward{})
+	gamma := net.NewProc("Gamma", &Forward{})
 
 	net.Connect(kick, "OUT", alpha, "IN", 1)
-	net.Connect(boot, "OUT", alpha, "IN", 1)
 	net.Connect(alpha, "OUT", beta, "IN", 1)
-	net.Connect(beta, "OUT", boot, "IN", 1)
+	net.Connect(beta, "OUT", gamma, "IN", 1)
+	net.Connect(gamma, "OUT", alpha, "IN", 1)
 
 	net.Run()
 }
