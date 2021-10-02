@@ -83,6 +83,7 @@ func (p *Process) Receive(c InputConn) *Packet {
 	return c.receive(p)
 }
 
+/*
 func (p *Process) allInputsClosed() bool {
 	allClosed := true
 	for _, v := range p.inPorts {
@@ -101,7 +102,7 @@ func (p *Process) allInputsClosed() bool {
 	}
 	return allClosed
 }
-
+*/
 func (p *Process) ensureRunning() {
 
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
@@ -149,7 +150,7 @@ func (p *Process) Run() {
 
 	allDrained, hasData := p.inputState()
 
-	canRun := len(p.inPorts) == 0 || hasData || !allDrained || p.isMustRun(p.component)
+	canRun := p.selfStarting || hasData || !allDrained || p.isMustRun(p.component)
 
 	for canRun {
 		// multiple activations, if necessary!
