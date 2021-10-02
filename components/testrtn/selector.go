@@ -24,7 +24,7 @@ func (selector *Selector) Setup(p *core.Process) {
 func (Selector) MustRun() {}
 
 func (selector *Selector) Execute(p *core.Process) {
-	fmt.Println(p.GetName() + " started")
+	//fmt.Println(p.GetName() + " started")
 
 	icpkt := p.Receive(selector.iptIp)
 	param := icpkt.Contents.(string)
@@ -52,5 +52,5 @@ func (selector *Selector) Execute(p *core.Process) {
 
 	}
 
-	fmt.Println(p.GetName() + " ended")
+	//fmt.Println(p.GetName() + " ended")
 }

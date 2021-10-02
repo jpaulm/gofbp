@@ -1,7 +1,7 @@
 package testrtn
 
 import (
-	"fmt"
+	//"fmt"
 
 	"github.com/jpaulm/gofbp/core"
 )
@@ -15,10 +15,10 @@ func (kick *Kick) Setup(p *core.Process) {
 }
 
 func (kick *Kick) Execute(p *core.Process) {
-	fmt.Println(p.GetName() + " started")
+	//fmt.Println(p.GetName() + " started")
 
 	var pkt = p.Create("Kicker IP")
 	p.Send(kick.opt, pkt)
 
-	fmt.Println(p.GetName() + " ended")
+	//fmt.Println(p.GetName() + " ended")
 }

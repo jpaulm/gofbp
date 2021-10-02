@@ -19,7 +19,7 @@ func (writeToConsole *WriteToConsole) Setup(p *core.Process) {
 func (WriteToConsole) MustRun() {}
 
 func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
-	fmt.Println(p.GetName() + " started")
+	//fmt.Println(p.GetName() + " started")
 
 	for {
 		var pkt = p.Receive(writeToConsole.ipt)
@@ -34,5 +34,5 @@ func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
 		}
 	}
 
-	fmt.Println(p.GetName() + " ended")
+	//fmt.Println(p.GetName() + " ended")
 }

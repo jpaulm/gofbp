@@ -115,14 +115,41 @@ func (p *Process) ensureRunning() {
 	}()
 }
 
+func (p *Process) inputState() (bool, bool) {
+	allDrained := true
+	hasData := false
+	for _, v := range p.inPorts {
+		if v.GetType() == "InArrayPort" {
+			//allClosed = true
+			for _, w := range v.(*InArrayPort).array {
+				if !w.isDrained() /* || !w.IsClosed() */ {
+					allDrained = false
+				}
+				hasData = hasData || !w.IsEmpty()
+			}
+		} else {
+			if !v.isDrained() /*|| !v.IsClosed() */ {
+				allDrained = false
+			}
+			hasData = hasData || !v.IsEmpty()
+		}
+	}
+	return allDrained, hasData
+}
+
 func (p *Process) Run() {
 	atomic.StoreInt32(&p.status, Dormant)
 	defer atomic.StoreInt32(&p.status, Terminated)
 	defer fmt.Println(p.GetName(), " terminated")
-
+	fmt.Println(p.GetName(), " started")
 	p.component.Setup(p)
 
-	canRun := !p.allInputsClosed() || p.isMustRun(p.component)
+	//var allDrained bool
+	//var hasData bool
+
+	allDrained, hasData := p.inputState()
+
+	canRun := len(p.inPorts) == 0 || hasData || !allDrained || p.isMustRun(p.component)
 
 	for canRun {
 		// multiple activations, if necessary!
@@ -136,7 +163,9 @@ func (p *Process) Run() {
 			panic(p.name + " deactivated without disposing of all owned packets")
 		}
 
-		if p.allInputsClosed() {
+		allDrained, _ := p.inputState()
+
+		if allDrained {
 			canRun = false
 		} else {
 			for _, v := range p.inPorts {

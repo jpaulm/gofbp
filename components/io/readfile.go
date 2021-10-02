@@ -20,7 +20,7 @@ func (readFile *ReadFile) Setup(p *core.Process) {
 }
 
 func (readFile *ReadFile) Execute(p *core.Process) {
-	fmt.Println(p.GetName() + " started")
+	//fmt.Println(p.GetName() + " started")
 	icpkt := p.Receive(readFile.ipt)
 	fname := icpkt.Contents.(string)
 	f, err := os.Open(fname)
@@ -58,5 +58,5 @@ func (readFile *ReadFile) Execute(p *core.Process) {
 		p.Send(readFile.opt, pkt)
 		rec = rec[i+1:]
 	}
-	fmt.Println(p.GetName() + " ended")
+	//fmt.Println(p.GetName() + " ended")
 }

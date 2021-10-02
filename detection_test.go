@@ -1,12 +1,15 @@
 package main
 
 import (
+	//"fmt"
 	"fmt"
 	"testing"
 
+	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
 )
 
+/*
 type Kick struct {
 	opt core.OutputConn
 }
@@ -16,14 +19,14 @@ func (kick *Kick) Setup(p *core.Process) {
 }
 
 func (kick *Kick) Execute(p *core.Process) {
-	fmt.Println(p.GetName() + " started")
+	//fmt.Println(p.GetName() + " started")
 
 	var pkt = p.Create("Kicker IP")
 	p.Send(kick.opt, pkt)
 
-	fmt.Println(p.GetName() + " ended")
+	//fmt.Println(p.GetName() + " ended")
 }
-
+*/
 type Bootstrap struct {
 	in  core.InputConn
 	out core.OutputConn
@@ -69,8 +72,9 @@ func (c *Forward) Execute(p *core.Process) {
 func TestDetectionBug(t *testing.T) {
 	var net *core.Network = core.NewNetwork("DetectionBug")
 
-	kick := net.NewProc("Kick", &Kick{})
-	boot := net.NewProc("Boot", &Bootstrap{})
+	kick := net.NewProc("Kick", &testrtn.Kick{})
+	//boot := net.NewProc("Boot", &Bootstrap{})
+	boot := net.NewProc("Boot", &Forward{})
 	alpha := net.NewProc("Alpha", &Forward{})
 	beta := net.NewProc("Beta", &Forward{})
 
