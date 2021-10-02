@@ -2,7 +2,7 @@
 
 This repo holds the beginning of an FBP implementation in Go
 
-*As of 30 Sept., 2021, all test cases working, except for detection_test.go*
+*As of 30 Sept., 2021, all test cases working*
 
 Features include:
 
@@ -25,7 +25,7 @@ The following test cases are now working - thanks to Egon Elbre for all his help
 
 - file records being selected    
 
-- force deadlock (https://github.com/jpaulm/gofbp/blob/master/main11.go - change to main.go to run)
+- force deadlock (last test in `gofbp_test.go`)
  
 
 To run them, position to your `GitHub\gofbp` directory, and do any of the following:
@@ -36,14 +36,18 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run CopyFile -count=1`
 - `go test -run DoSelect -count=1`
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
+- `go test -run ForceDeadlock -count=1 -timeout 0s` 
 
-`go test` runs them all, in sequence - _note that the last test in this sequence is designed to crash!_
+`go test` runs them all, in sequence...
+
+Note that the last test in this sequence is designed to crash - _it is recommended to use the parameter `-timeout 0s` to see the stacktrace as soon as possible!_
 
 The following components are available:
 
 testrtn folder:
 - concatstr.go
 - discard.go
+- kick.go
 - receiver.go
 - roundrobinsender.go
 - selector.go
