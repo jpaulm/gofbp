@@ -5,6 +5,44 @@ import (
 	"sync/atomic"
 )
 
+type Component interface {
+	Setup(*Process)
+	Execute(*Process)
+}
+
+type ComponentWithMustRun interface {
+	Component
+	MustRun()
+}
+
+type InputConn interface {
+	receive(p *Process) *Packet
+	isDrained() bool
+	resetForNextExecution()
+
+	IsEmpty() bool
+	IsClosed() bool
+	GetType() string
+
+	GetArrayItem(i int) *Connection
+	SetArrayItem(c *Connection, i int)
+	ArrayLength() int
+}
+
+type OutputConn interface {
+	send(*Process, *Packet) bool
+
+	//IsEmpty() bool
+	//IsClosed() bool
+	SetOptional(b bool)
+	GetType() string
+
+	GetArrayItem(i int) *OutPort
+	SetArrayItem(c *OutPort, i int)
+	ArrayLength() int
+	Close()
+}
+
 type Process struct {
 	name      string
 	network   *Network
