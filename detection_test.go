@@ -20,6 +20,8 @@ func (c *Forward) Setup(p *core.Process) {
 }
 
 func (c *Forward) Execute(p *core.Process) {
+	defer c.out.Close()
+
 	limit := 0
 	for {
 		pkt := p.Receive(c.in)
@@ -38,7 +40,7 @@ func TestForwarding(t *testing.T) {
 	net := core.NewNetwork("Forwarding")
 
 	kick := net.NewProc("Kick", &testrtn.Kick{})
-	alpha := net.NewProc("Alpha", &Forward{Limit: 5})
+	alpha := net.NewProc("Alpha", &Forward{Limit: 1})
 	beta := net.NewProc("Beta", &Forward{})
 	gamma := net.NewProc("Gamma", &Forward{})
 

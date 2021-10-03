@@ -172,7 +172,6 @@ func (p *Process) run() {
 				v.resetForNextExecution()
 			}
 		}
-
 	}
 
 	for _, v := range p.outPorts {
