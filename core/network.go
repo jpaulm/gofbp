@@ -240,24 +240,15 @@ func (n *Network) Run() {
 		}()
 	*/
 
-	var canRun bool = false
+	startedAnything := false
 	for _, proc := range n.procs {
-		proc.selfStarting = true
-		if proc.inPorts != nil {
-			for _, conn := range proc.inPorts {
-				if conn.GetType() != "InitializationConnection" {
-					proc.selfStarting = false
-				}
-			}
+		if proc.isSelfStarting() {
+			proc.ensureRunning()
+			startedAnything = true
 		}
-		if !proc.selfStarting {
-			continue
-		}
-
-		proc.ensureRunning()
-		canRun = true
 	}
-	if !canRun {
+
+	if !startedAnything {
 		n.wg.Add(0 - len(n.procs))
 		panic("No process can start")
 	}

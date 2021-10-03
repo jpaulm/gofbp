@@ -1,14 +1,11 @@
 package core
 
-//var _ Conn = (*InArrayPort)(nil)
-
 type InArrayPort struct {
 	network *Network
 
 	portName string
 	fullName string
 	array    []*Connection
-	closed   bool
 }
 
 func (c *InArrayPort) isDrained() bool {
@@ -21,15 +18,25 @@ func (c *InArrayPort) isDrained() bool {
 }
 
 func (c *InArrayPort) IsEmpty() bool {
-	return false
+	for _, v := range c.array {
+		if !v.IsEmpty() {
+			return false
+		}
+	}
+	return true
 }
 
 func (c *InArrayPort) receive(p *Process) *Packet {
-	return nil
+	panic("receive from an array port")
 }
 
 func (c *InArrayPort) IsClosed() bool {
-	return c.closed
+	for _, v := range c.array {
+		if !v.IsClosed() {
+			return false
+		}
+	}
+	return true
 }
 
 func (c *InArrayPort) resetForNextExecution() {}

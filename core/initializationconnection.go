@@ -15,10 +15,16 @@ type InitializationConnection struct {
 }
 
 func (c *InitializationConnection) isDrained() bool {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
 	return c.closed
 }
 
 func (c *InitializationConnection) IsEmpty() bool {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
 	return !c.closed
 }
 
@@ -32,7 +38,6 @@ func (c *InitializationConnection) receive(p *Process) *Packet {
 	pkt.Contents = c.value
 	pkt.owner = p
 	p.ownedPkts++
-	//c.closed = true
 	c.Close()
 	fmt.Println(p.name, "Received IIP: ", pkt.Contents)
 	return pkt
@@ -43,14 +48,19 @@ func (c *InitializationConnection) Close() {
 	defer c.mtx.Unlock()
 
 	c.closed = true
-
 }
 
 func (c *InitializationConnection) IsClosed() bool {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
 	return c.closed
 }
 
 func (c *InitializationConnection) resetForNextExecution() {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
 	c.closed = false
 }
 

@@ -5,10 +5,6 @@ import (
 	"sync/atomic"
 )
 
-//import (
-//	"github.com/gofbp/core"
-//)
-
 type Process struct {
 	name      string
 	network   *Network
@@ -17,10 +13,7 @@ type Process struct {
 	logFile   string
 	component Component
 	ownedPkts int
-	//done         bool
-	selfStarting bool // process has no non-IIP input ports
-	//MustRun   bool
-	status int32
+	status    int32
 }
 
 func (p *Process) GetName() string {
@@ -72,85 +65,55 @@ func (p *Process) OpenOutArrayPort(s ...string) OutputConn {
 		opt.name = s[0]
 	}
 	return p.outPorts[s[0]]
-
 }
 
+// Send sends a packet to the output connection.
+// Returns false when fails to send.
 func (p *Process) Send(o OutputConn, pkt *Packet) bool {
 	return o.send(p, pkt)
 }
 
+// Receive receives from the connection.
+// Returns nil, when there's no more data.
 func (p *Process) Receive(c InputConn) *Packet {
 	return c.receive(p)
 }
 
-/*
-func (p *Process) allInputsClosed() bool {
-	allClosed := true
-	for _, v := range p.inPorts {
-		if v.GetType() == "InArrayPort" {
-			allClosed = true
-			for _, w := range v.(*InArrayPort).array {
-				if !w.isDrained() || !w.IsClosed() {
-					return false
-				}
-			}
-		} else {
-			if !v.isDrained() || !v.IsClosed() {
-				return false
-			}
-		}
-	}
-	return allClosed
+// Create creates a new packet.
+func (p *Process) Create(s string) *Packet {
+	var pkt *Packet = new(Packet)
+	pkt.Contents = s
+	pkt.owner = p
+	p.ownedPkts++
+	return pkt
 }
-*/
-func (p *Process) ensureRunning() {
 
+// Discard safely deletes the packet.
+func (p *Process) Discard(pkt *Packet) {
+	p.ownedPkts--
+}
+
+// ensureRunning starts the process if it hasn't started already.
+func (p *Process) ensureRunning() {
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		return
 	}
 
-	//p.network.wg.Add(1)
-	go func() { // Process goroutine
+	go func() {
 		defer p.network.wg.Done()
-		p.Run()
+		p.run()
 	}()
 }
 
-func (p *Process) inputState() (bool, bool) {
-	allDrained := true
-	hasData := false
-	for _, v := range p.inPorts {
-		if v.GetType() == "InArrayPort" {
-			//allClosed = true
-			for _, w := range v.(*InArrayPort).array {
-				if !w.isDrained() /* || !w.IsClosed() */ {
-					allDrained = false
-				}
-				hasData = hasData || !w.IsEmpty()
-			}
-		} else {
-			if !v.isDrained() /*|| !v.IsClosed() */ {
-				allDrained = false
-			}
-			hasData = hasData || !v.IsEmpty()
-		}
-	}
-	return allDrained, hasData
-}
-
-func (p *Process) Run() {
+// run executes the process.
+func (p *Process) run() {
 	atomic.StoreInt32(&p.status, Dormant)
 	defer atomic.StoreInt32(&p.status, Terminated)
 	defer fmt.Println(p.GetName(), " terminated")
 	fmt.Println(p.GetName(), " started")
 	p.component.Setup(p)
 
-	//var allDrained bool
-	//var hasData bool
-
-	allDrained, hasData := p.inputState()
-
-	canRun := p.selfStarting || hasData || !allDrained || p.isMustRun(p.component)
+	canRun := !p.allInputsClosed() || p.isSelfStarting()
 
 	for canRun {
 		// multiple activations, if necessary!
@@ -164,9 +127,7 @@ func (p *Process) Run() {
 			panic(p.name + " deactivated without disposing of all owned packets")
 		}
 
-		allDrained, _ := p.inputState()
-
-		if allDrained {
+		if p.allInputsClosed() {
 			canRun = false
 		} else {
 			for _, v := range p.inPorts {
@@ -177,34 +138,45 @@ func (p *Process) Run() {
 	}
 
 	for _, v := range p.outPorts {
-		/*
-			if v.GetType() != "NullOutPort" {
-				if v.GetType() == "OutPort" {
-					v.(*OutPort).Conn.decUpstream()
-				} else {
-					for _, w := range v.(*OutArrayPort).array {
-						w.Conn.decUpstream()
-					}
-				}
-			}
-		*/
 		v.Close()
 	}
 }
 
-func (p *Process) isMustRun(comp Component) bool {
+// isSelfStarting returns whether the process should start at the beginning of the network.
+func (p *Process) isSelfStarting() bool {
+	// start anything that has a MustRun annotation
+	if isMustRun(p.component) {
+		return true
+	}
+
+	// start anything that doesn't have any input ports
+	if len(p.inPorts) == 0 {
+		return true
+	}
+
+	// start anything that has an initialization connection
+	for _, in := range p.inPorts {
+		if _, ok := in.(*InitializationConnection); ok {
+			return true
+		}
+	}
+
+	return false
+}
+
+// allInputsClosed returns whether there are any inbound connections
+// that might return data.
+func (p *Process) allInputsClosed() bool {
+	for _, v := range p.inPorts {
+		if !v.isDrained() {
+			return false
+		}
+	}
+	return true
+}
+
+// isMustRun checks whether component has MustRun annotation.
+func isMustRun(comp Component) bool {
 	_, hasMustRun := comp.(ComponentWithMustRun)
 	return hasMustRun
-}
-
-func (p *Process) Create(s string) *Packet {
-	var pkt *Packet = new(Packet)
-	pkt.Contents = s
-	pkt.owner = p
-	p.ownedPkts++
-	return pkt
-}
-
-func (p *Process) Discard(pkt *Packet) {
-	p.ownedPkts--
 }
