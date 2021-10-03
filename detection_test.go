@@ -49,3 +49,16 @@ func TestForwarding(t *testing.T) {
 
 	net.Run()
 }
+
+func TestTwoConnections(t *testing.T) {
+	net := core.NewNetwork("TwoConnections")
+
+	kick1 := net.NewProc("Kick1", &testrtn.Kick{})
+	kick2 := net.NewProc("Kick2", &testrtn.Kick{})
+	printer := net.NewProc("Printer", &Printer{})
+
+	net.Connect(kick1, "OUT", printer, "IN", 1)
+	net.Connect(kick2, "OUT", printer, "IN", 1)
+
+	net.Run()
+}
