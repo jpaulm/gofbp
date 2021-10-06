@@ -7,7 +7,7 @@ type InputConn interface {
 
 	IsEmpty() bool
 	IsClosed() bool
-	GetType() string
+	//GetType() string
 
 	GetArrayItem(i int) *Connection
 	SetArrayItem(c *Connection, i int)

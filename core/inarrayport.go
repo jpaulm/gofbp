@@ -41,9 +41,9 @@ func (c *InArrayPort) IsClosed() bool {
 
 func (c *InArrayPort) resetForNextExecution() {}
 
-func (c *InArrayPort) GetType() string {
-	return "InArrayPort"
-}
+//func (c *InArrayPort) GetType() string {
+//	return "InArrayPort"
+//}
 
 func (c *InArrayPort) GetArrayItem(i int) *Connection {
 	if i >= len(c.array) {

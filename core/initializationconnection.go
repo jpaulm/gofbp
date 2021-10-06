@@ -65,9 +65,9 @@ func (c *InitializationConnection) resetForNextExecution() {
 	c.closed = false
 }
 
-func (c *InitializationConnection) GetType() string {
-	return "InitializationConnection"
-}
+//func (c *InitializationConnection) GetType() string {
+//	return "InitializationConnection"
+//}
 
 func (c *InitializationConnection) GetArrayItem(i int) *Connection {
 	return nil

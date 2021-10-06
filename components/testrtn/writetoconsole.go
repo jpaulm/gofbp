@@ -27,7 +27,9 @@ func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
 			break
 		}
 		fmt.Println(pkt.Contents)
-		if writeToConsole.opt.GetType() == "OutPort" {
+		//if writeToConsole.opt.GetType() == "OutPort" {
+		_, b := writeToConsole.opt.(*core.OutPort)
+		if b {
 			p.Send(writeToConsole.opt, pkt)
 		} else {
 			p.Discard(pkt)

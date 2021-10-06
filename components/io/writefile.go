@@ -47,7 +47,9 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 			panic("Unable to write file: " + fname)
 		}
 
-		if writeFile.opt.GetType() == "OutPort" {
+		_, b := writeFile.opt.(*core.OutPort)
+		if b {
+			//if writeFile.opt.GetType() == "OutPort" {
 			p.Send(writeFile.opt, pkt)
 		} else {
 			p.Discard(pkt)

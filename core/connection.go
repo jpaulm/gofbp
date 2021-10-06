@@ -131,9 +131,9 @@ func (c *Connection) nolockIsFull() bool {
 
 func (c *Connection) resetForNextExecution() {}
 
-func (c *Connection) GetType() string {
-	return "Connection"
-}
+//func (c *Connection) GetType() string {
+//	return "Connection"
+//}
 
 func (c *Connection) GetArrayItem(i int) *Connection {
 	return nil

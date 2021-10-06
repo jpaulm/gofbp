@@ -15,9 +15,9 @@ func (o *OutArrayPort) send(p *Process, pkt *Packet) bool { panic("send on array
 
 func (o *OutArrayPort) SetOptional(b bool) {}
 
-func (o *OutArrayPort) GetType() string {
-	return "OutArrayPort"
-}
+//func (o *OutArrayPort) GetType() string {
+//	return "OutArrayPort"
+//}
 
 func (o *OutArrayPort) GetArrayItem(i int) *OutPort {
 	if i >= len(o.array) {

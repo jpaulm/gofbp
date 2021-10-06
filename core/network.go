@@ -245,7 +245,9 @@ func (n *Network) Run() {
 		proc.selfStarting = true
 		if proc.inPorts != nil {
 			for _, conn := range proc.inPorts {
-				if conn.GetType() != "InitializationConnection" {
+				//if conn.GetType() != "InitializationConnection" {
+				_, b := conn.(*InitializationConnection)
+				if !b {
 					proc.selfStarting = false
 				}
 			}

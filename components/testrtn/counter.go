@@ -32,7 +32,9 @@ func (counter *Counter) Execute(p *core.Process) {
 			break
 		}
 		//fmt.Println(pkt.Contents)
-		if counter.opt.GetType() == "OutPort" {
+		//if counter.opt.GetType() == "OutPort" {
+		_, b := counter.opt.(*core.OutPort)
+		if b {
 			p.Send(counter.opt, pkt)
 		} else {
 			p.Discard(pkt)

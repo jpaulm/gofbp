@@ -14,10 +14,6 @@ func (o *OutPort) SetOptional(b bool) {
 	o.optional = b
 }
 
-func (o *OutPort) GetType() string {
-	return "OutPort"
-}
-
 func (o *OutPort) GetArrayItem(i int) *OutPort {
 	return nil
 }

@@ -87,26 +87,6 @@ func (p *Process) Receive(c InputConn) *Packet {
 	return c.receive(p)
 }
 
-/*
-func (p *Process) allInputsClosed() bool {
-	allClosed := true
-	for _, v := range p.inPorts {
-		if v.GetType() == "InArrayPort" {
-			allClosed = true
-			for _, w := range v.(*InArrayPort).array {
-				if !w.isDrained() || !w.IsClosed() {
-					return false
-				}
-			}
-		} else {
-			if !v.isDrained() || !v.IsClosed() {
-				return false
-			}
-		}
-	}
-	return allClosed
-}
-*/
 func (p *Process) ensureRunning() {
 
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
@@ -124,7 +104,9 @@ func (p *Process) inputState() (bool, bool) {
 	allDrained := true
 	hasData := false
 	for _, v := range p.inPorts {
-		if v.GetType() == "InArrayPort" {
+		//if v.GetType() == "InArrayPort" {
+		_, b := v.(*InArrayPort)
+		if b {
 			//allClosed = true
 			for _, w := range v.(*InArrayPort).array {
 				if !w.isDrained() /* || !w.IsClosed() */ {
@@ -181,17 +163,6 @@ func (p *Process) Run() {
 	}
 
 	for _, v := range p.outPorts {
-		/*
-			if v.GetType() != "NullOutPort" {
-				if v.GetType() == "OutPort" {
-					v.(*OutPort).Conn.decUpstream()
-				} else {
-					for _, w := range v.(*OutArrayPort).array {
-						w.Conn.decUpstream()
-					}
-				}
-			}
-		*/
 		v.Close()
 	}
 }
