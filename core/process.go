@@ -75,10 +75,14 @@ func (p *Process) OpenOutArrayPort(s ...string) OutputConn {
 
 }
 
+// Send sends a packet to the output connection.
+// Returns false when fails to send.
 func (p *Process) Send(o OutputConn, pkt *Packet) bool {
 	return o.send(p, pkt)
 }
 
+// Receive receives from the connection.
+// Returns nil, when there's no more data.
 func (p *Process) Receive(c InputConn) *Packet {
 	return c.receive(p)
 }

@@ -32,7 +32,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	fmt.Println(p.name, "Sending", pkt.Contents)
 	c.downStrProc.ensureRunning()
 	c.condNE.Broadcast()
-	for c.isFull() { // connection is full
+	for c.nolockIsFull() { // connection is full
 		atomic.StoreInt32(&p.status, SuspSend)
 		c.condNF.Wait()
 		atomic.StoreInt32(&p.status, Active)
@@ -50,7 +50,7 @@ func (c *Connection) receive(p *Process) *Packet {
 	defer c.condNE.L.Unlock()
 
 	fmt.Println(p.name, "Receiving")
-	for c.isEmpty() { // connection is empty
+	for c.nolockIsEmpty() { // connection is empty
 		if c.closed {
 			c.condNF.Broadcast()
 			return nil
@@ -104,17 +104,17 @@ func (c *Connection) isDrained() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	return c.isEmpty() && c.closed
+	return c.nolockIsEmpty() && c.closed
 }
 
 func (c *Connection) IsEmpty() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	return c.isEmpty()
+	return c.nolockIsEmpty()
 }
 
-func (c *Connection) isEmpty() bool {
+func (c *Connection) nolockIsEmpty() bool {
 	return c.ir == c.is && c.pktArray[c.is] == nil
 }
 
@@ -125,7 +125,7 @@ func (c *Connection) IsClosed() bool {
 	return c.closed
 }
 
-func (c *Connection) isFull() bool {
+func (c *Connection) nolockIsFull() bool {
 	return c.ir == c.is && c.pktArray[c.is] != nil
 }
 
