@@ -4,9 +4,11 @@ This repo holds the beginning of an FBP implementation in Go
 
 *As of 2 Oct., 2021, all test cases working*
 
-Please note, on Oct 6, the "type" test in components was changed to use the compile-time function, so you will need to reload the system, and make changes to any components affected, as shown in `components/io/writefile.go`.
+Please note, on Oct 6, the following changes have been made:
 
-Also, components referencing array-type input or output ports should be changed as shown in `concatstr.go` and `roundrobinsender.go`.
+- "type" test in components was changed to use the compile-time function, so you will need to reload the system, and make changes to any components affected, as shown in `components/io/writefile.go`.
+
+- components referencing array-type input or output ports should be changed as shown in `concatstr.go` and `roundrobinsender.go`.
 
 Features include:
 
