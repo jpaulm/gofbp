@@ -8,13 +8,13 @@ Please note, on Oct 6, the following changes have been made:
 
 - "type" test in components was changed to use the compile-time function, so you will need to reload the system, and make changes to any components affected, as shown in `components/io/writefile.go`.
 
-- components referencing array-type input or output ports should be changed as shown in `concatstr.go` and `roundrobinsender.go`.
+- components referencing array-type input or output ports should be changed as shown in `components\testrtn\concatstr.go` and `components\testrtn\roundrobinsender.go`.
 
 Features include:
 
 - delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
-- the reason for `MustRun` is that components are not triggered if there is no data incoming on their input ports (apart from closing down downstream processes as appropriate;  some components however need to execute in spite of this, e.g. WriteFile, and counting components.
-- optional output ports - see https://github.com/jpaulm/gofbp/blob/master/components/testrtn/writetoconsole.go
+- the reason for `MustRun` is that components are not triggered if there is no data incoming on their non-IIP input ports (apart from closing down downstream processes as appropriate);  some components however need to execute in spite of this, e.g. `components\io\writefile.go` (which must clear the output file), and counter-type components.
+- optional output ports - see `components\testrtn\writetoconsole.go`
 
 
 The following test cases are now working - thanks to Egon Elbre for all his help!
