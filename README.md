@@ -6,6 +6,8 @@ This repo holds the beginning of an FBP implementation in Go
 
 Please note, on Oct 6, the "type" test in components was changed to use the compile-time function, so you will need to reload the system, and make changes to any components affected, as shown in `components/io/writefile.go`.
 
+Also, components referencing array-type input or output ports should be changed as shown in `concatstr.go` and `roundrobinsender.go`.
+
 Features include:
 
 - delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
