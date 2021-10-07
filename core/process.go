@@ -10,10 +10,12 @@ import (
 //)
 
 type Process struct {
-	name      string
-	network   *Network
-	inPorts   map[string]InputConn
-	outPorts  map[string]OutputConn
+	name    string
+	network *Network
+	//inPorts   map[string]InputConn
+	inPorts map[string]interface{}
+	//outPorts  map[string]OutputConn
+	outPorts  map[string]interface{}
 	logFile   string
 	component Component
 	ownedPkts int
@@ -35,10 +37,10 @@ func (p *Process) OpenInPort(s string) InputConn {
 	if in == nil {
 		panic(p.name + ": Port name not found (" + s + ")")
 	}
-	return in
+	return in.(InputConn)
 }
 
-func (p *Process) OpenInArrayPort(s string) InputConn {
+func (p *Process) OpenInArrayPort(s string) InputArrayConn {
 	if len(p.inPorts) == 0 {
 		panic(p.name + ": No input ports specified")
 	}
@@ -46,7 +48,7 @@ func (p *Process) OpenInArrayPort(s string) InputConn {
 	if in == nil {
 		panic(p.name + ": Port name not found (" + s + ")")
 	}
-	return in
+	return in.(InputArrayConn)
 }
 
 func (p *Process) OpenOutPort(s ...string) OutputConn {
@@ -61,17 +63,24 @@ func (p *Process) OpenOutPort(s ...string) OutputConn {
 		panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
 	}
 
-	return out
+	return out.(OutputConn)
 
 }
 
-func (p *Process) OpenOutArrayPort(s ...string) OutputConn {
+// not sure it maes sense to allow optional for array ports!
+
+func (p *Process) OpenOutArrayPort(s ...string) OutputArrayConn {
 	if len(p.outPorts) == 0 {
 		opt := new(NullOutPort)
 		p.outPorts[s[0]] = opt
 		opt.name = s[0]
 	}
-	return p.outPorts[s[0]]
+	out := p.outPorts[s[0]]
+
+	if len(s) == 2 && s[1] != "opt" {
+		panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
+	}
+	return out.(OutputArrayConn)
 
 }
 
@@ -115,10 +124,13 @@ func (p *Process) inputState() (bool, bool) {
 				hasData = hasData || !w.IsEmpty()
 			}
 		} else {
-			if !v.isDrained() /*|| !v.IsClosed() */ {
-				allDrained = false
+			_, b := v.(*Connection)
+			if b {
+				if !v.(*Connection).isDrained() /*|| !v.IsClosed() */ {
+					allDrained = false
+				}
+				hasData = hasData || !v.(*Connection).IsEmpty()
 			}
-			hasData = hasData || !v.IsEmpty()
 		}
 	}
 	return allDrained, hasData
@@ -136,7 +148,7 @@ func (p *Process) Run() {
 
 	allDrained, hasData := p.inputState()
 
-	canRun := p.selfStarting || hasData || !allDrained || p.isMustRun(p.component)
+	canRun := p.selfStarting || hasData || !allDrained || p.isMustRun()
 
 	for canRun {
 		// multiple activations, if necessary!
@@ -156,19 +168,30 @@ func (p *Process) Run() {
 			canRun = false
 		} else {
 			for _, v := range p.inPorts {
-				v.resetForNextExecution()
+				_, b := v.(InitializationConnection)
+				if b {
+					v.(*InitializationConnection).resetForNextExecution()
+				}
 			}
 		}
 
 	}
 
 	for _, v := range p.outPorts {
-		v.Close()
+		_, b := v.(OutputConn)
+		if b {
+			v.(OutputConn).Close()
+		} else {
+			_, b := v.(OutputArrayConn)
+			if b {
+				v.(OutputArrayConn).Close()
+			}
+		}
 	}
 }
 
-func (p *Process) isMustRun(comp Component) bool {
-	_, hasMustRun := comp.(ComponentWithMustRun)
+func (p *Process) isMustRun() bool {
+	_, hasMustRun := p.component.(ComponentWithMustRun)
 	return hasMustRun
 }
 

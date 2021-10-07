@@ -7,9 +7,12 @@ type OutputConn interface {
 	//IsClosed() bool
 	SetOptional(b bool)
 	//GetType() string
+	Close()
+}
 
+type OutputArrayConn interface {
+	OutputConn
 	GetArrayItem(i int) *OutPort
 	SetArrayItem(c *OutPort, i int)
 	ArrayLength() int
-	Close()
 }

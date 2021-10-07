@@ -7,5 +7,5 @@ type Component interface {
 
 type ComponentWithMustRun interface {
 	Component
-	MustRun()
+	MustRun() bool
 }

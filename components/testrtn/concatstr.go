@@ -5,7 +5,8 @@ import (
 )
 
 type ConcatStr struct {
-	ipt core.InputConn
+	//ipt core.InputArrayConn
+	ipt core.InputArrayConn
 	opt core.OutputConn
 }
 

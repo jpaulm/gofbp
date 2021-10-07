@@ -49,8 +49,8 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	//n.procList = append(n.procList, proc)
 	n.procs[nm] = proc
 
-	proc.inPorts = make(map[string]InputConn)
-	proc.outPorts = make(map[string]OutputConn)
+	proc.inPorts = make(map[string]interface{})
+	proc.outPorts = make(map[string]interface{})
 
 	return proc
 }
@@ -61,7 +61,7 @@ func (n *Network) NewConnection(cap int) *Connection {
 	}
 	conn.condNE.L = &conn.mtx
 	conn.condNF.L = &conn.mtx
-	conn.pktArray = make([]*Packet, cap, cap)
+	conn.pktArray = make([]*Packet, cap)
 	return conn
 }
 
@@ -94,16 +94,18 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	inPort := parsePort(in)
 
 	var connxn *Connection
-	var anyInConn InputConn
+	//var anyInConn InputConn
 
 	if inPort.indexed {
-		anyInConn = p2.inPorts[inPort.name]
+		var anyInConn = p2.inPorts[inPort.name]
 		if anyInConn == nil {
+
 			anyInConn = n.NewInArrayPort()
 			p2.inPorts[inPort.name] = anyInConn
 		}
 
-		connxn = anyInConn.GetArrayItem(inPort.index)
+		//anyInConn = anyInConn.(InputArrayConn)
+		connxn = anyInConn.(InputArrayConn).GetArrayItem(inPort.index)
 
 		if connxn == nil {
 			connxn = n.NewConnection(cap)
@@ -114,7 +116,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 			if anyInConn == nil {
 				p2.inPorts[inPort.name] = connxn
 			} else {
-				anyInConn.SetArrayItem(connxn, inPort.index)
+				anyInConn.(InputArrayConn).SetArrayItem(connxn, inPort.index)
 			}
 		}
 	} else {
@@ -132,12 +134,12 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 
 	// connxn built; input port array built if necessary
 
-	var anyOutConn OutputConn
+	//var anyOutConn OutputConn
 
 	outPort := parsePort(out)
 
 	if outPort.indexed {
-		anyOutConn = p1.outPorts[outPort.name]
+		var anyOutConn = p1.outPorts[outPort.name]
 		if anyOutConn == nil {
 			anyOutConn = n.NewOutArrayPort()
 			p1.outPorts[outPort.name] = anyOutConn
@@ -146,7 +148,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		opt := new(OutPort)
 		//p1.outPorts[out] = anyOutConn
 		opt.name = out
-		anyOutConn.SetArrayItem(opt, outPort.index)
+		anyOutConn.(OutputArrayConn).SetArrayItem(opt, outPort.index)
 		opt.Conn = connxn
 
 	} else {
