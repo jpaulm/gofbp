@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"sync"
 	"sync/atomic"
 )
 
@@ -23,6 +24,7 @@ type Process struct {
 	selfStarting bool // process has no non-IIP input ports
 	//MustRun   bool
 	status int32
+	mtx    sync.Mutex
 }
 
 func (p *Process) GetName() string {
@@ -137,6 +139,8 @@ func (p *Process) inputState() (bool, bool) {
 }
 
 func (p *Process) Run() {
+	p.mtx.Lock()
+	defer p.mtx.Unlock()
 	atomic.StoreInt32(&p.status, Dormant)
 	defer atomic.StoreInt32(&p.status, Terminated)
 	defer fmt.Println(p.GetName(), " terminated")

@@ -213,6 +213,8 @@ func (n *Network) Run() {
 			allTerminated := true
 			deadlockDetected := true
 			for _, proc := range n.procs {
+				proc.mtx.Lock()
+				defer proc.mtx.Unlock()
 				status := atomic.LoadInt32(&proc.status)
 				if status != Terminated {
 					allTerminated = false
@@ -222,7 +224,7 @@ func (n *Network) Run() {
 				}
 			}
 			if allTerminated {
-				fmt.Println("Run terminated")
+				//	fmt.Println("Run terminated")
 				return
 			}
 			if deadlockDetected {
@@ -244,6 +246,8 @@ func (n *Network) Run() {
 
 	var canRun bool = false
 	for _, proc := range n.procs {
+		proc.mtx.Lock()
+		defer proc.mtx.Unlock()
 		proc.selfStarting = true
 		if proc.inPorts != nil {
 			for _, conn := range proc.inPorts {
