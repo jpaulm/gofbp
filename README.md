@@ -31,7 +31,7 @@ The following test cases are now working - thanks to Egon Elbre for all his help
 
 - file records being selected    
 
-- force deadlock (last test in `gofbp_test.go`)
+- force deadlock (last test in `gofbp_test.go`) - this has to be run separately, as it is designed to crash!
  
 
 To run them, position to your `GitHub\gofbp` directory, and do any of the following:
