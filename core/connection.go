@@ -6,8 +6,6 @@ import (
 	"sync/atomic"
 )
 
-// Based on https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
-
 type Connection struct {
 	network     *Network
 	pktArray    []*Packet

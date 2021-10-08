@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"sync"
 	"sync/atomic"
 )
 
@@ -14,11 +13,7 @@ type Process struct {
 	logFile   string
 	component Component
 	ownedPkts int
-	//done         bool
-	selfStarting bool // process has no non-IIP input ports
-	//MustRun   bool
-	status int32
-	mtx    sync.Mutex
+	status    int32
 }
 
 func (p *Process) GetName() string {
@@ -81,57 +76,29 @@ func (p *Process) ensureRunning() {
 		return
 	}
 
-	//p.network.wg.Add(1)
-	go func() { // Process goroutine
+	go func() {
 		defer p.network.wg.Done()
-		p.Run()
+		p.run()
 	}()
 }
 
-func (p *Process) inputState() (bool, bool) {
-	allDrained := true
-	hasData := false
-	for _, v := range p.inPorts {
-		//if v.GetType() == "InArrayPort" {
-		_, b := v.(*InArrayPort)
-		if b {
-			//allClosed = true
-			for _, w := range v.(*InArrayPort).array {
-				if !w.isDrained() /* || !w.IsClosed() */ {
-					allDrained = false
-				}
-				hasData = hasData || !w.IsEmpty()
-			}
-		} else {
-			_, b := v.(*Connection)
-			if b {
-				if !v.(*Connection).isDrained() /*|| !v.IsClosed() */ {
-					allDrained = false
-				}
-				hasData = hasData || !v.(*Connection).IsEmpty()
-			}
-		}
-	}
-	return allDrained, hasData
-}
-
-func (p *Process) Run() {
-	p.mtx.Lock()
-	defer p.mtx.Unlock()
+func (p *Process) run() {
 	atomic.StoreInt32(&p.status, Dormant)
 	defer atomic.StoreInt32(&p.status, Terminated)
-	defer fmt.Println(p.GetName(), " terminated")
+
 	fmt.Println(p.GetName(), " started")
+	defer fmt.Println(p.GetName(), " terminated")
+
 	p.component.Setup(p)
 
-	//var allDrained bool
-	//var hasData bool
+	runOnce := p.isSelfStarting()
+	for runOnce || !p.allInputsClosed() {
+		runOnce = false
 
-	allDrained, hasData := p.inputState()
+		for _, v := range p.inPorts {
+			v.resetForNextExecution()
+		}
 
-	canRun := p.selfStarting || hasData || !allDrained || p.isMustRun()
-
-	for canRun {
 		// multiple activations, if necessary!
 		fmt.Println(p.GetName(), " activated")
 		atomic.StoreInt32(&p.status, Active)
@@ -143,16 +110,6 @@ func (p *Process) Run() {
 			panic(p.name + " deactivated without disposing of all owned packets")
 		}
 
-		allDrained, _ := p.inputState()
-
-		if allDrained {
-			canRun = false
-		} else {
-			for _, v := range p.inPorts {
-				v.resetForNextExecution()
-			}
-		}
-
 	}
 
 	for _, v := range p.outPorts {
@@ -160,21 +117,38 @@ func (p *Process) Run() {
 	}
 }
 
-func (p *Process) isMustRun() bool {
-	_, hasMustRun := p.component.(ComponentWithMustRun)
-	return hasMustRun
+// isSelfStarting returns whether the process should start at the beginning of the network.
+func (p *Process) isSelfStarting() bool {
+	// start anything that has a MustRun annotation
+	if isMustRun(p.component) {
+		return true
+	}
+
+	// start anything that doesn't have any input ports
+	if len(p.inPorts) == 0 {
+		return true
+	}
+
+	// start anything that has an initialization connection
+	for _, in := range p.inPorts {
+		if _, ok := in.(*InitializationConnection); ok {
+			return true
+		}
+	}
+
+	return false
 }
 
-/*
-// create packet containing string
-func (p *Process) Create(s string) *Packet {
-	var pkt *Packet = new(Packet)
-	pkt.Contents = s
-	pkt.owner = p
-	p.ownedPkts++
-	return pkt
+// allInputsClosed returns whether there are any inbound connections
+// that might return data.
+func (p *Process) allInputsClosed() bool {
+	for _, v := range p.inPorts {
+		if !v.isDrained() {
+			return false
+		}
+	}
+	return true
 }
-*/
 
 // create packet containing anything!
 func (p *Process) Create(x interface{}) *Packet {
@@ -195,6 +169,13 @@ func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 	return pkt
 }
 
+// Discard safely deletes the packet.
 func (p *Process) Discard(pkt *Packet) {
 	p.ownedPkts--
+}
+
+// isMustRun checks whether component has MustRun annotation.
+func isMustRun(comp Component) bool {
+	_, hasMustRun := comp.(ComponentWithMustRun)
+	return hasMustRun
 }
