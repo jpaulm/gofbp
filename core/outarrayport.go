@@ -9,8 +9,6 @@ type OutArrayPort struct {
 	closed   bool
 }
 
-func (o *OutArrayPort) SetOptional(b bool) {}
-
 func (o *OutArrayPort) GetArrayItem(i int) OutputConn {
 	if i >= len(o.array) {
 		return nil

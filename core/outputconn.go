@@ -7,7 +7,8 @@ type outputCommon interface {
 type OutputConn interface {
 	outputCommon
 	send(*Process, *Packet) bool
-	SetOptional(b bool)
+
+	IsConnected() bool
 }
 
 type OutputArrayConn interface {

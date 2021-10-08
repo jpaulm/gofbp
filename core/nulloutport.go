@@ -4,8 +4,14 @@ type NullOutPort struct {
 	name string
 }
 
-func (c *NullOutPort) SetOptional(b bool) {}
+// NullOutPort by default discards the packet.
+func (*NullOutPort) send(p *Process, pkt *Packet) bool {
+	p.Discard(pkt)
+	return true
+}
 
-func (c *NullOutPort) send(*Process, *Packet) bool { panic("send on null port") }
+func (*NullOutPort) IsConnected() bool {
+	return false
+}
 
-func (c *NullOutPort) Close() {}
+func (*NullOutPort) Close() {}

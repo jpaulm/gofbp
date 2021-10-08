@@ -37,13 +37,17 @@ func (p *Process) OpenInArrayPort(name string) InputArrayConn {
 	return in.(InputArrayConn)
 }
 
-func (p *Process) OpenOutPort(name string, opts ...string) OutputConn {
+func (p *Process) OpenOutPort(name string) OutputConn {
 	out, ok := p.outPorts[name]
 	if !ok {
-		if len(opts) == 0 || opts[0] != "opt" {
-			panic(p.name + ": Port name not found (" + name + ")")
-		}
+		panic(p.name + ": Port name not found (" + name + ")")
+	}
+	return out.(OutputConn)
+}
 
+func (p *Process) OpenOutPortOptional(name string) OutputConn {
+	out, ok := p.outPorts[name]
+	if !ok {
 		out = &NullOutPort{name: name}
 		p.outPorts[name] = out
 	}
