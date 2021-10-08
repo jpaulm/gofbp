@@ -195,7 +195,6 @@ func (n *Network) Initialize(initValue string, p2 *Process, in string) {
 	conn.fullName = p2.name + "." + in
 
 	conn.value = initValue
-
 }
 
 func (n *Network) Run() {

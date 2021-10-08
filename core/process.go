@@ -73,23 +73,18 @@ func (p *Process) Receive(c InputConn) *Packet {
 }
 
 func (p *Process) ensureRunning() {
-	if !p.compareSwapTransition(NotStarted, Active) {
+	if !p.transitionFrom(NotStarted, Dormant) {
 		return
 	}
 
 	go func() {
 		defer p.network.wg.Done()
+		defer p.transition(Terminated)
 		p.run()
 	}()
 }
 
 func (p *Process) run() {
-	p.transition(Dormant)
-	defer p.transition(Terminated)
-
-	fmt.Println(p.GetName(), " started")
-	defer fmt.Println(p.GetName(), " terminated")
-
 	p.component.Setup(p)
 
 	runOnce := p.isSelfStarting()
@@ -101,16 +96,13 @@ func (p *Process) run() {
 		}
 
 		// multiple activations, if necessary!
-		fmt.Println(p.GetName(), " activated")
 		p.transition(Active)
 		p.component.Execute(p) // single "activation"
 		p.transition(Dormant)
-		fmt.Println(p.GetName(), " deactivated")
 
 		if p.ownedPkts > 0 {
 			panic(p.name + " deactivated without disposing of all owned packets")
 		}
-
 	}
 
 	for _, v := range p.outPorts {
@@ -185,10 +177,15 @@ func (p *Process) status() ProcessStatus {
 	return ProcessStatus(atomic.LoadInt32(&p.atomicStatus))
 }
 
-func (p *Process) transition(targetStatus ProcessStatus) {
-	atomic.StoreInt32(&p.atomicStatus, int32(targetStatus))
+func (p *Process) transition(next ProcessStatus) {
+	previous := ProcessStatus(atomic.SwapInt32(&p.atomicStatus, int32(next)))
+	fmt.Printf("%s %s -> %s\n", p.GetName(), previous, next)
 }
 
-func (p *Process) compareSwapTransition(existingStatus, targetStatus ProcessStatus) bool {
-	return atomic.CompareAndSwapInt32(&p.atomicStatus, int32(existingStatus), int32(targetStatus))
+func (p *Process) transitionFrom(current, next ProcessStatus) bool {
+	ok := atomic.CompareAndSwapInt32(&p.atomicStatus, int32(current), int32(next))
+	if ok {
+		fmt.Printf("%s %s -> %s\n", p.GetName(), current, next)
+	}
+	return ok
 }
