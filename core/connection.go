@@ -3,7 +3,6 @@ package core
 import (
 	"fmt"
 	"sync"
-	"sync/atomic"
 )
 
 type Connection struct {
@@ -31,9 +30,9 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	c.downStrProc.ensureRunning()
 	c.condNE.Broadcast()
 	for c.nolockIsFull() { // connection is full
-		atomic.StoreInt32(&p.status, SuspSend)
+		p.transition(SuspendedSend)
 		c.condNF.Wait()
-		atomic.StoreInt32(&p.status, Active)
+		p.transition(Active)
 	}
 	fmt.Println(p.name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
@@ -53,10 +52,9 @@ func (c *Connection) receive(p *Process) *Packet {
 			c.condNF.Broadcast()
 			return nil
 		}
-		atomic.StoreInt32(&p.status, SuspRecv)
+		p.transition(SuspendedRecv)
 		c.condNE.Wait()
-		atomic.StoreInt32(&p.status, Active)
-
+		p.transition(Active)
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil

@@ -13,7 +13,8 @@ type Process struct {
 	logFile   string
 	component Component
 	ownedPkts int
-	status    int32
+
+	atomicStatus int32
 }
 
 func (p *Process) GetName() string {
@@ -72,7 +73,7 @@ func (p *Process) Receive(c InputConn) *Packet {
 }
 
 func (p *Process) ensureRunning() {
-	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
+	if !p.compareSwapTransition(NotStarted, Active) {
 		return
 	}
 
@@ -83,8 +84,8 @@ func (p *Process) ensureRunning() {
 }
 
 func (p *Process) run() {
-	atomic.StoreInt32(&p.status, Dormant)
-	defer atomic.StoreInt32(&p.status, Terminated)
+	p.transition(Dormant)
+	defer p.transition(Terminated)
 
 	fmt.Println(p.GetName(), " started")
 	defer fmt.Println(p.GetName(), " terminated")
@@ -101,9 +102,9 @@ func (p *Process) run() {
 
 		// multiple activations, if necessary!
 		fmt.Println(p.GetName(), " activated")
-		atomic.StoreInt32(&p.status, Active)
+		p.transition(Active)
 		p.component.Execute(p) // single "activation"
-		atomic.StoreInt32(&p.status, Dormant)
+		p.transition(Dormant)
 		fmt.Println(p.GetName(), " deactivated")
 
 		if p.ownedPkts > 0 {
@@ -178,4 +179,16 @@ func (p *Process) Discard(pkt *Packet) {
 func isMustRun(comp Component) bool {
 	_, hasMustRun := comp.(ComponentWithMustRun)
 	return hasMustRun
+}
+
+func (p *Process) status() ProcessStatus {
+	return ProcessStatus(atomic.LoadInt32(&p.atomicStatus))
+}
+
+func (p *Process) transition(targetStatus ProcessStatus) {
+	atomic.StoreInt32(&p.atomicStatus, int32(targetStatus))
+}
+
+func (p *Process) compareSwapTransition(existingStatus, targetStatus ProcessStatus) bool {
+	return atomic.CompareAndSwapInt32(&p.atomicStatus, int32(existingStatus), int32(targetStatus))
 }

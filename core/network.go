@@ -5,16 +5,7 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
-	"sync/atomic"
-)
-
-const (
-	Notstarted int32 = iota
-	Active
-	Dormant
-	SuspSend
-	SuspRecv
-	Terminated
+	"time"
 )
 
 type Network struct {
@@ -36,13 +27,11 @@ func NewNetwork(name string) *Network {
 }
 
 func (n *Network) NewProc(nm string, comp Component) *Process {
-
 	proc := &Process{
 		name:      nm,
 		network:   n,
 		logFile:   "",
 		component: comp,
-		status:    Notstarted,
 	}
 
 	//n.procList = append(n.procList, proc)
@@ -237,12 +226,11 @@ func (n *Network) Run() {
 
 func (n *Network) deadlockDetection() {
 	for {
+		time.Sleep(200 * time.Millisecond)
 		allTerminated := true
 		deadlockDetected := true
 		for _, proc := range n.procs {
-			//proc.mtx.Lock()
-			//defer proc.mtx.Unlock()
-			status := atomic.LoadInt32(&proc.status)
+			status := proc.status()
 			if status != Terminated {
 				allTerminated = false
 				if status == Active {
@@ -251,19 +239,12 @@ func (n *Network) deadlockDetection() {
 			}
 		}
 		if allTerminated {
-			//	fmt.Println("Run terminated")
 			return
 		}
 		if deadlockDetected {
 			fmt.Println("\nDeadlock detected!")
 			for key, proc := range n.procs {
-				fmt.Println(key, " Status: ",
-					[]string{"notStarted",
-						"active",
-						"dormant",
-						"suspSend",
-						"suspRecv",
-						"terminated"}[proc.status])
+				fmt.Println(key, " Status: ", proc.status())
 			}
 			panic("Deadlock!")
 		}
