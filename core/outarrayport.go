@@ -1,35 +1,27 @@
 package core
 
-//var _ Conn = (*InArrayPort)(nil)
-
 type OutArrayPort struct {
 	network *Network
 
 	portName string
 	fullName string
-	array    []*OutPort
+	array    []OutputConn
 	closed   bool
 }
 
-func (o *OutArrayPort) send(p *Process, pkt *Packet) bool { panic("send on array port") }
-
 func (o *OutArrayPort) SetOptional(b bool) {}
 
-//func (o *OutArrayPort) GetType() string {
-//	return "OutArrayPort"
-//}
-
-func (o *OutArrayPort) GetArrayItem(i int) *OutPort {
+func (o *OutArrayPort) GetArrayItem(i int) OutputConn {
 	if i >= len(o.array) {
 		return nil
 	}
 	return o.array[i]
 }
 
-func (o *OutArrayPort) SetArrayItem(o2 *OutPort, i int) {
+func (o *OutArrayPort) SetArrayItem(o2 OutputConn, i int) {
 	if i >= len(o.array) {
 		// add to .array to fit c2
-		increaseBy := make([]*OutPort, i-len(o.array)+1)
+		increaseBy := make([]OutputConn, i-len(o.array)+1)
 		o.array = append(o.array, increaseBy...)
 	}
 	o.array[i] = o2

@@ -6,17 +6,11 @@ import (
 	"sync/atomic"
 )
 
-//import (
-//	"github.com/gofbp/core"
-//)
-
 type Process struct {
-	name    string
-	network *Network
-	//inPorts   map[string]InputConn
-	inPorts map[string]interface{}
-	//outPorts  map[string]OutputConn
-	outPorts  map[string]interface{}
+	name      string
+	network   *Network
+	inPorts   map[string]inputCommon
+	outPorts  map[string]outputCommon
 	logFile   string
 	component Component
 	ownedPkts int
@@ -31,59 +25,43 @@ func (p *Process) GetName() string {
 	return p.name
 }
 
-func (p *Process) OpenInPort(s string) InputConn {
-	if len(p.inPorts) == 0 {
-		panic(p.name + ": No input ports specified")
-	}
-	in := p.inPorts[s]
-	if in == nil {
-		panic(p.name + ": Port name not found (" + s + ")")
+func (p *Process) OpenInPort(name string) InputConn {
+	in, ok := p.inPorts[name]
+	if !ok {
+		panic(p.name + ": Port name not found (" + name + ")")
 	}
 	return in.(InputConn)
 }
 
-func (p *Process) OpenInArrayPort(s string) InputArrayConn {
-	if len(p.inPorts) == 0 {
-		panic(p.name + ": No input ports specified")
-	}
-	in := p.inPorts[s]
-	if in == nil {
-		panic(p.name + ": Port name not found (" + s + ")")
+func (p *Process) OpenInArrayPort(name string) InputArrayConn {
+	in, ok := p.inPorts[name]
+	if !ok {
+		panic(p.name + ": Port name not found (" + name + ")")
 	}
 	return in.(InputArrayConn)
 }
 
-func (p *Process) OpenOutPort(s ...string) OutputConn {
-	if len(p.outPorts) == 0 {
-		opt := new(NullOutPort)
-		p.outPorts[s[0]] = opt
-		opt.name = s[0]
-	}
-	out := p.outPorts[s[0]]
+func (p *Process) OpenOutPort(name string, opts ...string) OutputConn {
+	out, ok := p.outPorts[name]
+	if !ok {
+		if len(opts) == 0 || opts[0] != "opt" {
+			panic(p.name + ": Port name not found (" + name + ")")
+		}
 
-	if len(s) == 2 && s[1] != "opt" {
-		panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
+		out = &NullOutPort{name: name}
+		p.outPorts[name] = out
 	}
-
 	return out.(OutputConn)
-
 }
 
 // not sure it maes sense to allow optional for array ports!
 
-func (p *Process) OpenOutArrayPort(s ...string) OutputArrayConn {
-	if len(p.outPorts) == 0 {
-		opt := new(NullOutPort)
-		p.outPorts[s[0]] = opt
-		opt.name = s[0]
-	}
-	out := p.outPorts[s[0]]
-
-	if len(s) == 2 && s[1] != "opt" {
-		panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
+func (p *Process) OpenOutArrayPort(name string) OutputArrayConn {
+	out, ok := p.outPorts[name]
+	if !ok {
+		panic(p.name + ": Port name not found (" + name + ")")
 	}
 	return out.(OutputArrayConn)
-
 }
 
 // Send sends a packet to the output connection.
@@ -99,7 +77,6 @@ func (p *Process) Receive(c InputConn) *Packet {
 }
 
 func (p *Process) ensureRunning() {
-
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		return
 	}
@@ -172,25 +149,14 @@ func (p *Process) Run() {
 			canRun = false
 		} else {
 			for _, v := range p.inPorts {
-				_, b := v.(InitializationConnection)
-				if b {
-					v.(*InitializationConnection).resetForNextExecution()
-				}
+				v.resetForNextExecution()
 			}
 		}
 
 	}
 
 	for _, v := range p.outPorts {
-		_, b := v.(OutputConn)
-		if b {
-			v.(OutputConn).Close()
-		} else {
-			_, b := v.(OutputArrayConn)
-			if b {
-				v.(OutputArrayConn).Close()
-			}
-		}
+		v.Close()
 	}
 }
 

@@ -5,7 +5,7 @@ type InArrayPort struct {
 
 	portName string
 	fullName string
-	array    []*Connection
+	array    []InputConn
 }
 
 func (c *InArrayPort) isDrained() bool {
@@ -26,10 +26,6 @@ func (c *InArrayPort) IsEmpty() bool {
 	return true
 }
 
-func (c *InArrayPort) receive(p *Process) *Packet {
-	panic("receive from an array port")
-}
-
 func (c *InArrayPort) IsClosed() bool {
 	for _, v := range c.array {
 		if !v.IsClosed() {
@@ -41,21 +37,17 @@ func (c *InArrayPort) IsClosed() bool {
 
 func (c *InArrayPort) resetForNextExecution() {}
 
-//func (c *InArrayPort) GetType() string {
-//	return "InArrayPort"
-//}
-
-func (c *InArrayPort) GetArrayItem(i int) *Connection {
+func (c *InArrayPort) GetArrayItem(i int) InputConn {
 	if i >= len(c.array) {
 		return nil
 	}
 	return c.array[i]
 }
 
-func (c *InArrayPort) SetArrayItem(c2 *Connection, i int) {
+func (c *InArrayPort) SetArrayItem(c2 InputConn, i int) {
 	if i >= len(c.array) {
 		// add to .array to fit c2
-		increaseBy := make([]*Connection, i-len(c.array)+1)
+		increaseBy := make([]InputConn, i-len(c.array)+1)
 		c.array = append(c.array, increaseBy...)
 	}
 	c.array[i] = c2
