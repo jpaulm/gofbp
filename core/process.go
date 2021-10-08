@@ -199,9 +199,31 @@ func (p *Process) isMustRun() bool {
 	return hasMustRun
 }
 
+/*
+// create packet containing string
 func (p *Process) Create(s string) *Packet {
 	var pkt *Packet = new(Packet)
 	pkt.Contents = s
+	pkt.owner = p
+	p.ownedPkts++
+	return pkt
+}
+*/
+
+// create packet containing anything!
+func (p *Process) Create(x interface{}) *Packet {
+	var pkt *Packet = new(Packet)
+	pkt.Contents = x
+	pkt.owner = p
+	p.ownedPkts++
+	return pkt
+}
+
+// create bracket
+func (p *Process) CreateBracket(pktType int32, s string) *Packet {
+	var pkt *Packet = new(Packet)
+	pkt.Contents = s
+	pkt.pktType = pktType
 	pkt.owner = p
 	p.ownedPkts++
 	return pkt
