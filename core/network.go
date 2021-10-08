@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
-	"time"
 )
 
 type Network struct {
@@ -13,6 +12,7 @@ type Network struct {
 	procs map[string]*Process
 	//procList []*Process
 	//driver  Process
+	status  networkStatus
 	logFile string
 	wg      sync.WaitGroup
 }
@@ -207,8 +207,6 @@ func (n *Network) Run() {
 	n.wg.Add(len(n.procs))
 	defer n.wg.Wait()
 
-	go n.deadlockDetection()
-
 	startedAnything := false
 	for _, proc := range n.procs {
 		if proc.isSelfStarting() {
@@ -220,33 +218,5 @@ func (n *Network) Run() {
 	if !startedAnything {
 		n.wg.Add(0 - len(n.procs))
 		panic("No process can start")
-	}
-}
-
-func (n *Network) deadlockDetection() {
-	for {
-		time.Sleep(200 * time.Millisecond)
-		allTerminated := true
-		deadlockDetected := true
-		for _, proc := range n.procs {
-			status := proc.status()
-			if status != Terminated {
-				allTerminated = false
-				if status == Active {
-					deadlockDetected = false
-				}
-			}
-		}
-		if allTerminated {
-			return
-		}
-		if deadlockDetected {
-			fmt.Println("\nDeadlock detected!")
-			for key, proc := range n.procs {
-				fmt.Println(key, " Status: ", proc.status())
-			}
-			panic("Deadlock!")
-		}
-
 	}
 }

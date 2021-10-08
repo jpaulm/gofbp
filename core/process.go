@@ -180,12 +180,14 @@ func (p *Process) status() ProcessStatus {
 func (p *Process) transition(next ProcessStatus) {
 	previous := ProcessStatus(atomic.SwapInt32(&p.atomicStatus, int32(next)))
 	fmt.Printf("%s %s -> %s\n", p.GetName(), previous, next)
+	p.network.processTransitioned(previous, next)
 }
 
 func (p *Process) transitionFrom(current, next ProcessStatus) bool {
 	ok := atomic.CompareAndSwapInt32(&p.atomicStatus, int32(current), int32(next))
 	if ok {
 		fmt.Printf("%s %s -> %s\n", p.GetName(), current, next)
+		p.network.processTransitioned(current, next)
 	}
 	return ok
 }
