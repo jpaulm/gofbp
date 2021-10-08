@@ -213,8 +213,8 @@ func (n *Network) Run() {
 			allTerminated := true
 			deadlockDetected := true
 			for _, proc := range n.procs {
-				proc.mtx.Lock()
-				defer proc.mtx.Unlock()
+				//proc.mtx.Lock()
+				//defer proc.mtx.Unlock()
 				status := atomic.LoadInt32(&proc.status)
 				if status != Terminated {
 					allTerminated = false
