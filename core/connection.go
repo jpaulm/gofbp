@@ -24,8 +24,8 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	if pkt.owner != p {
 		panic("Sending packet not owned by this process")
 	}
-	c.condNF.L.Lock()
-	defer c.condNF.L.Unlock()
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
 	fmt.Println(p.name, "Sending", pkt.Contents)
 	c.downStrProc.ensureRunning()
 	for c.nolockIsFull() { // connection is full
@@ -43,8 +43,8 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 }
 
 func (c *Connection) receive(p *Process) *Packet {
-	c.condNE.L.Lock()
-	defer c.condNE.L.Unlock()
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
 
 	fmt.Println(p.name, "Receiving")
 	for c.nolockIsEmpty() { // connection is empty
