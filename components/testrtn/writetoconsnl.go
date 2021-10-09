@@ -15,7 +15,7 @@ type WriteToConsNL struct {
 
 func (writeToConsole *WriteToConsNL) Setup(p *core.Process) {
 	writeToConsole.ipt = p.OpenInPort("IN")
-	writeToConsole.opt = p.OpenOutPort("OUT", "opt")
+	writeToConsole.opt = p.OpenOutPortOptional("OUT")
 }
 
 //func (WriteToConsNL) MustRun() {}
@@ -30,14 +30,7 @@ func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
 		return
 	}
 	fmt.Println(pkt.Contents)
-	//if writeToConsole.opt.GetType() == "OutPort" {
-	_, b := writeToConsole.opt.(*core.OutPort)
-	if b {
-		p.Send(writeToConsole.opt, pkt)
-	} else {
-		p.Discard(pkt)
-	}
-	//}
+	p.Send(writeToConsole.opt, pkt)
 
 	//fmt.Println(p.GetName() + " deactivated")
 }

@@ -3,10 +3,7 @@ package core
 import (
 	"fmt"
 	"sync"
-	"sync/atomic"
 )
-
-// Based on https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
 
 type Connection struct {
 	network     *Network
@@ -27,27 +24,27 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	if pkt.owner != p {
 		panic("Sending packet not owned by this process")
 	}
-	c.condNF.L.Lock()
-	defer c.condNF.L.Unlock()
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
 	fmt.Println(p.name, "Sending", pkt.Contents)
 	c.downStrProc.ensureRunning()
-	c.condNE.Broadcast()
 	for c.nolockIsFull() { // connection is full
-		atomic.StoreInt32(&p.status, SuspSend)
+		p.transition(SuspendedSend)
 		c.condNF.Wait()
-		atomic.StoreInt32(&p.status, Active)
+		p.transition(Active)
 	}
 	fmt.Println(p.name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
 	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
 	p.ownedPkts--
+	c.condNE.Broadcast()
 	return true
 }
 
 func (c *Connection) receive(p *Process) *Packet {
-	c.condNE.L.Lock()
-	defer c.condNE.L.Unlock()
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
 
 	fmt.Println(p.name, "Receiving")
 	for c.nolockIsEmpty() { // connection is empty
@@ -55,10 +52,9 @@ func (c *Connection) receive(p *Process) *Packet {
 			c.condNF.Broadcast()
 			return nil
 		}
-		atomic.StoreInt32(&p.status, SuspRecv)
+		p.transition(SuspendedRecv)
 		c.condNE.Wait()
-		atomic.StoreInt32(&p.status, Active)
-
+		p.transition(Active)
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
@@ -130,17 +126,3 @@ func (c *Connection) nolockIsFull() bool {
 }
 
 func (c *Connection) resetForNextExecution() {}
-
-//func (c *Connection) GetType() string {
-//	return "Connection"
-//}
-
-func (c *Connection) GetArrayItem(i int) *Connection {
-	return nil
-}
-
-func (c *Connection) SetArrayItem(c2 *Connection, i int) {}
-
-func (c *Connection) ArrayLength() int {
-	return 0
-}

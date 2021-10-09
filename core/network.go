@@ -5,17 +5,6 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
-	"sync/atomic"
-	"time"
-)
-
-const (
-	Notstarted int32 = iota
-	Active
-	Dormant
-	SuspSend
-	SuspRecv
-	Terminated
 )
 
 type Network struct {
@@ -23,6 +12,7 @@ type Network struct {
 	procs map[string]*Process
 	//procList []*Process
 	//driver  Process
+	status  networkStatus
 	logFile string
 	wg      sync.WaitGroup
 }
@@ -37,20 +27,18 @@ func NewNetwork(name string) *Network {
 }
 
 func (n *Network) NewProc(nm string, comp Component) *Process {
-
 	proc := &Process{
 		name:      nm,
 		network:   n,
 		logFile:   "",
 		component: comp,
-		status:    Notstarted,
 	}
 
 	//n.procList = append(n.procList, proc)
 	n.procs[nm] = proc
 
-	proc.inPorts = make(map[string]interface{})
-	proc.outPorts = make(map[string]interface{})
+	proc.inPorts = make(map[string]inputCommon)
+	proc.outPorts = make(map[string]outputCommon)
 
 	return proc
 }
@@ -90,73 +78,88 @@ func (n *Network) NewOutArrayPort() *OutArrayPort {
 }
 
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
-
 	inPort := parsePort(in)
 
-	var connxn *Connection
-	//var anyInConn InputConn
+	var conn InputConn
 
 	if inPort.indexed {
-		var anyInConn = p2.inPorts[inPort.name]
-		if anyInConn == nil {
-
-			anyInConn = n.NewInArrayPort()
-			p2.inPorts[inPort.name] = anyInConn
+		// try get an existing port
+		existingConn := p2.inPorts[inPort.name]
+		if existingConn == nil {
+			// create one, if it doesn't exist
+			existingConn = n.NewInArrayPort()
+			p2.inPorts[inPort.name] = existingConn
 		}
+		// enforce it's an array
+		arrayConn := existingConn.(InputArrayConn)
 
-		//anyInConn = anyInConn.(InputArrayConn)
-		connxn = anyInConn.(InputArrayConn).GetArrayItem(inPort.index)
-
-		if connxn == nil {
-			connxn = n.NewConnection(cap)
-			connxn.portName = inPort.name
-			connxn.fullName = p2.name + "." + inPort.name
-			connxn.downStrProc = p2
-			connxn.network = n
-			if anyInConn == nil {
-				p2.inPorts[inPort.name] = connxn
-			} else {
-				anyInConn.(InputArrayConn).SetArrayItem(connxn, inPort.index)
-			}
+		// try get an existing connection from array
+		conn = arrayConn.GetArrayItem(inPort.index)
+		if conn == nil {
+			// create one if it doesn't exist
+			newConn := n.NewConnection(cap)
+			newConn.portName = inPort.name
+			newConn.fullName = p2.name + "." + inPort.name
+			newConn.downStrProc = p2
+			newConn.network = n
+			conn = newConn
+			arrayConn.SetArrayItem(conn, inPort.index)
 		}
 	} else {
-		if p2.inPorts[inPort.name] == nil {
-			connxn = n.NewConnection(cap)
-			connxn.portName = inPort.name
-			connxn.fullName = p2.name + "." + inPort.name
-			connxn.downStrProc = p2
-			connxn.network = n
-			p2.inPorts[inPort.name] = connxn
-		} else {
-			connxn = p2.inPorts[inPort.name].(*Connection)
+		// try get an existing port
+		existingConn, ok := p2.inPorts[inPort.name]
+		if !ok {
+			// create one if it doesn't exist
+			newConn := n.NewConnection(cap)
+			newConn.portName = inPort.name
+			newConn.fullName = p2.name + "." + inPort.name
+			newConn.downStrProc = p2
+			newConn.network = n
+			existingConn = newConn
+			p2.inPorts[inPort.name] = newConn
 		}
+		conn = existingConn.(InputConn)
 	}
 
 	// connxn built; input port array built if necessary
 
-	//var anyOutConn OutputConn
+	// rest of the code requires that the input is a `*Connection`
+	// this probably could be unrestricted.
+	connxn := conn.(*Connection)
 
 	outPort := parsePort(out)
-
 	if outPort.indexed {
-		var anyOutConn = p1.outPorts[outPort.name]
-		if anyOutConn == nil {
+		// try get an existing port
+		anyOutConn, ok := p1.outPorts[outPort.name]
+		if !ok {
+			// create one if it doesn't exist
 			anyOutConn = n.NewOutArrayPort()
 			p1.outPorts[outPort.name] = anyOutConn
 		}
+		// enforce the output is an array
+		arrayConn := anyOutConn.(OutputArrayConn)
 
-		opt := new(OutPort)
-		//p1.outPorts[out] = anyOutConn
-		opt.name = out
-		anyOutConn.(OutputArrayConn).SetArrayItem(opt, outPort.index)
-		opt.Conn = connxn
+		// check that nothing has connected to that item
+		if existing := arrayConn.GetArrayItem(outPort.index); existing != nil {
+			panic("output port " + out + " already connected")
+		}
+
+		// update the array
+		arrayConn.SetArrayItem(&OutPort{
+			name: out,
+			conn: connxn,
+		}, outPort.index)
 
 	} else {
-		//var opt OutputConn
-		opt := new(OutPort)
-		p1.outPorts[out] = opt
-		opt.name = out
-		opt.Conn = connxn
+		// check that nothing has connected already
+		if _, exists := p1.outPorts[out]; exists {
+			panic("output port " + out + " already connected")
+		}
+		// add the connection
+		p1.outPorts[out] = &OutPort{
+			name: out,
+			conn: connxn,
+		}
 	}
 
 	connxn.incUpstream()
@@ -186,14 +189,12 @@ func parsePort(in string) portDefinition {
 }
 
 func (n *Network) Initialize(initValue string, p2 *Process, in string) {
-
 	conn := n.NewInitializationConnection()
 	p2.inPorts[in] = conn
 	conn.portName = in
 	conn.fullName = p2.name + "." + in
 
 	conn.value = initValue
-
 }
 
 func (n *Network) Run() {
@@ -204,68 +205,17 @@ func (n *Network) Run() {
 	// reactivated many times during the process "run"
 
 	n.wg.Add(len(n.procs))
-
 	defer n.wg.Wait()
 
-	go func() {
-		for {
-			time.Sleep(200 * time.Millisecond)
-			allTerminated := true
-			deadlockDetected := true
-			for _, proc := range n.procs {
-				//proc.mtx.Lock()
-				//defer proc.mtx.Unlock()
-				status := atomic.LoadInt32(&proc.status)
-				if status != Terminated {
-					allTerminated = false
-					if status == Active {
-						deadlockDetected = false
-					}
-				}
-			}
-			if allTerminated {
-				//	fmt.Println("Run terminated")
-				return
-			}
-			if deadlockDetected {
-				fmt.Println("\nDeadlock detected!")
-				for key, proc := range n.procs {
-					fmt.Println(key, " Status: ",
-						[]string{"notStarted",
-							"active",
-							"dormant",
-							"suspSend",
-							"suspRecv",
-							"terminated"}[proc.status])
-				}
-				panic("Deadlock!")
-			}
-
-		}
-	}()
-
-	var canRun bool = false
+	startedAnything := false
 	for _, proc := range n.procs {
-		proc.mtx.Lock()
-		defer proc.mtx.Unlock()
-		proc.selfStarting = true
-		if proc.inPorts != nil {
-			for _, conn := range proc.inPorts {
-				//if conn.GetType() != "InitializationConnection" {
-				_, b := conn.(*InitializationConnection)
-				if !b {
-					proc.selfStarting = false
-				}
-			}
+		if proc.isSelfStarting() {
+			proc.ensureRunning()
+			startedAnything = true
 		}
-		if !proc.selfStarting {
-			continue
-		}
-
-		proc.ensureRunning()
-		canRun = true
 	}
-	if !canRun {
+
+	if !startedAnything {
 		n.wg.Add(0 - len(n.procs))
 		panic("No process can start")
 	}

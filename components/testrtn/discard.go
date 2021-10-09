@@ -13,7 +13,7 @@ type Discard struct {
 
 func (discard *Discard) Setup(p *core.Process) {
 	discard.ipt = p.OpenInPort("IN")
-	discard.opt = p.OpenOutPort("OUT", "opt")
+	discard.opt = p.OpenOutPortOptional("OUT")
 }
 
 //func (Discard) MustRun() {}
@@ -29,7 +29,6 @@ func (discard *Discard) Execute(p *core.Process) {
 		//fmt.Println(pkt.Contents)
 
 		p.Discard(pkt)
-
 	}
 
 	//fmt.Println(p.GetName() + " ended")

@@ -1,18 +1,19 @@
 package core
 
-type OutputConn interface {
-	send(*Process, *Packet) bool
-
-	//IsEmpty() bool
-	//IsClosed() bool
-	SetOptional(b bool)
-	//GetType() string
+type outputCommon interface {
 	Close()
 }
 
+type OutputConn interface {
+	outputCommon
+	send(*Process, *Packet) bool
+
+	IsConnected() bool
+}
+
 type OutputArrayConn interface {
-	OutputConn
-	GetArrayItem(i int) *OutPort
-	SetArrayItem(c *OutPort, i int)
+	outputCommon
+	GetArrayItem(i int) OutputConn
+	SetArrayItem(c OutputConn, i int)
 	ArrayLength() int
 }

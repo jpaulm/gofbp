@@ -2,26 +2,16 @@ package core
 
 type NullOutPort struct {
 	name string
-	//Conn     *Connection
-	//optional bool
 }
 
-func (c *NullOutPort) SetOptional(b bool) {}
-
-func (c *NullOutPort) send(*Process, *Packet) bool { panic("send on null port") }
-
-//func (c *NullOutPort) GetType() string {
-//	return "NullOutPort"
-//}
-
-func (c *NullOutPort) GetArrayItem(i int) *OutPort {
-	return nil
+// NullOutPort by default discards the packet.
+func (*NullOutPort) send(p *Process, pkt *Packet) bool {
+	p.Discard(pkt)
+	return true
 }
 
-func (c *NullOutPort) SetArrayItem(o *OutPort, i int) {}
-
-func (c *NullOutPort) ArrayLength() int {
-	return 0
+func (*NullOutPort) IsConnected() bool {
+	return false
 }
 
-func (c *NullOutPort) Close() {}
+func (*NullOutPort) Close() {}
