@@ -28,7 +28,6 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	defer c.condNF.L.Unlock()
 	fmt.Println(p.name, "Sending", pkt.Contents)
 	c.downStrProc.ensureRunning()
-	c.condNE.Broadcast()
 	for c.nolockIsFull() { // connection is full
 		p.transition(SuspendedSend)
 		c.condNF.Wait()
@@ -39,6 +38,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
 	p.ownedPkts--
+	c.condNE.Broadcast()
 	return true
 }
 
