@@ -5,8 +5,6 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
-	"sync/atomic"
-	"time"
 )
 
 const (
@@ -55,8 +53,8 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	return proc
 }
 
-func (n *Network) NewConnection(cap int) *Connection {
-	conn := &Connection{
+func (n *Network) NewConnection(cap int) *InPort {
+	conn := &InPort{
 		network: n,
 	}
 	conn.condNE.L = &conn.mtx
@@ -82,18 +80,18 @@ func (n *Network) NewInArrayPort() *InArrayPort {
 }
 
 func (n *Network) NewOutArrayPort() *OutArrayPort {
-	conn := &OutArrayPort{
+	port := &OutArrayPort{
 		network: n,
 	}
 
-	return conn
+	return port
 }
 
 func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
 
 	inPort := parsePort(in)
 
-	var connxn *Connection
+	var connxn *InPort
 	//var anyInConn InputConn
 
 	if inPort.indexed {
@@ -128,7 +126,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 			connxn.network = n
 			p2.inPorts[inPort.name] = connxn
 		} else {
-			connxn = p2.inPorts[inPort.name].(*Connection)
+			connxn = p2.inPorts[inPort.name].(*InPort)
 		}
 	}
 
@@ -145,11 +143,14 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 			p1.outPorts[outPort.name] = anyOutConn
 		}
 
-		opt := new(OutPort)
+		//opt := new(OutArrayPort)
+		out := anyOutConn.(*OutArrayPort)
 		//p1.outPorts[out] = anyOutConn
-		opt.name = out
-		anyOutConn.(OutputArrayConn).SetArrayItem(opt, outPort.index)
+		//opt.name = out
+		opt := new(OutPort)
+		out.SetArrayItem(opt, outPort.index)
 		opt.Conn = connxn
+		opt.connected = true
 
 	} else {
 		//var opt OutputConn
@@ -157,6 +158,8 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		p1.outPorts[out] = opt
 		opt.name = out
 		opt.Conn = connxn
+		opt.connected = true
+		fmt.Println(opt)
 	}
 
 	connxn.incUpstream()
@@ -207,42 +210,44 @@ func (n *Network) Run() {
 
 	defer n.wg.Wait()
 
-	go func() {
-		for {
-			time.Sleep(200 * time.Millisecond)
-			allTerminated := true
-			deadlockDetected := true
-			for _, proc := range n.procs {
-				//proc.mtx.Lock()
-				//defer proc.mtx.Unlock()
-				status := atomic.LoadInt32(&proc.status)
-				if status != Terminated {
-					allTerminated = false
-					if status == Active {
-						deadlockDetected = false
+	/*
+		go func() {
+			for {
+				time.Sleep(200 * time.Millisecond)
+				allTerminated := true
+				deadlockDetected := true
+				for _, proc := range n.procs {
+					//proc.mtx.Lock()
+					//defer proc.mtx.Unlock()
+					status := atomic.LoadInt32(&proc.status)
+					if status != Terminated {
+						allTerminated = false
+						if status == Active {
+							deadlockDetected = false
+						}
 					}
 				}
-			}
-			if allTerminated {
-				//	fmt.Println("Run terminated")
-				return
-			}
-			if deadlockDetected {
-				fmt.Println("\nDeadlock detected!")
-				for key, proc := range n.procs {
-					fmt.Println(key, " Status: ",
-						[]string{"notStarted",
-							"active",
-							"dormant",
-							"suspSend",
-							"suspRecv",
-							"terminated"}[proc.status])
+				if allTerminated {
+					//	fmt.Println("Run terminated")
+					return
 				}
-				panic("Deadlock!")
-			}
+				if deadlockDetected {
+					fmt.Println("\nDeadlock detected!")
+					for key, proc := range n.procs {
+						fmt.Println(key, " Status: ",
+							[]string{"notStarted",
+								"active",
+								"dormant",
+								"suspSend",
+								"suspRecv",
+								"terminated"}[proc.status])
+					}
+					panic("Deadlock!")
+				}
 
-		}
-	}()
+			}
+		}()
+	*/
 
 	var canRun bool = false
 	for _, proc := range n.procs {

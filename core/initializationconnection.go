@@ -69,12 +69,12 @@ func (c *InitializationConnection) resetForNextExecution() {
 //	return "InitializationConnection"
 //}
 
-func (c *InitializationConnection) GetArrayItem(i int) *Connection {
-	return nil
-}
+//func (c *InitializationConnection) GetArrayItem(i int) *InPort {
+//	return nil
+//}
 
-func (c *InitializationConnection) SetArrayItem(c2 *Connection, i int) {}
+//func (c *InitializationConnection) SetArrayItem(c2 *InPort, i int) {}
 
-func (c *InitializationConnection) ArrayLength() int {
-	return 0
-}
+//func (c *InitializationConnection) ArrayLength() int {
+//	return 0
+//}

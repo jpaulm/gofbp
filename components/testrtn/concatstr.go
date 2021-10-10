@@ -5,15 +5,13 @@ import (
 )
 
 type ConcatStr struct {
-	//ipt core.InputArrayConn
-	ipt core.InputArrayConn
-	opt core.OutputConn
+	ipt *core.InArrayPort
+	opt *core.OutPort
 }
 
 func (concatstr *ConcatStr) Setup(p *core.Process) {
 	concatstr.ipt = p.OpenInArrayPort("IN")
 	concatstr.opt = p.OpenOutPort("OUT")
-	//concatstr.opt.SetOptional(true)
 }
 
 func (concatstr *ConcatStr) Execute(p *core.Process) {

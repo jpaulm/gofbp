@@ -7,13 +7,13 @@ import (
 )
 
 type WriteToConsole struct {
-	ipt core.InputConn
-	opt core.OutputConn
+	ipt *core.InPort
+	out *core.OutPort
 }
 
 func (writeToConsole *WriteToConsole) Setup(p *core.Process) {
 	writeToConsole.ipt = p.OpenInPort("IN")
-	writeToConsole.opt = p.OpenOutPort("OUT", "opt")
+	writeToConsole.out = p.OpenOutPort("OUT", "opt")
 }
 
 func (WriteToConsole) MustRun() {}
@@ -27,10 +27,9 @@ func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
 			break
 		}
 		fmt.Println(pkt.Contents)
-		//if writeToConsole.opt.GetType() == "OutPort" {
-		_, b := writeToConsole.opt.(*core.OutPort)
-		if b {
-			p.Send(writeToConsole.opt, pkt)
+		//if writeToConsole.out.GetType() == "OutPort" {
+		if writeToConsole.out.IsConnected() {
+			p.Send(writeToConsole.out, pkt)
 		} else {
 			p.Discard(pkt)
 		}

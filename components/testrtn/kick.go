@@ -7,7 +7,7 @@ import (
 )
 
 type Kick struct {
-	opt core.OutputConn
+	opt *core.OutPort
 }
 
 func (kick *Kick) Setup(p *core.Process) {

@@ -5,8 +5,10 @@ type OutputConn interface {
 
 	//IsEmpty() bool
 	//IsClosed() bool
-	SetOptional(b bool)
+	//SetOptional(b bool)
 	//GetType() string
+	IsConnected() bool
+
 	Close()
 }
 

@@ -9,8 +9,8 @@ import (
 // WriteToConsole modifieed to be a non-looper (NL)
 
 type WriteToConsNL struct {
-	ipt core.InputConn
-	opt core.OutputConn
+	ipt *core.InPort
+	opt *core.OutPort
 }
 
 func (writeToConsole *WriteToConsNL) Setup(p *core.Process) {
@@ -31,8 +31,7 @@ func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
 	}
 	fmt.Println(pkt.Contents)
 	//if writeToConsole.opt.GetType() == "OutPort" {
-	_, b := writeToConsole.opt.(*core.OutPort)
-	if b {
+	if writeToConsole.opt.IsConnected() {
 		p.Send(writeToConsole.opt, pkt)
 	} else {
 		p.Discard(pkt)

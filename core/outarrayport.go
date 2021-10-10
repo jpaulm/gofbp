@@ -5,19 +5,14 @@ package core
 type OutArrayPort struct {
 	network *Network
 
-	portName string
-	fullName string
-	array    []*OutPort
-	closed   bool
+	portName  string
+	name      string // full name
+	array     []*OutPort
+	closed    bool
+	connected bool
 }
 
 func (o *OutArrayPort) send(p *Process, pkt *Packet) bool { panic("send on array port") }
-
-func (o *OutArrayPort) SetOptional(b bool) {}
-
-//func (o *OutArrayPort) GetType() string {
-//	return "OutArrayPort"
-//}
 
 func (o *OutArrayPort) GetArrayItem(i int) *OutPort {
 	if i >= len(o.array) {
@@ -43,4 +38,8 @@ func (o *OutArrayPort) Close() {
 	for _, v := range o.array {
 		v.Close()
 	}
+}
+
+func (o *OutArrayPort) IsConnected() bool {
+	return o.connected
 }

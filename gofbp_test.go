@@ -84,7 +84,7 @@ func TestCopyFile(t *testing.T) {
 	net.Run()
 }
 
-func TestDoSelect(t *testing.T) {
+func TestDoSelect1(t *testing.T) {
 	net := core.NewNetwork("DoSelect")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
@@ -107,7 +107,30 @@ func TestDoSelect(t *testing.T) {
 	net.Run()
 }
 
+func TestDoSelect2(t *testing.T) {
+	net := core.NewNetwork("DoSelect")
+
+	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
+	proc2 := net.NewProc("Select", &testrtn.Selector{})
+	proc3a := net.NewProc("WriteFile", &io.WriteFile{})
+	//proc3b := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
+
+	path, err := os.Getwd()
+	if err != nil {
+		panic("Can't find workspace directory")
+	}
+
+	net.Initialize(path+"\\testdata.txt", proc1, "FILENAME")
+	net.Initialize("X", proc2, "PARAM")
+	net.Initialize(path+"\\testdata.copy", proc3a, "FILENAME")
+	net.Connect(proc1, "OUT", proc2, "IN", 6)
+	net.Connect(proc2, "ACC", proc3a, "IN", 6)
+	//net.Connect(proc2, "REJ", proc3b, "IN", 6)
+
+	net.Run()
+}
 func TestWriteToConsUsingNL(t *testing.T) {
+
 	net := core.NewNetwork("MergeToCons")
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})

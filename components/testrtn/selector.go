@@ -8,17 +8,21 @@ import (
 )
 
 type Selector struct {
-	ipt   core.InputConn
-	iptIp core.InputConn
-	opt1  core.OutputConn
-	opt2  core.OutputConn
+	ipt   *core.InPort
+	iptIp *core.InitializationConnection
+	out1  *core.OutPort
+	out2  *core.OutPort
 }
 
 func (selector *Selector) Setup(p *core.Process) {
+
 	selector.ipt = p.OpenInPort("IN")
-	selector.opt1 = p.OpenOutPort("ACC")
-	selector.opt2 = p.OpenOutPort("REJ")
-	selector.iptIp = p.OpenInPort("PARAM")
+
+	selector.out1 = p.OpenOutPort("ACC")
+
+	selector.out2 = p.OpenOutPort("REJ", "opt") // is optional
+
+	selector.iptIp = p.OpenInitializationPort("PARAM")
 }
 
 func (Selector) MustRun() {}
@@ -44,12 +48,22 @@ func (selector *Selector) Execute(p *core.Process) {
 			i = len(s)
 		}
 
-		if 0 == strings.Compare(s[:i], param[:i]) {
-			p.Send(selector.opt1, pkt)
+		if 0 == strings.Compare(param[:i], s[:i]) {
+			p.Send(selector.out1, pkt)
 		} else {
-			p.Send(selector.opt2, pkt)
-		}
+			if !selector.out2.IsConnected() {
+				if selector.out2 == nil {
+					p.Discard(pkt)
+				}
+			} else {
+				if selector.out2 == nil {
+					panic("Selector - port not specified, but not optional")
+				}
+			}
 
+			p.Send(selector.out2, pkt)
+
+		}
 	}
 
 	//fmt.Println(p.GetName() + " ended")

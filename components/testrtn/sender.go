@@ -8,12 +8,12 @@ import (
 )
 
 type Sender struct {
-	ipt core.InputConn
-	opt core.OutputConn
+	ipt *core.InitializationConnection
+	opt *core.OutPort
 }
 
 func (sender *Sender) Setup(p *core.Process) {
-	sender.ipt = p.OpenInPort("COUNT")
+	sender.ipt = p.OpenInitializationPort("COUNT")
 	sender.opt = p.OpenOutPort("OUT")
 }
 

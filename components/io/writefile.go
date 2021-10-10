@@ -8,13 +8,13 @@ import (
 )
 
 type WriteFile struct {
-	iptIp core.InputConn
-	ipt   core.InputConn
-	opt   core.OutputConn
+	iptIp *core.InitializationConnection
+	ipt   *core.InPort
+	opt   *core.OutPort
 }
 
 func (writeFile *WriteFile) Setup(p *core.Process) {
-	writeFile.iptIp = p.OpenInPort("FILENAME")
+	writeFile.iptIp = p.OpenInitializationPort("FILENAME")
 	writeFile.ipt = p.OpenInPort("IN")
 	writeFile.opt = p.OpenOutPort("OUT", "opt")
 }
@@ -47,15 +47,16 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 			panic("Unable to write file: " + fname)
 		}
 
-		_, b := writeFile.opt.(*core.OutPort)
-		if b {
-			//if writeFile.opt.GetType() == "OutPort" {
-			p.Send(writeFile.opt, pkt)
-		} else {
+		if !writeFile.opt.IsConnected() {
 			p.Discard(pkt)
+		} else {
+			if writeFile.opt == nil {
+				panic("WwriteFile - port not specified, but not optional")
+			}
+			//}
 		}
-	}
 
-	fmt.Println(p.GetName()+": File", fname, "written")
-	//fmt.Println(p.GetName() + " ended")
+		fmt.Println(p.GetName()+": File", fname, "written")
+		//fmt.Println(p.GetName() + " ended")
+	}
 }

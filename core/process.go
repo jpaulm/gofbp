@@ -31,59 +31,120 @@ func (p *Process) GetName() string {
 	return p.name
 }
 
-func (p *Process) OpenInPort(s string) InputConn {
+func (p *Process) OpenInPort(s string) *InPort {
+	var in *InPort
+	var b bool
 	if len(p.inPorts) == 0 {
 		panic(p.name + ": No input ports specified")
 	}
-	in := p.inPorts[s]
+	in, b = p.inPorts[s].(*InPort)
 	if in == nil {
 		panic(p.name + ": Port name not found (" + s + ")")
 	}
-	return in.(InputConn)
+	if !b {
+		panic("Port wrong type")
+	}
+	return in
 }
 
-func (p *Process) OpenInArrayPort(s string) InputArrayConn {
+func (p *Process) OpenInitializationPort(s string) *InitializationConnection {
+	var in *InitializationConnection
+	var b bool
 	if len(p.inPorts) == 0 {
 		panic(p.name + ": No input ports specified")
 	}
-	in := p.inPorts[s]
+	in, b = p.inPorts[s].(*InitializationConnection)
 	if in == nil {
 		panic(p.name + ": Port name not found (" + s + ")")
 	}
-	return in.(InputArrayConn)
+	if !b {
+		panic("Port wrong type")
+	}
+	return in
 }
 
-func (p *Process) OpenOutPort(s ...string) OutputConn {
+func (p *Process) OpenInArrayPort(s string) *InArrayPort {
+	var in *InArrayPort
+	var b bool
+	if len(p.inPorts) == 0 {
+		panic(p.name + ": No input ports specified")
+	}
+	in, b = p.inPorts[s].(*InArrayPort)
+	if in == nil {
+		panic(p.name + ": Port name not found (" + s + ")")
+	}
+	if !b {
+		panic("Port wrong type")
+	}
+	return in
+}
+
+func (p *Process) OpenOutPort(s ...string) *OutPort {
+	var out *OutPort
+	var b bool
 	if len(p.outPorts) == 0 {
-		opt := new(NullOutPort)
-		p.outPorts[s[0]] = opt
-		opt.name = s[0]
+		out = new(OutPort)
+		p.outPorts[s[0]] = out
+		out.name = s[0]
+		out.connected = false
+	} else {
+		out, b = p.outPorts[s[0]].(*OutPort)
+		if !b {
+			panic("Port wrong type")
+		}
 	}
-	out := p.outPorts[s[0]]
 
-	if len(s) == 2 && s[1] != "opt" {
-		panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
+	if len(s) == 2 {
+
+		if s[1] != "opt" {
+			panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
+		}
+
+		if out == nil {
+			out := new(OutPort)
+			p.outPorts[s[0]] = out
+			out.name = s[0]
+			out.connected = false
+
+		}
 	}
 
-	return out.(OutputConn)
+	return out
 
 }
 
-// not sure it maes sense to allow optional for array ports!
+// not sure it makes sense to allow optional for array ports!
 
-func (p *Process) OpenOutArrayPort(s ...string) OutputArrayConn {
+func (p *Process) OpenOutArrayPort(s ...string) *OutArrayPort {
+	var out *OutArrayPort
+	var b bool
 	if len(p.outPorts) == 0 {
-		opt := new(NullOutPort)
-		p.outPorts[s[0]] = opt
-		opt.name = s[0]
+		out = new(OutArrayPort)
+		p.outPorts[s[0]] = out
+		out.name = s[0]
+		out.connected = false
+	} else {
+		out, b = p.outPorts[s[0]].(*OutArrayPort)
+		if !b {
+			panic("Port wrong type")
+		}
 	}
-	out := p.outPorts[s[0]]
 
-	if len(s) == 2 && s[1] != "opt" {
-		panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
+	if len(s) == 2 {
+
+		if s[1] != "opt" {
+			panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
+		}
+
+		if out == nil {
+			out := new(OutArrayPort)
+			p.outPorts[s[0]] = out
+			out.name = s[0]
+			out.connected = false
+		}
 	}
-	return out.(OutputArrayConn)
 
+	return out
 }
 
 // Send sends a packet to the output connection.
@@ -126,12 +187,12 @@ func (p *Process) inputState() (bool, bool) {
 				hasData = hasData || !w.IsEmpty()
 			}
 		} else {
-			_, b := v.(*Connection)
+			_, b := v.(*InPort)
 			if b {
-				if !v.(*Connection).isDrained() /*|| !v.IsClosed() */ {
+				if !v.(*InPort).isDrained() /*|| !v.IsClosed() */ {
 					allDrained = false
 				}
-				hasData = hasData || !v.(*Connection).IsEmpty()
+				hasData = hasData || !v.(*InPort).IsEmpty()
 			}
 		}
 	}
@@ -182,13 +243,23 @@ func (p *Process) Run() {
 	}
 
 	for _, v := range p.outPorts {
-		_, b := v.(OutputConn)
+		var port interface{}
+		var b bool
+
+		port, b = v.(*OutPort)
+		//if port == nil {
+		//	continue
+		//}
+		fmt.Println(v, port, " close after run")
 		if b {
-			v.(OutputConn).Close()
+			port.(*OutPort).Close()
 		} else {
-			_, b := v.(OutputArrayConn)
+			port, b = v.(*OutArrayPort)
+			//if port == nil {
+			//	continue
+			///}
 			if b {
-				v.(OutputArrayConn).Close()
+				port.(*OutArrayPort).Close()
 			}
 		}
 	}

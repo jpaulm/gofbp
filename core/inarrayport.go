@@ -5,7 +5,7 @@ type InArrayPort struct {
 
 	portName string
 	fullName string
-	array    []*Connection
+	array    []*InPort
 }
 
 func (c *InArrayPort) isDrained() bool {
@@ -45,17 +45,17 @@ func (c *InArrayPort) resetForNextExecution() {}
 //	return "InArrayPort"
 //}
 
-func (c *InArrayPort) GetArrayItem(i int) *Connection {
+func (c *InArrayPort) GetArrayItem(i int) *InPort {
 	if i >= len(c.array) {
 		return nil
 	}
 	return c.array[i]
 }
 
-func (c *InArrayPort) SetArrayItem(c2 *Connection, i int) {
+func (c *InArrayPort) SetArrayItem(c2 *InPort, i int) {
 	if i >= len(c.array) {
 		// add to .array to fit c2
-		increaseBy := make([]*Connection, i-len(c.array)+1)
+		increaseBy := make([]*InPort, i-len(c.array)+1)
 		c.array = append(c.array, increaseBy...)
 	}
 	c.array[i] = c2

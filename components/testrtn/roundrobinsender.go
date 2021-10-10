@@ -7,8 +7,8 @@ import (
 )
 
 type RoundRobinSender struct {
-	ipt core.InputConn
-	out core.OutputArrayConn
+	ipt *core.InPort
+	out *core.OutArrayPort
 }
 
 func (rrsender *RoundRobinSender) Setup(p *core.Process) {

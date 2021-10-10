@@ -7,13 +7,11 @@ import (
 )
 
 type Discard struct {
-	ipt core.InputConn
-	opt core.OutputConn
+	ipt *core.InPort
 }
 
 func (discard *Discard) Setup(p *core.Process) {
 	discard.ipt = p.OpenInPort("IN")
-	discard.opt = p.OpenOutPort("OUT", "opt")
 }
 
 //func (Discard) MustRun() {}

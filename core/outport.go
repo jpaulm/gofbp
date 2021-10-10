@@ -1,17 +1,17 @@
 package core
 
 type OutPort struct {
-	name     string
-	Conn     *Connection
-	optional bool
+	name      string
+	Conn      *InPort
+	connected bool
 }
 
 func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	return o.Conn.send(p, pkt)
 }
 
-func (o *OutPort) SetOptional(b bool) {
-	o.optional = b
+func (o *OutPort) IsConnected() bool {
+	return o.connected
 }
 
 func (o *OutPort) GetArrayItem(i int) *OutPort {

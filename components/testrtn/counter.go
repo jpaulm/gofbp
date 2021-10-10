@@ -8,9 +8,9 @@ import (
 )
 
 type Counter struct {
-	ipt core.InputConn
-	opt core.OutputConn
-	cnt core.OutputConn
+	ipt *core.InPort
+	cnt *core.OutPort
+	opt *core.OutPort
 }
 
 func (counter *Counter) Setup(p *core.Process) {
@@ -31,10 +31,7 @@ func (counter *Counter) Execute(p *core.Process) {
 		if pkt == nil {
 			break
 		}
-		//fmt.Println(pkt.Contents)
-		//if counter.opt.GetType() == "OutPort" {
-		_, b := counter.opt.(*core.OutPort)
-		if b {
+		if counter.opt.IsConnected() {
 			p.Send(counter.opt, pkt)
 		} else {
 			p.Discard(pkt)

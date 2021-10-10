@@ -12,7 +12,7 @@ type InputConn interface {
 
 type InputArrayConn interface {
 	InputConn
-	GetArrayItem(i int) *Connection
-	SetArrayItem(c *Connection, i int)
+	GetArrayItem(i int) *InPort
+	SetArrayItem(c *InPort, i int)
 	ArrayLength() int
 }
