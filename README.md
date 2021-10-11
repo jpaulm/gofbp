@@ -2,7 +2,7 @@
 
 This repo holds the beginning of an FBP implementation in Go
 
-*As of 2 Oct., 2021, all test cases working*
+*As of 11 Oct., 2021, all test cases are working again - some name changes may be done over the next few days*
 
 Please note, on Oct 6, the following changes have been made:
 
