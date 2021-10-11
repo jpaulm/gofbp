@@ -38,11 +38,11 @@ func (p *Process) OpenInPort(s string) *InPort {
 		panic(p.name + ": No input ports specified")
 	}
 	in, b = p.inPorts[s].(*InPort)
-	if in == nil {
-		panic(p.name + ": Port name not found (" + s + ")")
-	}
+	//if in == nil {
+	//	panic(p.name + ": Port name not found (" + s + ")")
+	//}
 	if !b {
-		panic("Port wrong type")
+		panic(p.name + " " + s + " InPort found other type")
 	}
 	return in
 }
@@ -54,11 +54,11 @@ func (p *Process) OpenInitializationPort(s string) *InitializationConnection {
 		panic(p.name + ": No input ports specified")
 	}
 	in, b = p.inPorts[s].(*InitializationConnection)
-	if in == nil {
-		panic(p.name + ": Port name not found (" + s + ")")
-	}
+	//if in == nil {
+	//	panic(p.name + ": Port name not found (" + s + ")")
+	//}
 	if !b {
-		panic("Port wrong type")
+		panic(p.name + " " + s + " InitializationPort wrong type")
 	}
 	return in
 }
@@ -70,11 +70,11 @@ func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 		panic(p.name + ": No input ports specified")
 	}
 	in, b = p.inPorts[s].(*InArrayPort)
-	if in == nil {
-		panic(p.name + ": Port name not found (" + s + ")")
-	}
+	//if in == nil {
+	//	panic(p.name + ": Port name not found (" + s + ")")
+	//}
 	if !b {
-		panic("Port wrong type")
+		panic(p.name + " " + s + " InArrayPort wrong type")
 	}
 	return in
 }
@@ -90,7 +90,8 @@ func (p *Process) OpenOutPort(s ...string) *OutPort {
 	} else {
 		out, b = p.outPorts[s[0]].(*OutPort)
 		if !b {
-			panic("Port wrong type")
+			//panic(p.name + " " + s[0] + " OutPort wrong type")
+			return nil // fix later...
 		}
 	}
 
@@ -126,7 +127,7 @@ func (p *Process) OpenOutArrayPort(s ...string) *OutArrayPort {
 	} else {
 		out, b = p.outPorts[s[0]].(*OutArrayPort)
 		if !b {
-			panic("Port wrong type")
+			panic(p.name + " " + s[0] + " OutArrayPort wrong type")
 		}
 	}
 
@@ -247,21 +248,19 @@ func (p *Process) Run() {
 		var b bool
 
 		port, b = v.(*OutPort)
-		//if port == nil {
-		//	continue
-		//}
-		fmt.Println(v, port, " close after run")
+		//fmt.Println(p.name, v, port, " close after run")
 		if b {
-			port.(*OutPort).Close()
-		} else {
-			port, b = v.(*OutArrayPort)
-			//if port == nil {
-			//	continue
-			///}
-			if b {
-				port.(*OutArrayPort).Close()
+			if !port.(*OutPort).IsConnected() {
+				continue
 			}
+			port.(*OutPort).Close()
+			continue
 		}
+		port, b = v.(*OutArrayPort)
+		if b {
+			port.(*OutArrayPort).Close()
+		}
+		// if anything else, just continue
 	}
 }
 
