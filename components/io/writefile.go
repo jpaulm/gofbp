@@ -8,7 +8,7 @@ import (
 )
 
 type WriteFile struct {
-	iptIp *core.InitializationConnection
+	iptIp *core.InitializationPort
 	ipt   *core.InPort
 	opt   *core.OutPort
 }

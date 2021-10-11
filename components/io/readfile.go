@@ -10,7 +10,7 @@ import (
 )
 
 type ReadFile struct {
-	ipt *core.InitializationConnection
+	ipt *core.InitializationPort
 	opt *core.OutPort
 }
 

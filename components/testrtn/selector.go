@@ -9,7 +9,7 @@ import (
 
 type Selector struct {
 	ipt   *core.InPort
-	iptIp *core.InitializationConnection
+	iptIp *core.InitializationPort
 	out1  *core.OutPort
 	out2  *core.OutPort
 }

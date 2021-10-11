@@ -8,7 +8,7 @@ import (
 )
 
 type Sender struct {
-	ipt *core.InitializationConnection
+	ipt *core.InitializationPort
 	opt *core.OutPort
 }
 

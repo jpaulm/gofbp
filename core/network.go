@@ -63,8 +63,8 @@ func (n *Network) NewConnection(cap int) *InPort {
 	return conn
 }
 
-func (n *Network) NewInitializationConnection() *InitializationConnection {
-	conn := &InitializationConnection{
+func (n *Network) NewInitializationPort() *InitializationPort {
+	conn := &InitializationPort{
 		network: n,
 	}
 
@@ -190,7 +190,7 @@ func parsePort(in string) portDefinition {
 
 func (n *Network) Initialize(initValue string, p2 *Process, in string) {
 
-	conn := n.NewInitializationConnection()
+	conn := n.NewInitializationPort()
 	p2.inPorts[in] = conn
 	conn.portName = in
 	conn.fullName = p2.name + "." + in
@@ -256,8 +256,8 @@ func (n *Network) Run() {
 		proc.selfStarting = true
 		if proc.inPorts != nil {
 			for _, conn := range proc.inPorts {
-				//if conn.GetType() != "InitializationConnection" {
-				_, b := conn.(*InitializationConnection)
+				//if conn.GetType() != "InitializationPort" {
+				_, b := conn.(*InitializationPort)
 				if !b {
 					proc.selfStarting = false
 				}

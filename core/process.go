@@ -47,13 +47,13 @@ func (p *Process) OpenInPort(s string) *InPort {
 	return in
 }
 
-func (p *Process) OpenInitializationPort(s string) *InitializationConnection {
-	var in *InitializationConnection
+func (p *Process) OpenInitializationPort(s string) *InitializationPort {
+	var in *InitializationPort
 	var b bool
 	if len(p.inPorts) == 0 {
 		panic(p.name + ": No input ports specified")
 	}
-	in, b = p.inPorts[s].(*InitializationConnection)
+	in, b = p.inPorts[s].(*InitializationPort)
 	//if in == nil {
 	//	panic(p.name + ": Port name not found (" + s + ")")
 	//}
@@ -234,9 +234,9 @@ func (p *Process) Run() {
 			canRun = false
 		} else {
 			for _, v := range p.inPorts {
-				_, b := v.(InitializationConnection)
+				_, b := v.(InitializationPort)
 				if b {
-					v.(*InitializationConnection).resetForNextExecution()
+					v.(*InitializationPort).resetForNextExecution()
 				}
 			}
 		}
