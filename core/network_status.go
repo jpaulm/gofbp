@@ -5,13 +5,24 @@ import (
 	"sync"
 )
 
-const deadlockDetectionEnabled = false
-
 type networkStatus struct {
-	mu         sync.Mutex
-	deadlocked bool
-	running    int32
-	suspended  int32
+	mu              sync.Mutex
+	deadlocked      bool
+	running         int32
+	liveConnections int32
+	suspended       int32
+}
+
+func (network *Network) incLiveConnection() {
+	network.status.mu.Lock()
+	defer network.status.mu.Unlock()
+	network.status.liveConnections++
+}
+
+func (network *Network) decLiveConnection() {
+	network.status.mu.Lock()
+	defer network.status.mu.Unlock()
+	network.status.liveConnections--
 }
 
 func (network *Network) processTransitioned(from, to ProcessStatus) {
@@ -38,7 +49,7 @@ func (network *Network) processTransitioned(from, to ProcessStatus) {
 		leftRunning := network.status.running
 		network.status.mu.Unlock()
 
-		if leftRunning <= 0 {
+		if leftRunning <= 0 && network.status.liveConnections == 0 {
 			network.deadlockDetected()
 		}
 
@@ -54,7 +65,7 @@ func (network *Network) processTransitioned(from, to ProcessStatus) {
 		running, suspended := network.status.running, network.status.suspended
 		network.status.mu.Unlock()
 
-		if running == 0 && suspended > 0 {
+		if running == 0 && suspended > 0 && network.status.liveConnections == 0 {
 			network.deadlockDetected()
 		}
 
@@ -69,10 +80,6 @@ func (network *Network) processTransitioned(from, to ProcessStatus) {
 }
 
 func (network *Network) deadlockDetected() {
-	if !deadlockDetectionEnabled {
-		return
-	}
-
 	network.status.mu.Lock()
 	defer network.status.mu.Unlock()
 

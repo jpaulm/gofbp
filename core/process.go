@@ -78,6 +78,9 @@ func (p *Process) Receive(c InputConn) *Packet {
 
 func (p *Process) ensureRunning() {
 	if !p.transitionFrom(NotStarted, Dormant) {
+		if p.status() == Terminated {
+			panic("tried to send to a terminated process")
+		}
 		return
 	}
 

@@ -18,6 +18,10 @@ type Connection struct {
 	fullName    string
 	array       []*Connection
 	downStrProc *Process
+
+	markedLive   bool
+	pendingSends int64
+	pendingRecvs int64
 }
 
 func (c *Connection) send(p *Process, pkt *Packet) bool {
@@ -28,10 +32,29 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	defer c.mtx.Unlock()
 	fmt.Println(p.name, "Sending", pkt.Contents)
 	c.downStrProc.ensureRunning()
-	for c.nolockIsFull() { // connection is full
-		p.transition(SuspendedSend)
-		c.condNF.Wait()
-		p.transition(Active)
+	if c.nolockIsFull() {
+		// Any connection that has a pair of sends and receives
+		// should be considered live.
+		if !c.markedLive && c.pendingRecvs > 0 {
+			c.markedLive = true
+			c.network.incLiveConnection()
+		}
+		c.pendingSends++
+
+		for c.nolockIsFull() { // connection is full
+			p.transition(SuspendedSend)
+			c.condNF.Wait()
+			p.transition(Active)
+		}
+
+		// We unmark liveness when there are no receivers.
+		// Otherwise there's a possibility that the sender terminates
+		// and the receiver is still suspended.
+		c.pendingSends--
+		if c.markedLive && c.pendingRecvs == 0 {
+			c.markedLive = false
+			c.network.decLiveConnection()
+		}
 	}
 	fmt.Println(p.name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
@@ -47,15 +70,40 @@ func (c *Connection) receive(p *Process) *Packet {
 	defer c.mtx.Unlock()
 
 	fmt.Println(p.name, "Receiving")
-	for c.nolockIsEmpty() { // connection is empty
+
+	if c.nolockIsEmpty() {
+		// Any connection that has a pair of sends and receives
+		// should be considered live. It might take some time to
+		// propagate those items through.
+		if !c.markedLive && c.pendingSends > 0 {
+			c.markedLive = true
+			c.network.incLiveConnection()
+		}
+		c.pendingRecvs++
+
+		for c.nolockIsEmpty() && !c.closed {
+			p.transition(SuspendedRecv)
+			c.condNE.Wait()
+			p.transition(Active)
+		}
+
+		// Once there are no more receivers we can unmark the connection.
+		c.pendingRecvs--
+		if c.markedLive && c.pendingSends == 0 && c.nolockIsEmpty() {
+			c.markedLive = false
+			c.network.decLiveConnection()
+		}
+		if c.markedLive && c.pendingRecvs == 0 {
+			c.markedLive = false
+			c.network.decLiveConnection()
+		}
+
 		if c.closed {
 			c.condNF.Broadcast()
 			return nil
 		}
-		p.transition(SuspendedRecv)
-		c.condNE.Wait()
-		p.transition(Active)
 	}
+
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
 	fmt.Println(p.name, "Received", pkt.Contents)
@@ -80,16 +128,24 @@ func (c *Connection) decUpstream() {
 
 	c.upStrmCnt--
 	if c.upStrmCnt == 0 {
-		c.closed = true
-		c.condNE.Broadcast()
-		c.downStrProc.ensureRunning()
-
+		c.nolockClose()
 	}
 }
 
 func (c *Connection) Close() {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
+	c.nolockClose()
+}
+
+func (c *Connection) nolockClose() {
+	// Mark connection live when there are pending receives,
+	// otherwise the receivers could be marked as deadlocked
+	// although they have to receive the close signal.
+	if !c.markedLive && c.pendingRecvs > 0 {
+		c.markedLive = true
+		c.network.incLiveConnection()
+	}
 
 	c.closed = true
 	c.condNE.Broadcast()
