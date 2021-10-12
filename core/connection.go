@@ -38,7 +38,7 @@ func (c *Connection) send(p *Process, pkt *Packet) bool {
 	c.is = (c.is + 1) % len(c.pktArray)
 	pkt.owner = nil
 	p.ownedPkts--
-	c.condNE.Broadcast()
+	c.condNE.Signal()
 	return true
 }
 
@@ -62,7 +62,7 @@ func (c *Connection) receive(p *Process) *Packet {
 	c.ir = (c.ir + 1) % len(c.pktArray)
 	pkt.owner = p
 	p.ownedPkts++
-	c.condNF.Broadcast()
+	c.condNF.Signal()
 
 	return pkt
 }
