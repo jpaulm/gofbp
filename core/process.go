@@ -42,7 +42,7 @@ func (p *Process) OpenInPort(s string) *InPort {
 	//	panic(p.name + ": Port name not found (" + s + ")")
 	//}
 	if !b {
-		panic(p.name + " " + s + " InPort found other type")
+		panic(p.name + " " + s + " InPort not connected, or found other type")
 	}
 	return in
 }
@@ -58,7 +58,7 @@ func (p *Process) OpenInitializationPort(s string) *InitializationPort {
 	//	panic(p.name + ": Port name not found (" + s + ")")
 	//}
 	if !b {
-		panic(p.name + " " + s + " InitializationPort wrong type")
+		panic(p.name + " " + s + " InitializationPort not connected, or found other type")
 	}
 	return in
 }
@@ -74,7 +74,7 @@ func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 	//	panic(p.name + ": Port name not found (" + s + ")")
 	//}
 	if !b {
-		panic(p.name + " " + s + " InArrayPort wrong type")
+		panic(p.name + " " + s + " InArrayPort not connected, or found other type")
 	}
 	return in
 }
@@ -127,7 +127,7 @@ func (p *Process) OpenOutArrayPort(s ...string) *OutArrayPort {
 	} else {
 		out, b = p.outPorts[s[0]].(*OutArrayPort)
 		if !b {
-			panic(p.name + " " + s[0] + " OutArrayPort wrong type")
+			panic(p.name + " " + s[0] + " OutArrayPort not connected, or found other type")
 		}
 	}
 
@@ -300,5 +300,9 @@ func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 }
 
 func (p *Process) Discard(pkt *Packet) {
+	if pkt == nil {
+		panic("Discarding nil packet")
+	}
 	p.ownedPkts--
+	pkt = nil
 }

@@ -24,6 +24,9 @@ type InPort struct {
 }
 
 func (c *InPort) send(p *Process, pkt *Packet) bool {
+	if pkt == nil {
+		panic("Sending nil packet")
+	}
 	if pkt.owner != p {
 		panic("Sending packet not owned by this process")
 	}

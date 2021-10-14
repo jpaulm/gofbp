@@ -56,12 +56,11 @@ func (selector *Selector) Execute(p *core.Process) {
 					p.Discard(pkt)
 				}
 			} else {
-				if selector.out2 == nil {
-					panic("Selector - port not specified, but not optional")
-				}
+				//if selector.out2 == nil {
+				//	panic("Selector - port not specified, but not optional")
+				//}
+				p.Send(selector.out2, pkt)
 			}
-
-			p.Send(selector.out2, pkt)
 
 		}
 	}

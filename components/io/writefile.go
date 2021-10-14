@@ -50,9 +50,10 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 		if !writeFile.opt.IsConnected() {
 			p.Discard(pkt)
 		} else {
-			if writeFile.opt == nil {
-				panic("WwriteFile - port not specified, but not optional")
-			}
+			//if writeFile.opt == nil {
+			//	panic("WriteFile - port not specified, but not optional")
+			//}
+			p.Send(writeFile.opt, pkt)
 			//}
 		}
 
