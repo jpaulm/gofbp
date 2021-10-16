@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
+	"sync/atomic"
+	"time"
 )
 
 const (
@@ -159,7 +161,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		opt.name = out
 		opt.Conn = connxn
 		opt.connected = true
-		fmt.Println(opt)
+		//fmt.Println(opt)
 	}
 
 	connxn.incUpstream()
@@ -210,44 +212,42 @@ func (n *Network) Run() {
 
 	defer n.wg.Wait()
 
-	/*
-		go func() {
-			for {
-				time.Sleep(200 * time.Millisecond)
-				allTerminated := true
-				deadlockDetected := true
-				for _, proc := range n.procs {
-					//proc.mtx.Lock()
-					//defer proc.mtx.Unlock()
-					status := atomic.LoadInt32(&proc.status)
-					if status != Terminated {
-						allTerminated = false
-						if status == Active {
-							deadlockDetected = false
-						}
+	go func() {
+		for {
+			time.Sleep(200 * time.Millisecond)
+			allTerminated := true
+			deadlockDetected := true
+			for _, proc := range n.procs {
+				//proc.mtx.Lock()
+				//defer proc.mtx.Unlock()
+				status := atomic.LoadInt32(&proc.status)
+				if status != Terminated {
+					allTerminated = false
+					if status == Active {
+						deadlockDetected = false
 					}
 				}
-				if allTerminated {
-					//	fmt.Println("Run terminated")
-					return
-				}
-				if deadlockDetected {
-					fmt.Println("\nDeadlock detected!")
-					for key, proc := range n.procs {
-						fmt.Println(key, " Status: ",
-							[]string{"notStarted",
-								"active",
-								"dormant",
-								"suspSend",
-								"suspRecv",
-								"terminated"}[proc.status])
-					}
-					panic("Deadlock!")
-				}
-
 			}
-		}()
-	*/
+			if allTerminated {
+				//	fmt.Println("Run terminated")
+				return
+			}
+			if deadlockDetected {
+				fmt.Println("\nDeadlock detected!")
+				for key, proc := range n.procs {
+					fmt.Println(key, " Status: ",
+						[]string{"notStarted",
+							"active",
+							"dormant",
+							"suspSend",
+							"suspRecv",
+							"terminated"}[proc.status])
+				}
+				panic("Deadlock!")
+			}
+
+		}
+	}()
 
 	var canRun bool = false
 	for _, proc := range n.procs {

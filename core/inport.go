@@ -43,8 +43,9 @@ func (c *InPort) send(p *Process, pkt *Packet) bool {
 	fmt.Println(p.name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
 	c.is = (c.is + 1) % len(c.pktArray)
-	pkt.owner = nil
+	//pkt.owner = nil
 	p.ownedPkts--
+	pkt = nil
 	return true
 }
 
