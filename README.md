@@ -2,13 +2,9 @@
 
 This repo holds the beginning of an FBP implementation in Go
 
-*As of 11 Oct., 2021, all test cases are working again - some name changes may be done over the next few days*
+*As of 12 Oct., 2021, all test cases are working again - if you downloaded GoFBP before 12 Oct., please download it again, to see what changes have been made to the API*
 
-Please note, on Oct 6, the following changes have been made:
-
-- "type" test in components was changed to use the compile-time function, so you will need to reload the system, and make changes to any components affected, as shown in `components/io/writefile.go`.
-
-- components referencing array-type input or output ports should be changed as shown in `components\testrtn\concatstr.go` and `components\testrtn\roundrobinsender.go`.
+Right now, Go `panic` is being used for most error conditions - these will be changed gradually to use more standard Go error handling.
 
 Features include:
 
@@ -43,9 +39,9 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run DoSelect -count=1`
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 
-To run ForceDeadlock, do something like the following
+To run ForceDeadlock, do the following:
 
-- `go test -run Force -count=1 -timeout 0s` 
+- `go test -run ForceDeadlock -count=1 -timeout 0s` 
 
 `go test -count=1` runs them all, including `ForceDeadlock`
 
