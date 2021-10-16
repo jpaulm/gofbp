@@ -134,17 +134,3 @@ func (c *InPort) nolockIsFull() bool {
 }
 
 func (c *InPort) resetForNextExecution() {}
-
-//func (c *InPort) GetType() string {
-//	return "InPort"
-//}
-
-func (c *InPort) GetArrayItem(i int) *InPort {
-	return nil
-}
-
-func (c *InPort) SetArrayItem(c2 *InPort, i int) {}
-
-func (c *InPort) ArrayLength() int {
-	return 0
-}

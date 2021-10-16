@@ -16,7 +16,7 @@ type Counter struct {
 func (counter *Counter) Setup(p *core.Process) {
 	counter.ipt = p.OpenInPort("IN")
 	counter.cnt = p.OpenOutPort("COUNT")
-	counter.opt = p.OpenOutPort("OUT", "opt")
+	counter.opt = p.OpenOutPortOptional("OUT")
 }
 
 func (Counter) MustRun() {}

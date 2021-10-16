@@ -1,7 +1,6 @@
 package core
 
-type InputConn interface {
-	receive(p *Process) *Packet
+type inputCommon interface {
 	isDrained() bool
 	resetForNextExecution()
 
@@ -10,8 +9,13 @@ type InputConn interface {
 	//GetType() string
 }
 
+type InputConn interface {
+	inputCommon
+	receive(p *Process) *Packet
+}
+
 type InputArrayConn interface {
-	InputConn
+	inputCommon
 	GetArrayItem(i int) *InPort
 	SetArrayItem(c *InPort, i int)
 	ArrayLength() int

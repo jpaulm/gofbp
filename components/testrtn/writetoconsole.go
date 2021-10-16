@@ -13,7 +13,7 @@ type WriteToConsole struct {
 
 func (writeToConsole *WriteToConsole) Setup(p *core.Process) {
 	writeToConsole.ipt = p.OpenInPort("IN")
-	writeToConsole.out = p.OpenOutPort("OUT", "opt")
+	writeToConsole.out = p.OpenOutPortOptional("OUT")
 }
 
 func (WriteToConsole) MustRun() {}

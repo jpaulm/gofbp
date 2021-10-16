@@ -15,7 +15,7 @@ type WriteToConsNL struct {
 
 func (writeToConsole *WriteToConsNL) Setup(p *core.Process) {
 	writeToConsole.ipt = p.OpenInPort("IN")
-	writeToConsole.opt = p.OpenOutPort("OUT", "opt")
+	writeToConsole.opt = p.OpenOutPortOptional("OUT")
 }
 
 //func (WriteToConsNL) MustRun() {}

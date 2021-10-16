@@ -3,9 +3,9 @@ package core
 type InArrayPort struct {
 	network *Network
 
-	portName string
-	fullName string
-	array    []*InPort
+	//portName string
+	//fullName string
+	array []*InPort
 }
 
 func (c *InArrayPort) isDrained() bool {
@@ -26,9 +26,9 @@ func (c *InArrayPort) IsEmpty() bool {
 	return true
 }
 
-func (c *InArrayPort) receive(p *Process) *Packet {
-	panic("receive from an array port")
-}
+//func (c *InArrayPort) receive(p *Process) *Packet {
+//	panic("receive from an array port")
+//}
 
 func (c *InArrayPort) IsClosed() bool {
 	for _, v := range c.array {

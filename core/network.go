@@ -21,8 +21,8 @@ type Network struct {
 	procs map[string]*Process
 	//procList []*Process
 	//driver  Process
-	logFile string
-	wg      sync.WaitGroup
+	//logFile string
+	wg sync.WaitGroup
 }
 
 func NewNetwork(name string) *Network {
@@ -49,6 +49,8 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 
 	proc.inPorts = make(map[string]interface{})
 	proc.outPorts = make(map[string]interface{})
+	//proc.inPorts = make(map[string]inputCommon)
+	//proc.outPorts = make(map[string]outputCommon)
 
 	return proc
 }
@@ -212,7 +214,7 @@ func (n *Network) Run() {
 	/*
 		go func() {
 			for {
-				//time.Sleep(200 * time.Millisecond)
+				time.Sleep(200 * time.Millisecond)
 				allTerminated := true
 				deadlockDetected := true
 				for _, proc := range n.procs {

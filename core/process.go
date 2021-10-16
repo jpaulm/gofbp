@@ -13,10 +13,11 @@ import (
 type Process struct {
 	name    string
 	network *Network
-	//inPorts   map[string]InputConn
-	inPorts map[string]interface{}
-	//outPorts  map[string]OutputConn
-	outPorts  map[string]interface{}
+
+	inPorts  map[string]interface{}
+	outPorts map[string]interface{}
+	//inPorts map[string]inputCommon
+	//outPorts  map[string]outputCommon
 	logFile   string
 	component Component
 	ownedPkts int
@@ -79,69 +80,82 @@ func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 	return in
 }
 
-func (p *Process) OpenOutPort(s ...string) *OutPort {
+func (p *Process) OpenOutPort(s string) *OutPort {
 	var out *OutPort
 	var b bool
 	if len(p.outPorts) == 0 {
 		out = new(OutPort)
-		p.outPorts[s[0]] = out
-		out.name = s[0]
+		p.outPorts[s] = out
+		out.name = s
 		out.connected = false
 	} else {
-		out, b = p.outPorts[s[0]].(*OutPort)
+		out, b = p.outPorts[s].(*OutPort)
 		if !b {
-			//panic(p.name + " " + s[0] + " OutPort wrong type")
-			return nil // fix later...
+			panic(p.name + " " + s + " OutPort not connected, or found other type")
 		}
 	}
 
-	if len(s) == 2 {
+	/*
+		if len(s) == 2 {
 
-		if s[1] != "opt" {
-			panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
+			if s[1] != "opt" {
+				panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
+			}
+
+			if out == nil {
+				out := new(OutPort)
+				p.outPorts[s[0]] = out
+				out.name = s[0]
+				out.connected = false
+
+			}
 		}
 
-		if out == nil {
-			out := new(OutPort)
-			p.outPorts[s[0]] = out
-			out.name = s[0]
-			out.connected = false
-
-		}
-	}
+	*/
 
 	return out
 
 }
 
+func (p *Process) OpenOutPortOptional(s string) *OutPort {
+	var out *OutPort
+	var b bool
+	if len(p.outPorts) == 0 {
+		out = new(OutPort)
+		p.outPorts[s] = out
+		out.name = s
+		out.connected = false
+	} else {
+		out, b = p.outPorts[s].(*OutPort)
+		//if !b {
+		//	panic(p.name + " " + s + " OutPort not connected, or found other type")
+		//}
+
+		if !b || out == nil {
+			out := new(OutPort)
+			p.outPorts[s] = out
+			out.name = s
+			out.connected = false
+		}
+	}
+
+	return out
+}
+
 // not sure it makes sense to allow optional for array ports!
 
-func (p *Process) OpenOutArrayPort(s ...string) *OutArrayPort {
+func (p *Process) OpenOutArrayPort(s string) *OutArrayPort {
 	var out *OutArrayPort
 	var b bool
 	if len(p.outPorts) == 0 {
 		out = new(OutArrayPort)
-		p.outPorts[s[0]] = out
-		out.name = s[0]
+		p.outPorts[s] = out
+		out.name = s
 		out.connected = false
 	} else {
-		out, b = p.outPorts[s[0]].(*OutArrayPort)
+		out, b = p.outPorts[s].(*OutArrayPort)
 		if !b {
-			panic(p.name + " " + s[0] + " OutArrayPort not connected, or found other type")
-		}
-	}
-
-	if len(s) == 2 {
-
-		if s[1] != "opt" {
-			panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
-		}
-
-		if out == nil {
-			out := new(OutArrayPort)
-			p.outPorts[s[0]] = out
-			out.name = s[0]
-			out.connected = false
+			panic(p.name + " " + s + " OutArrayPort not connected, or found other type")
 		}
 	}
 

@@ -81,6 +81,9 @@ func TestCopyFile(t *testing.T) {
 }
 
 func TestDoSelect1(t *testing.T) {
+
+	// port REJ from proc2 is connected
+
 	net := core.NewNetwork("DoSelect")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
@@ -99,6 +102,9 @@ func TestDoSelect1(t *testing.T) {
 }
 
 func TestDoSelect2(t *testing.T) {
+
+	// port REJ from proc2 is NOT connected
+
 	net := core.NewNetwork("DoSelect2")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})

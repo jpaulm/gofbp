@@ -16,7 +16,7 @@ type WriteFile struct {
 func (writeFile *WriteFile) Setup(p *core.Process) {
 	writeFile.iptIp = p.OpenInitializationPort("FILENAME")
 	writeFile.ipt = p.OpenInPort("IN")
-	writeFile.opt = p.OpenOutPort("OUT", "opt")
+	writeFile.opt = p.OpenOutPortOptional("OUT")
 }
 
 func (WriteFile) MustRun() {}

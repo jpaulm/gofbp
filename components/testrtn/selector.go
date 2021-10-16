@@ -20,7 +20,7 @@ func (selector *Selector) Setup(p *core.Process) {
 
 	selector.out1 = p.OpenOutPort("ACC")
 
-	selector.out2 = p.OpenOutPort("REJ", "opt") // is optional
+	selector.out2 = p.OpenOutPortOptional("REJ")
 
 	selector.iptIp = p.OpenInitializationPort("PARAM")
 }
@@ -52,13 +52,8 @@ func (selector *Selector) Execute(p *core.Process) {
 			p.Send(selector.out1, pkt)
 		} else {
 			if !selector.out2.IsConnected() {
-				if selector.out2 == nil {
-					p.Discard(pkt)
-				}
+				p.Discard(pkt)
 			} else {
-				//if selector.out2 == nil {
-				//	panic("Selector - port not specified, but not optional")
-				//}
 				p.Send(selector.out2, pkt)
 			}
 
