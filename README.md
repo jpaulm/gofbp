@@ -12,6 +12,7 @@ Features include:
 - the reason for `MustRun` is that components are not triggered if there is no data incoming on their non-IIP input ports (apart from closing down downstream processes as appropriate);  some components however need to execute in spite of this, e.g. `components\io\writefile.go` (which must clear the output file), and counter-type components.
 - optional output ports - see `components\testrtn\writetoconsole.go`
 
+**Note:** the last test in `go test` is designed to crash.  To skip this test, remove the double slashes from the `t.Skip` statement at the beginning of `force_deadlock_test.go`.
 
 The following test cases are now working - thanks to Egon Elbre for all his help!
 
