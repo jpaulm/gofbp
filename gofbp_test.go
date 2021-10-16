@@ -1,8 +1,9 @@
 package main
 
 import (
-	"os"
 	"testing"
+
+	"path/filepath"
 
 	"github.com/jpaulm/gofbp/components/io"
 	"github.com/jpaulm/gofbp/components/testrtn"
@@ -72,13 +73,8 @@ func TestCopyFile(t *testing.T) {
 
 	proc2 := net.NewProc("WriteFile", &io.WriteFile{})
 
-	path, err := os.Getwd()
-	if err != nil {
-		panic("Can't find workspace directory")
-	}
-
-	net.Initialize(path+"\\testdata.txt", proc1, "FILENAME")
-	net.Initialize(path+"\\testdata.copy", proc2, "FILENAME")
+	net.Initialize(filepath.Join("testdata", "testdata.txt"), proc1, "FILENAME")
+	net.Initialize(filepath.Join("testdata", "copy-file.tmp"), proc2, "FILENAME")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
 
 	net.Run()
@@ -92,14 +88,9 @@ func TestDoSelect1(t *testing.T) {
 	proc3a := net.NewProc("WriteFile", &io.WriteFile{})
 	proc3b := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
 
-	path, err := os.Getwd()
-	if err != nil {
-		panic("Can't find workspace directory")
-	}
-
-	net.Initialize(path+"\\testdata.txt", proc1, "FILENAME")
+	net.Initialize(filepath.Join("testdata", "testdata.txt"), proc1, "FILENAME")
 	net.Initialize("X", proc2, "PARAM")
-	net.Initialize(path+"\\testdata.copy", proc3a, "FILENAME")
+	net.Initialize(filepath.Join("testdata", "do-select.tmp"), proc3a, "FILENAME")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
 	net.Connect(proc2, "ACC", proc3a, "IN", 6)
 	net.Connect(proc2, "REJ", proc3b, "IN", 6)
@@ -108,21 +99,16 @@ func TestDoSelect1(t *testing.T) {
 }
 
 func TestDoSelect2(t *testing.T) {
-	net := core.NewNetwork("DoSelect")
+	net := core.NewNetwork("DoSelect2")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 	proc2 := net.NewProc("Select", &testrtn.Selector{})
 	proc3a := net.NewProc("WriteFile", &io.WriteFile{})
 	//proc3b := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
 
-	path, err := os.Getwd()
-	if err != nil {
-		panic("Can't find workspace directory")
-	}
-
-	net.Initialize(path+"\\testdata.txt", proc1, "FILENAME")
+	net.Initialize(filepath.Join("testdata", "testdata.txt"), proc1, "FILENAME")
 	net.Initialize("X", proc2, "PARAM")
-	net.Initialize(path+"\\testdata.copy", proc3a, "FILENAME")
+	net.Initialize(filepath.Join("testdata", "do-select.tmp"), proc3a, "FILENAME")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
 	net.Connect(proc2, "ACC", proc3a, "IN", 6)
 	//net.Connect(proc2, "REJ", proc3b, "IN", 6)
