@@ -70,6 +70,7 @@ io folder:
 **To dos**
 
 - More and better documentation
+- Convert `panic`s to more standard Go error handling
 - Way too much logging - have to make that optional - use a JSON file...?  Issue raised for this...
 - Add subnet handling
 - Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp
