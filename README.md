@@ -2,9 +2,9 @@
 
 This repo holds the beginning of an FBP implementation in Go
 
-*As of 12 Oct., 2021, all test cases are working again - if you downloaded GoFBP before 12 Oct., please download it again, to see what changes have been made to the API*
+*As of 17 Oct., 2021, all test cases are working again.  Apologies: if you downloaded GoFBP before 17 Oct., please download it again, and use the current component definitons as a model for developing your own components*
 
-Right now, Go `panic` is being used for most error conditions - these will be changed gradually to use more standard Go error handling.
+There may well be further internal changes, but I am hoping that the "external" APIs (network and component definitions) are now firm. 
 
 Features include:
 
@@ -65,4 +65,9 @@ io folder:
 - readfile.go
 - writefile.go
 
-Note: way too much logging - have to make that optional - use a JSON file...?  Issue raised for this...
+**To dos**
+
+- More and better documentation
+- Way too much logging - have to make that optional - use a JSON file...?  Issue raised for this...
+- Add subnet handling
+- Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp
