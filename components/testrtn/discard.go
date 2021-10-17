@@ -7,7 +7,7 @@ import (
 )
 
 type Discard struct {
-	ipt *core.InPort
+	ipt core.InputConn
 }
 
 func (discard *Discard) Setup(p *core.Process) {

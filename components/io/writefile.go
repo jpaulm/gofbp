@@ -8,13 +8,13 @@ import (
 )
 
 type WriteFile struct {
-	iptIp *core.InitializationPort
-	ipt   *core.InPort
-	opt   *core.OutPort
+	iptIp core.InputConn
+	ipt   core.InputConn
+	opt   core.OutputConn
 }
 
 func (writeFile *WriteFile) Setup(p *core.Process) {
-	writeFile.iptIp = p.OpenInitializationPort("FILENAME")
+	writeFile.iptIp = p.OpenInPort("FILENAME")
 	writeFile.ipt = p.OpenInPort("IN")
 	writeFile.opt = p.OpenOutPortOptional("OUT")
 }

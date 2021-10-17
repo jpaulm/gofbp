@@ -10,12 +10,12 @@ import (
 )
 
 type ReadFile struct {
-	ipt *core.InitializationPort
-	opt *core.OutPort
+	ipt core.InputConn
+	opt core.OutputConn
 }
 
 func (readFile *ReadFile) Setup(p *core.Process) {
-	readFile.ipt = p.OpenInitializationPort("FILENAME")
+	readFile.ipt = p.OpenInPort("FILENAME")
 	readFile.opt = p.OpenOutPort("OUT")
 }
 

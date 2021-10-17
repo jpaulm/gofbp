@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-type InitializationPort struct {
+type InitializationConnection struct {
 	network  *Network
 	portName string
 	fullName string
@@ -14,21 +14,21 @@ type InitializationPort struct {
 	mtx      sync.Mutex
 }
 
-func (c *InitializationPort) isDrained() bool {
+func (c *InitializationConnection) isDrained() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
 	return c.closed
 }
 
-func (c *InitializationPort) IsEmpty() bool {
+func (c *InitializationConnection) IsEmpty() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
 	return !c.closed
 }
 
-func (c *InitializationPort) receive(p *Process) *Packet {
+func (c *InitializationConnection) receive(p *Process) *Packet {
 
 	if c.closed {
 		return nil
@@ -43,7 +43,7 @@ func (c *InitializationPort) receive(p *Process) *Packet {
 	return pkt
 }
 
-func (c *InitializationPort) Close() {
+func (c *InitializationConnection) Close() {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -51,30 +51,16 @@ func (c *InitializationPort) Close() {
 
 }
 
-func (c *InitializationPort) IsClosed() bool {
+func (c *InitializationConnection) IsClosed() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
 	return c.closed
 }
 
-func (c *InitializationPort) resetForNextExecution() {
+func (c *InitializationConnection) resetForNextExecution() {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
 	c.closed = false
 }
-
-//func (c *InitializationPort) GetType() string {
-//	return "InitializationPort"
-//}
-
-//func (c *InitializationPort) GetArrayItem(i int) *InPort {
-//	return nil
-//}
-
-//func (c *InitializationPort) SetArrayItem(c2 *InPort, i int) {}
-
-//func (c *InitializationPort) ArrayLength() int {
-//	return 0
-//}

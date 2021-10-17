@@ -7,8 +7,8 @@ import (
 )
 
 type WriteToConsole struct {
-	ipt *core.InPort
-	out *core.OutPort
+	ipt core.InputConn
+	out core.OutputConn
 }
 
 func (writeToConsole *WriteToConsole) Setup(p *core.Process) {

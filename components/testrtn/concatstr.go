@@ -5,8 +5,8 @@ import (
 )
 
 type ConcatStr struct {
-	ipt *core.InArrayPort
-	opt *core.OutPort
+	ipt core.InputArrayConn
+	opt core.OutputConn
 }
 
 func (concatstr *ConcatStr) Setup(p *core.Process) {

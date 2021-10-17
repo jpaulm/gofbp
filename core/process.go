@@ -14,10 +14,9 @@ type Process struct {
 	name    string
 	network *Network
 
-	inPorts  map[string]interface{}
-	outPorts map[string]interface{}
-	//inPorts map[string]inputCommon
-	//outPorts  map[string]outputCommon
+	inPorts  map[string]inputCommon
+	outPorts map[string]outputCommon
+
 	logFile   string
 	component Component
 	ownedPkts int
@@ -32,13 +31,13 @@ func (p *Process) GetName() string {
 	return p.name
 }
 
-func (p *Process) OpenInPort(s string) *InPort {
-	var in *InPort
+func (p *Process) OpenInPort(s string) InputConn {
+	var in InputConn
 	var b bool
 	if len(p.inPorts) == 0 {
 		panic(p.name + ": No input ports specified")
 	}
-	in, b = p.inPorts[s].(*InPort)
+	in, b = p.inPorts[s].(InputConn)
 	//if in == nil {
 	//	panic(p.name + ": Port name not found (" + s + ")")
 	//}
@@ -48,6 +47,7 @@ func (p *Process) OpenInPort(s string) *InPort {
 	return in
 }
 
+/*
 func (p *Process) OpenInitializationPort(s string) *InitializationPort {
 	var in *InitializationPort
 	var b bool
@@ -63,6 +63,8 @@ func (p *Process) OpenInitializationPort(s string) *InitializationPort {
 	}
 	return in
 }
+
+*/
 
 func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 	var in *InArrayPort
@@ -80,14 +82,11 @@ func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 	return in
 }
 
-func (p *Process) OpenOutPort(s string) *OutPort {
-	var out *OutPort
+func (p *Process) OpenOutPort(s string) OutputConn {
+	var out OutputConn
 	var b bool
 	if len(p.outPorts) == 0 {
-		out = new(OutPort)
-		p.outPorts[s] = out
-		out.name = s
-		out.connected = false
+		panic(p.name + " " + s + " OutPort not connected")
 	} else {
 		out, b = p.outPorts[s].(*OutPort)
 		if !b {
@@ -95,47 +94,29 @@ func (p *Process) OpenOutPort(s string) *OutPort {
 		}
 	}
 
-	/*
-		if len(s) == 2 {
-
-			if s[1] != "opt" {
-				panic(p.name + ": Invalid 2nd param (" + s[1] + ")")
-			}
-
-			if out == nil {
-				out := new(OutPort)
-				p.outPorts[s[0]] = out
-				out.name = s[0]
-				out.connected = false
-
-			}
-		}
-
-	*/
-
 	return out
 
 }
 
-func (p *Process) OpenOutPortOptional(s string) *OutPort {
-	var out *OutPort
+func (p *Process) OpenOutPortOptional(s string) OutputConn {
+	var out OutputConn
 	var b bool
 	if len(p.outPorts) == 0 {
-		out = new(OutPort)
+		out = new(NullOutPort)
 		p.outPorts[s] = out
-		out.name = s
-		out.connected = false
+		//out.name = s
+		//out.connected = false
 	} else {
 		out, b = p.outPorts[s].(*OutPort)
 		//if !b {
 		//	panic(p.name + " " + s + " OutPort not connected, or found other type")
 		//}
 
-		if !b || out == nil {
-			out := new(OutPort)
+		if !b {
+			out := new(NullOutPort)
 			p.outPorts[s] = out
-			out.name = s
-			out.connected = false
+			//out.name = s
+			//out.connected = false
 		}
 	}
 
@@ -248,10 +229,11 @@ func (p *Process) Run() {
 			canRun = false
 		} else {
 			for _, v := range p.inPorts {
-				_, b := v.(InitializationPort)
-				if b {
-					v.(*InitializationPort).resetForNextExecution()
-				}
+				//_, b := v.(InitializationConnection)
+				//if b {
+				//v.(*InitializationConnection).resetForNextExecution()
+				v.resetForNextExecution()
+				//}
 			}
 		}
 

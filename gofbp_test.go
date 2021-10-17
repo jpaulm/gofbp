@@ -84,7 +84,7 @@ func TestDoSelect1(t *testing.T) {
 
 	// port REJ from proc2 is connected
 
-	net := core.NewNetwork("DoSelect")
+	net := core.NewNetwork("DoSelect1")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 	proc2 := net.NewProc("Select", &testrtn.Selector{})

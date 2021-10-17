@@ -8,9 +8,9 @@ import (
 )
 
 type Counter struct {
-	ipt *core.InPort
-	cnt *core.OutPort
-	opt *core.OutPort
+	ipt core.InputConn
+	cnt core.OutputConn
+	opt core.OutputConn
 }
 
 func (counter *Counter) Setup(p *core.Process) {

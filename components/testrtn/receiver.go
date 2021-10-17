@@ -7,7 +7,7 @@ import (
 )
 
 type Receiver struct {
-	ipt *core.InPort
+	ipt core.InputConn
 }
 
 func (receiver *Receiver) Setup(p *core.Process) {

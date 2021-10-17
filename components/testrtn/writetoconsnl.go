@@ -9,8 +9,8 @@ import (
 // WriteToConsole modifieed to be a non-looper (NL)
 
 type WriteToConsNL struct {
-	ipt *core.InPort
-	opt *core.OutPort
+	ipt core.InputConn
+	opt core.OutputConn
 }
 
 func (writeToConsole *WriteToConsNL) Setup(p *core.Process) {

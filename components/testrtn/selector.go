@@ -8,10 +8,10 @@ import (
 )
 
 type Selector struct {
-	ipt   *core.InPort
-	iptIp *core.InitializationPort
-	out1  *core.OutPort
-	out2  *core.OutPort
+	ipt   core.InputConn
+	iptIp core.InputConn
+	out1  core.OutputConn
+	out2  core.OutputConn
 }
 
 func (selector *Selector) Setup(p *core.Process) {
@@ -22,7 +22,7 @@ func (selector *Selector) Setup(p *core.Process) {
 
 	selector.out2 = p.OpenOutPortOptional("REJ")
 
-	selector.iptIp = p.OpenInitializationPort("PARAM")
+	selector.iptIp = p.OpenInPort("PARAM")
 }
 
 func (Selector) MustRun() {}
