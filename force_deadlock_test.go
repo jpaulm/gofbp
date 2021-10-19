@@ -1,29 +1,35 @@
 package main
 
 import (
+	"context"
+	"os/exec"
+	"path/filepath"
+	"strings"
 	"testing"
-
-	"github.com/jpaulm/gofbp/components/testrtn"
-	"github.com/jpaulm/gofbp/core"
+	"time"
 )
 
 func TestForceDeadlock(t *testing.T) {
-	t.Skip("Deadlock detection is designed to crash!")
+	exe := filepath.Join(t.TempDir(), "deadlock.exe")
 
-	net := core.NewNetwork("ForceDeadlock")
+	compile := exec.Command("go", "build", "-o", exe, "./testdata/deadlock")
+	data, err := compile.CombinedOutput()
+	t.Log(string(data))
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	proc1 := net.NewProc("Sender", &testrtn.Sender{})
-	proc2 := net.NewProc("Counter", &testrtn.Counter{})
-	proc3 := net.NewProc("Concat", &testrtn.ConcatStr{})
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	proc4 := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
-
-	net.Initialize("15", proc1, "COUNT")
-
-	net.Connect(proc1, "OUT", proc2, "IN", 6)
-	net.Connect(proc2, "OUT", proc3, "IN[1]", 6)
-	net.Connect(proc2, "COUNT", proc3, "IN[0]", 6)
-	net.Connect(proc3, "OUT", proc4, "IN", 6)
-
-	net.Run()
+	run := exec.CommandContext(ctx, exe)
+	out, err := run.CombinedOutput()
+	t.Log(string(out))
+	if !strings.Contains(string(out), "deadlock") &&
+		!strings.Contains(string(out), "Deadlock") {
+		t.Error("expected output to mention a deadlock")
+	}
+	if err == nil {
+		t.Error("expected process to fail")
+	}
 }
