@@ -161,6 +161,8 @@ func (p *Process) ensureRunning() {
 		return
 	}
 
+	atomic.StoreInt32(&p.network.Active, 1)
+
 	//p.network.wg.Add(1)
 	go func() { // Process goroutine
 		defer p.network.wg.Done()
@@ -215,6 +217,7 @@ func (p *Process) Run() {
 		// multiple activations, if necessary!
 		fmt.Println(p.GetName(), " activated")
 		atomic.StoreInt32(&p.status, Active)
+		atomic.StoreInt32(&p.network.Active, 1)
 		p.component.Execute(p) // single "activation"
 		atomic.StoreInt32(&p.status, Dormant)
 		fmt.Println(p.GetName(), " deactivated")
@@ -240,21 +243,27 @@ func (p *Process) Run() {
 	}
 
 	for _, v := range p.outPorts {
-		var port interface{}
-		var b bool
+		//var port interface{}
+		//var port outputCommon
+		//var b bool
 
-		port, b = v.(*OutPort)
+		//port, b = v.(*OutPort)
 		//fmt.Println(p.name, v, port, " close after run")
-		if b {
-			if !port.(*OutPort).IsConnected() {
+		/*
+			if b {
+				if !port.(*OutPort).IsConnected() {
+					continue
+				}
+				port.(*OutPort).Close()
 				continue
 			}
-			port.(*OutPort).Close()
-			continue
-		}
-		port, b = v.(*OutArrayPort)
-		if b {
-			port.(*OutArrayPort).Close()
+			port, b = v.(*OutArrayPort)
+			if b {
+				port.(*OutArrayPort).Close()
+			}
+		*/
+		if v.IsConnected() {
+			v.Close()
 		}
 		// if anything else, just continue
 	}

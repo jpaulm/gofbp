@@ -5,10 +5,10 @@ package core
 type OutArrayPort struct {
 	network *Network
 
-	portName  string
-	name      string // full name
-	array     []*OutPort
-	closed    bool
+	//portName  string
+	name  string // full name
+	array []*OutPort
+	//closed    bool
 	connected bool
 }
 
@@ -41,5 +41,6 @@ func (o *OutArrayPort) Close() {
 }
 
 func (o *OutArrayPort) IsConnected() bool {
-	return o.connected
+	//return o.connected
+	return true
 }

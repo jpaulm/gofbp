@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
+	"sync/atomic"
+	"time"
 )
 
 const (
@@ -22,7 +24,8 @@ type Network struct {
 	//procList []*Process
 	//driver  Process
 	//logFile string
-	wg sync.WaitGroup
+	wg     sync.WaitGroup
+	Active int32
 }
 
 func NewNetwork(name string) *Network {
@@ -200,6 +203,7 @@ func (n *Network) Initialize(initValue string, p2 *Process, in string) {
 }
 
 func (n *Network) Run() {
+
 	defer fmt.Println(n.Name + " Done")
 	fmt.Println(n.Name + " Starting")
 
@@ -209,45 +213,37 @@ func (n *Network) Run() {
 	n.wg.Add(len(n.procs))
 
 	defer n.wg.Wait()
-	/*
-		go func() {
-			for {
-				time.Sleep(200 * time.Millisecond)
-				allTerminated := true
-				deadlockDetected := true
-				for _, proc := range n.procs {
-					//proc.mtx.Lock()
-					//defer proc.mtx.Unlock()
-					status := atomic.LoadInt32(&proc.status)
-					if status != Terminated {
-						allTerminated = false
-						if status == Active {
-							deadlockDetected = false
-						}
-					}
-				}
-				if allTerminated {
-					//	fmt.Println("Run terminated")
-					return
-				}
-				if deadlockDetected {
-					fmt.Println("\nDeadlock detected!")
-					for key, proc := range n.procs {
-						fmt.Println(key, " Status: ",
-							[]string{"notStarted",
-								"active",
-								"dormant",
-								"suspSend",
-								"suspRecv",
-								"terminated"}[proc.status])
-					}
-					panic("Deadlock!")
-				}
 
+	// Criterion being used for deadlock: no process has gone active in last 200 ms
+
+	go func() {
+		deadlockDetected := false
+		for {
+			time.Sleep(200 * time.Millisecond)
+			if atomic.LoadInt32(&n.Active) == 0 {
+				deadlockDetected = true
+				break
 			}
-		}()
+			atomic.StoreInt32(&n.Active, 0)
 
-	*/
+		}
+		if deadlockDetected {
+			fmt.Println("\nDeadlock detected!")
+			for key, proc := range n.procs {
+				stat := atomic.LoadInt32(&proc.status)
+				fmt.Println(" ",
+					[]string{"NotStarted:",
+						"Active:    ",
+						"Dormant:   ",
+						"SuspSend:  ",
+						"SuspRecv:  ",
+						"Terminated:"}[stat], key)
+			}
+			panic("Deadlock!")
+			//}
+
+		}
+	}()
 
 	var canRun bool = false
 	for _, proc := range n.procs {

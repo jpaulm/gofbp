@@ -6,20 +6,18 @@ import (
 	"sync/atomic"
 )
 
-// Based on https://stackoverflow.com/questions/36857167/how-to-correctly-use-sync-cond
-
 type InPort struct {
-	network     *Network
-	pktArray    []*Packet
-	is, ir      int // send index and receive index
-	mtx         sync.Mutex
-	condNE      sync.Cond
-	condNF      sync.Cond
-	closed      bool
-	upStrmCnt   int
-	portName    string
-	fullName    string
-	array       []*InPort
+	network   *Network
+	pktArray  []*Packet
+	is, ir    int // send index and receive index
+	mtx       sync.Mutex
+	condNE    sync.Cond
+	condNF    sync.Cond
+	closed    bool
+	upStrmCnt int
+	portName  string
+	fullName  string
+	//array       []*InPort
 	downStrProc *Process
 }
 
@@ -39,6 +37,7 @@ func (c *InPort) send(p *Process, pkt *Packet) bool {
 		atomic.StoreInt32(&p.status, SuspSend)
 		c.condNF.Wait()
 		atomic.StoreInt32(&p.status, Active)
+		atomic.StoreInt32(&c.network.Active, 1)
 	}
 	fmt.Println(p.name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
@@ -62,6 +61,7 @@ func (c *InPort) receive(p *Process) *Packet {
 		atomic.StoreInt32(&p.status, SuspRecv)
 		c.condNE.Wait()
 		atomic.StoreInt32(&p.status, Active)
+		atomic.StoreInt32(&c.network.Active, 1)
 
 	}
 	pkt := c.pktArray[c.ir]

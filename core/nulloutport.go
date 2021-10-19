@@ -1,7 +1,7 @@
 package core
 
 type NullOutPort struct {
-	name string
+	//name string
 }
 
 // NullOutPort by default discards the packet.
@@ -15,3 +15,7 @@ func (*NullOutPort) IsConnected() bool {
 }
 
 func (*NullOutPort) Close() {}
+
+func (*NullOutPort) IsClosed() bool {
+	return true
+}

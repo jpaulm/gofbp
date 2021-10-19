@@ -1,9 +1,10 @@
 {
   "extends": [
-    "config:base", ":disableDependencyDashboard"
+    "config:base"
   ] ,
   "automerge": true,
   "major": {
     "automerge": false
-  } 
+  },
+  "prHourlyLimit": 10
 }

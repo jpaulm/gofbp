@@ -8,7 +8,7 @@ import (
 )
 
 func TestForceDeadlock(t *testing.T) {
-	t.Skip("Deadlock detection is designed to crash!")
+	//t.Skip("Deadlock detection is designed to crash!")
 
 	net := core.NewNetwork("ForceDeadlock")
 
