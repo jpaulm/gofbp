@@ -74,3 +74,5 @@ io folder:
 - Way too much logging - have to make that optional - use a JSON file...?  Issue raised for this...
 - Add subnet handling
 - Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp
+- Add Load Balancing component
+- Add sample code showing use of substreams
