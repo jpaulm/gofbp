@@ -231,9 +231,9 @@ func (n *Network) Run() {
 				status := atomic.LoadInt32(&proc.status)
 				if status != Terminated {
 					allTerminated = false
-					//if status == Active {
-					//	deadlockDetected = false
-					//}
+					if status == Active {
+						atomic.StoreInt32(&n.Active, 1) // in case 200 ms go by without a status change...
+					}
 				}
 			}
 			if allTerminated {
