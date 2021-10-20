@@ -30,7 +30,7 @@ The following test cases are now working - thanks to Egon Elbre for all his help
 
 - file records being selected    
 
-- force deadlock (last test in `gofbp_test.go`) - this is designed to crash!
+- force deadlock (separate test file) - this is designed to crash!
  
 
 To run them, position to your `GitHub\gofbp` directory, and do any of the following:
@@ -41,14 +41,9 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run CopyFile -count=1`
 - `go test -run DoSelect -count=1`
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
+- `go test -run ForceDeadlock -count=1`
 
-To run ForceDeadlock, do the following:
-
-- `go test -run ForceDeadlock -count=1 -timeout 0s` 
-
-`go test -count=1` runs them all, including `ForceDeadlock`
-
-Note that the last test in this sequence (`ForceDeadlock`) is designed to crash - you will probably want to run it by itself...
+- `go test -count=1` runs them all, including `ForceDeadlock` (as the first one)
 
 The following components are available:
 
