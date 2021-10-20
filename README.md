@@ -20,7 +20,7 @@ FBP is a particular form of dataflow programming based on bounded buffers, infor
 GoFBP Network Definition Syntax and Component API:
 * https://jpaulm.github.io/fbp/gosyntax.htm
 
-## Features include (these are common to all FBP implementations on GitHub/jpaulm):
+## Features (these are common to all FBP implementations on GitHub/jpaulm):
 
 - delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
 - the reason for `MustRun` is that components are not triggered if there is no data incoming on their non-IIP input ports (apart from closing down downstream processes as appropriate);  some components however need to execute in spite of this, e.g. `components\io\writefile.go` (which must clear the output file), and counter-type components.
