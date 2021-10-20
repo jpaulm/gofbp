@@ -8,13 +8,25 @@ This repo holds the beginning of an FBP implementation in Go
 
 There may well be further internal changes, but I am hoping that the "external" APIs (network and component definitions) are now firm. 
 
-Features include:
+## General
+ 
+General web site for "classical" FBP: 
+* https://jpaulm.github.io/fbp
+
+In computer programming, flow-based programming (FBP) is a programming paradigm that defines applications as networks of "black box" processes, which exchange data across predefined connections by message passing, where the connections are specified externally to the processes. These black box processes can be reconnected endlessly to form different applications without having to be changed internally. FBP is thus naturally component-oriented.
+
+FBP is a particular form of dataflow programming based on bounded buffers, information packets with defined lifetimes, named ports, and separate definition of connections.
+ 
+GoFBP Network Definition Syntax and Component API:
+* https://jpaulm.github.io/fbp/gosyntax.htm
+
+## Features include (these are common to all FBP implementations on GitHub/jpaulm):
 
 - delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
 - the reason for `MustRun` is that components are not triggered if there is no data incoming on their non-IIP input ports (apart from closing down downstream processes as appropriate);  some components however need to execute in spite of this, e.g. `components\io\writefile.go` (which must clear the output file), and counter-type components.
 - optional output ports - see `components\testrtn\writetoconsole.go`
 
-**Note:** the last test in `go test` is designed to crash.  To skip this test, remove the double slashes from the `t.Skip` statement at the beginning of `force_deadlock_test.go`.
+**Note:** the last test in `go test` is designed to create error messages.
 
 The following test cases are now working - thanks to Egon Elbre for all his help!
 
