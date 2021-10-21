@@ -40,7 +40,7 @@ The following test cases are now working - thanks to Egon Elbre for all his help
 
 - file records being selected    
 
-- force deadlock (separate test file) - this is designed to crash, and in fact will give a message if it is does **not** crash!
+- force deadlock (separate test file) - this is designed to crash, and in fact will give a message if it does *not* crash!
  
 
 To run them, position to your `GitHub\gofbp` directory, and do any of the following:
