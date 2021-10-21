@@ -26,8 +26,6 @@ GoFBP Network Definition Syntax and Component API:
 - the reason for `MustRun` is that components are not triggered if there is no data incoming on their non-IIP input ports (apart from closing down downstream processes as appropriate);  some components however need to execute in spite of this, e.g. `components\io\writefile.go` (which must clear the output file), and counter-type components.
 - optional output ports - see `components\testrtn\writetoconsole.go`
 
-**Note:** the last test in `go test` is designed to create error messages.
-
 The following test cases are now working - thanks to Egon Elbre for all his help!
 
 - 2 Senders, one Receiver - merging first come, first served
@@ -42,7 +40,7 @@ The following test cases are now working - thanks to Egon Elbre for all his help
 
 - file records being selected    
 
-- force deadlock (separate test file) - this is designed to crash!
+- force deadlock (separate test file) - this is designed to crash, and in fact will give a message if it is does **not** crash!
  
 
 To run them, position to your `GitHub\gofbp` directory, and do any of the following:
