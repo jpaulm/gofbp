@@ -26,6 +26,7 @@ GoFBP Network Definition Syntax and Component API:
 - the reason for `MustRun` is that components are not triggered if there is no data incoming on their non-IIP input ports (apart from closing down downstream processes as appropriate);  some components however need to execute in spite of this, e.g. `components\io\writefile.go` (which must clear the output file), and counter-type components.
 - optional output ports - see `components\testrtn\writetoconsole.go`
 
+## Test Cases
 The following test cases are now working - thanks to Egon Elbre for all his help!
 
 - 2 Senders, one Receiver - merging first come, first served
@@ -52,6 +53,8 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run DoSelect -count=1`
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 - `go test -run ForceDeadlock -count=1`
+
+**Note**: the last one is constructed differently so that it can "crash" without disrupting the flow of tests: the network definition is in fact in `testdata`, while the test itself contains the code to compile and run the test.
 
 - `go test -count=1` runs them all, including `ForceDeadlock` (as the first one)
 
