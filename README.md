@@ -84,3 +84,4 @@ io folder:
 - Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp
 - Add Load Balancing component
 - Add sample code showing use of substreams
+- "Automatic" ports
