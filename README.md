@@ -56,7 +56,7 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 
 **Note**: the last one in this list is constructed differently so that it can "crash" without disrupting the flow of tests: the network definition is in fact in `testdata`, while the test itself contains the code to compile and run the test.
 
-You will occasionally see a message like `TempDir RemoveAll cleanup: remove ...\deadlock.exe: Access is denied.` - this thought to be due to whatver AntiVirus software you are running.  I believe it can be ignored.
+You will occasionally see a message like `TempDir RemoveAll cleanup: remove ...\deadlock.exe: Access is denied.` - this is thought to be due to whatver AntiVirus software you are running.  I believe it can be ignored.
 
 - `go test -count=1` runs them all, including `ForceDeadlock`
 
