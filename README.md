@@ -54,9 +54,11 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 - `go test -run ForceDeadlock -count=1`
 
-**Note**: the last one is constructed differently so that it can "crash" without disrupting the flow of tests: the network definition is in fact in `testdata`, while the test itself contains the code to compile and run the test.
+**Note**: the last one in this list is constructed differently so that it can "crash" without disrupting the flow of tests: the network definition is in fact in `testdata`, while the test itself contains the code to compile and run the test.
 
-- `go test -count=1` runs them all, including `ForceDeadlock` (as the first one)
+You will occasionally see a message like `TempDir RemoveAll cleanup: remove ...\deadlock.exe: Access is denied.` - this thought to be due to whatver AntiVirus software you are running.  I believe it can be ignored.
+
+- `go test -count=1` runs them all, including `ForceDeadlock`
 
 The following components are available:
 
