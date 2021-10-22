@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strconv"
 	"sync"
-	"sync/atomic"
-	"time"
+	//"sync/atomic"
+	//"time"
 )
 
 const (
@@ -47,7 +47,6 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 		status:    Notstarted,
 	}
 
-	//n.procList = append(n.procList, proc)
 	n.procs[nm] = proc
 
 	proc.inPorts = make(map[string]inputCommon)
@@ -214,51 +213,51 @@ func (n *Network) Run() {
 
 	defer n.wg.Wait()
 
-	// Criterion being used for deadlock: no process has gone active in last 200 ms
+	/*
+		// Criterion being used for deadlock: no process has become or is already active in last 200 ms
 
-	// criterion for deadlock: no activity in last 200 ms
-
-	go func() {
-		for {
-			atomic.StoreInt32(&n.Active, 0)
-			time.Sleep(200 * time.Millisecond)
-			//atomic.StoreInt32(&n.active, 0)
-			allTerminated := true
-			//deadlockDetected := true
-			for _, proc := range n.procs {
-				//proc.mtx.Lock()
-				//defer proc.mtx.Unlock()
-				status := atomic.LoadInt32(&proc.status)
-				if status != Terminated {
-					allTerminated = false
-					if status == Active {
-						atomic.StoreInt32(&n.Active, 1) // in case 200 ms go by without a status change...
+		go func() {
+			for {
+				atomic.StoreInt32(&n.Active, 0)
+				time.Sleep(2 * time.Millisecond)
+				//atomic.StoreInt32(&n.active, 0)
+				allTerminated := true
+				//deadlockDetected := true
+				for _, proc := range n.procs {
+					proc.mtx.Lock()
+					defer proc.mtx.Unlock()
+					status := atomic.LoadInt32(&proc.status)
+					if status != Terminated {
+						allTerminated = false
+						if status == Active {
+							atomic.StoreInt32(&n.Active, 1) // in case 200 ms go by without a status change...
+						}
 					}
 				}
-			}
-			if allTerminated {
-				//fmt.Println(n.Name, " terminated")
-				return
-			}
-			//if deadlockDetected {
-			if n.Active == 0 {
-				fmt.Println("\nDeadlock detected in", n.Name+"!")
-				for key, proc := range n.procs {
-					status := atomic.LoadInt32(&proc.status)
-					fmt.Println(" ",
-						[]string{"NotStarted:",
-							"Active:    ",
-							"Dormant:   ",
-							"SuspSend:  ",
-							"SuspRecv:  ",
-							"Terminated:"}[status], key)
+				if allTerminated {
+					//fmt.Println(n.Name, " terminated")
+					return
 				}
-				panic("Deadlock!")
+				//if deadlockDetected {
+				if n.Active == 0 {
+					fmt.Println("\nDeadlock detected in", n.Name+"!")
+					for key, proc := range n.procs {
+						status := atomic.LoadInt32(&proc.status)
+						fmt.Println(" ",
+							[]string{"NotStarted:",
+								"Active:    ",
+								"Dormant:   ",
+								"SuspSend:  ",
+								"SuspRecv:  ",
+								"Terminated:"}[status], key)
+					}
+					panic("Deadlock!")
+				}
+
 			}
 
-		}
-	}()
-
+		}()
+	*/
 	var canRun bool = false
 	for _, proc := range n.procs {
 		proc.mtx.Lock()

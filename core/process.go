@@ -47,25 +47,6 @@ func (p *Process) OpenInPort(s string) InputConn {
 	return in
 }
 
-/*
-func (p *Process) OpenInitializationPort(s string) *InitializationPort {
-	var in *InitializationPort
-	var b bool
-	if len(p.inPorts) == 0 {
-		panic(p.name + ": No input ports specified")
-	}
-	in, b = p.inPorts[s].(*InitializationPort)
-	//if in == nil {
-	//	panic(p.name + ": Port name not found (" + s + ")")
-	//}
-	if !b {
-		panic(p.name + " " + s + " InitializationPort not connected, or found other type")
-	}
-	return in
-}
-
-*/
-
 func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 	var in *InArrayPort
 	var b bool
@@ -161,16 +142,20 @@ func (p *Process) ensureRunning() {
 		return
 	}
 
+	//p.mtx.Lock()
+	//defer p.mtx.Unlock()
+
 	atomic.StoreInt32(&p.network.Active, 1)
 
-	//p.network.wg.Add(1)
 	go func() { // Process goroutine
 		defer p.network.wg.Done()
+
 		p.Run()
 	}()
 }
 
 func (p *Process) inputState() (bool, bool) {
+
 	allDrained := true
 	hasData := false
 	for _, v := range p.inPorts {
@@ -200,7 +185,7 @@ func (p *Process) inputState() (bool, bool) {
 func (p *Process) Run() {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
-	atomic.StoreInt32(&p.status, Dormant)
+	//atomic.StoreInt32(&p.status, Dormant)
 	defer atomic.StoreInt32(&p.status, Terminated)
 	defer fmt.Println(p.GetName(), " terminated")
 	fmt.Println(p.GetName(), " started")
@@ -208,6 +193,8 @@ func (p *Process) Run() {
 
 	//var allDrained bool
 	//var hasData bool
+
+	//atomic.StoreInt32(&p.status, Dormant)
 
 	allDrained, hasData := p.inputState()
 
@@ -243,25 +230,7 @@ func (p *Process) Run() {
 	}
 
 	for _, v := range p.outPorts {
-		//var port interface{}
-		//var port outputCommon
-		//var b bool
 
-		//port, b = v.(*OutPort)
-		//fmt.Println(p.name, v, port, " close after run")
-		/*
-			if b {
-				if !port.(*OutPort).IsConnected() {
-					continue
-				}
-				port.(*OutPort).Close()
-				continue
-			}
-			port, b = v.(*OutArrayPort)
-			if b {
-				port.(*OutArrayPort).Close()
-			}
-		*/
 		if v.IsConnected() {
 			v.Close()
 		}
@@ -274,16 +243,7 @@ func (p *Process) isMustRun() bool {
 	return hasMustRun
 }
 
-/*
-// create packet containing string
-func (p *Process) Create(s string) *Packet {
-	var pkt *Packet = new(Packet)
-	pkt.Contents = s
-	pkt.owner = p
-	p.ownedPkts++
-	return pkt
-}
-*/
+
 
 // create packet containing anything!
 func (p *Process) Create(x interface{}) *Packet {
