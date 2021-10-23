@@ -60,6 +60,14 @@ You will occasionally see a message like `TempDir RemoveAll cleanup: remove ...\
 
 - `go test -count=1` runs them all, including `ForceDeadlock`
 
+# Deadlocks
+
+FBP deadlocks are well understood, and are handled well by other FBP implementations on https://github.com/jpaulm .  They seem to be well detected by the Go scheduler - unfortunately, they are not so easy to troubleshhot, as Go deadlock detection is not "FBP-aware".  This has been raised as an issue - #28 .
+
+To troubleshoot FBP deadlocks, look at the list of goroutines involved, and add the component names to your diagram, together with the "state", deducible from the functions being executed.  Unfortunately, if you have multiple processes (goroutines) executing the same component, there is currently no easy way to determine which processes are involved.
+
+## Components
+
 The following components are available:
 
 testrtn folder:
