@@ -66,6 +66,10 @@ FBP deadlocks are well understood, and are handled well by other FBP implementat
 
 To troubleshoot FBP deadlocks, look at the list of goroutines involved, and add the component names to your diagram, together with the "state", deducible from the functions being executed.  Unfortunately, if you have multiple processes (goroutines) executing the same component, there is currently no easy way to determine which processes are involved.
 
+# Debugging Deadlocks
+
+As of this release (v2.1.0), go through the listed goroutines, looking for `Execute` - this will show the Component name (in the line below); now go up 2 lines, which should show `Send` or `Receive`: other goroutines can be ignored.  Mark `S`s or `R`s on your diagram, and this should give you an indication as to where in your diagram the deadlock is occurring.
+
 ## Components
 
 The following components are available:
