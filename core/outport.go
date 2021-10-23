@@ -30,6 +30,19 @@ func (o *OutPort) ArrayLength() int {
 	return 0
 }
 
+//func (o *OutPort) Close() {
+//	o.decUpstream()
+//}
+
 func (o *OutPort) Close() {
-	o.Conn.decUpstream()
+	o.Conn.mtx.Lock()
+	defer o.Conn.mtx.Unlock()
+
+	o.Conn.upStrmCnt--
+	if o.Conn.upStrmCnt == 0 {
+		o.Conn.closed = true
+		o.Conn.condNE.Broadcast()
+		o.Conn.downStrProc.ensureRunning()
+
+	}
 }

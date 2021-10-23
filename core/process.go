@@ -198,14 +198,16 @@ func (p *Process) Run() {
 
 	allDrained, hasData := p.inputState()
 
-	canRun := p.selfStarting || hasData || !allDrained || p.isMustRun()
+	canRun := p.selfStarting || hasData || !allDrained || p.isMustRun() && allDrained
 
 	for canRun {
 		// multiple activations, if necessary!
 		fmt.Println(p.GetName(), " activated")
 		atomic.StoreInt32(&p.status, Active)
 		atomic.StoreInt32(&p.network.Active, 1)
+
 		p.component.Execute(p) // single "activation"
+
 		atomic.StoreInt32(&p.status, Dormant)
 		fmt.Println(p.GetName(), " deactivated")
 
@@ -242,8 +244,6 @@ func (p *Process) isMustRun() bool {
 	_, hasMustRun := p.component.(ComponentWithMustRun)
 	return hasMustRun
 }
-
-
 
 // create packet containing anything!
 func (p *Process) Create(x interface{}) *Packet {

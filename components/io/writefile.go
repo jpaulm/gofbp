@@ -57,7 +57,7 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 			//}
 		}
 
-		fmt.Println(p.GetName()+": File", fname, "written")
 		//fmt.Println(p.GetName() + " ended")
 	}
+	fmt.Println(p.GetName()+": File", fname, "written")
 }

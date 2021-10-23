@@ -37,7 +37,7 @@ func (c *InPort) send(p *Process, pkt *Packet) bool {
 		atomic.StoreInt32(&p.status, SuspSend)
 		c.condNF.Wait()
 		atomic.StoreInt32(&p.status, Active)
-		atomic.StoreInt32(&c.network.Active, 1)
+		atomic.StoreInt32(&p.network.Active, 1)
 	}
 	fmt.Println(p.name, "Sent", pkt.Contents)
 	c.pktArray[c.is] = pkt
@@ -61,7 +61,7 @@ func (c *InPort) receive(p *Process) *Packet {
 		atomic.StoreInt32(&p.status, SuspRecv)
 		c.condNE.Wait()
 		atomic.StoreInt32(&p.status, Active)
-		atomic.StoreInt32(&c.network.Active, 1)
+		atomic.StoreInt32(&p.network.Active, 1)
 
 	}
 	pkt := c.pktArray[c.ir]
@@ -82,6 +82,7 @@ func (c *InPort) incUpstream() {
 	c.upStrmCnt++
 }
 
+/*
 func (c *InPort) decUpstream() {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
@@ -94,7 +95,7 @@ func (c *InPort) decUpstream() {
 
 	}
 }
-
+*/
 func (c *InPort) Close() {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()

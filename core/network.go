@@ -203,29 +203,20 @@ func (n *Network) Initialize(initValue string, p2 *Process, in string) {
 
 func (n *Network) Run() {
 
-	defer fmt.Println(n.Name + " Done")
-	fmt.Println(n.Name + " Starting")
-
-	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
-	// reactivated many times during the process "run"
-
-	n.wg.Add(len(n.procs))
-
-	defer n.wg.Wait()
+	// Criterion being used for deadlock: no process has become or is already active in last 200 ms
 
 	/*
-		// Criterion being used for deadlock: no process has become or is already active in last 200 ms
+		go func(n *Network) {
 
-		go func() {
 			for {
 				atomic.StoreInt32(&n.Active, 0)
-				time.Sleep(2 * time.Millisecond)
+				time.Sleep(2 * time.Millisecond) // shd be 200 ms!
 				//atomic.StoreInt32(&n.active, 0)
 				allTerminated := true
 				//deadlockDetected := true
 				for _, proc := range n.procs {
 					proc.mtx.Lock()
-					defer proc.mtx.Unlock()
+					//defer proc.mtx.Unlock()
 					status := atomic.LoadInt32(&proc.status)
 					if status != Terminated {
 						allTerminated = false
@@ -233,6 +224,7 @@ func (n *Network) Run() {
 							atomic.StoreInt32(&n.Active, 1) // in case 200 ms go by without a status change...
 						}
 					}
+					proc.mtx.Unlock()
 				}
 				if allTerminated {
 					//fmt.Println(n.Name, " terminated")
@@ -242,6 +234,8 @@ func (n *Network) Run() {
 				if n.Active == 0 {
 					fmt.Println("\nDeadlock detected in", n.Name+"!")
 					for key, proc := range n.procs {
+						proc.mtx.Lock()
+						//defer proc.mtx.Unlock()
 						status := atomic.LoadInt32(&proc.status)
 						fmt.Println(" ",
 							[]string{"NotStarted:",
@@ -250,15 +244,27 @@ func (n *Network) Run() {
 								"SuspSend:  ",
 								"SuspRecv:  ",
 								"Terminated:"}[status], key)
+						proc.mtx.Unlock()
 					}
 					panic("Deadlock!")
 				}
 
 			}
 
-		}()
+		}(n)
 	*/
-	var canRun bool = false
+	//go func() {
+	defer fmt.Println(n.Name + " Done")
+	fmt.Println(n.Name + " Starting")
+
+	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
+	// reactivated many times during the process "run"
+
+	n.wg.Add(len(n.procs))
+
+	defer n.wg.Wait()
+	var someProcsCanRun bool = false
+	//time.Sleep(1 * time.Millisecond)
 	for _, proc := range n.procs {
 		proc.mtx.Lock()
 		defer proc.mtx.Unlock()
@@ -277,10 +283,11 @@ func (n *Network) Run() {
 		}
 
 		proc.ensureRunning()
-		canRun = true
+		someProcsCanRun = true
 	}
-	if !canRun {
+	if !someProcsCanRun {
 		n.wg.Add(0 - len(n.procs))
 		panic("No process can start")
 	}
+	//}()
 }
