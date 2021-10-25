@@ -1,7 +1,7 @@
 package core
 
 import (
-	"fmt"
+	//"fmt"
 	"sync"
 	"sync/atomic"
 )
@@ -30,7 +30,7 @@ func (c *InPort) send(p *Process, pkt *Packet) bool {
 	}
 	c.condNF.L.Lock()
 	defer c.condNF.L.Unlock()
-	fmt.Println(p.name, "Sending", pkt.Contents)
+	c.network.trace(p.name, "Sending", pkt.Contents.(string))
 	c.downStrProc.ensureRunning()
 	c.condNE.Broadcast()
 	for c.nolockIsFull() { // InPort is full
@@ -39,7 +39,7 @@ func (c *InPort) send(p *Process, pkt *Packet) bool {
 		atomic.StoreInt32(&p.status, Active)
 		atomic.StoreInt32(&p.network.Active, 1)
 	}
-	fmt.Println(p.name, "Sent", pkt.Contents)
+	c.network.trace(p.name, "Sent", pkt.Contents.(string))
 	c.pktArray[c.is] = pkt
 	c.is = (c.is + 1) % len(c.pktArray)
 	//pkt.owner = nil
@@ -52,7 +52,7 @@ func (c *InPort) receive(p *Process) *Packet {
 	c.condNE.L.Lock()
 	defer c.condNE.L.Unlock()
 
-	fmt.Println(p.name, "Receiving")
+	c.network.trace(p.name, "Receiving")
 	for c.nolockIsEmpty() { // InPort is empty
 		if c.closed {
 			c.condNF.Broadcast()
@@ -66,7 +66,7 @@ func (c *InPort) receive(p *Process) *Packet {
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
-	fmt.Println(p.name, "Received", pkt.Contents)
+	c.network.trace(p.name, "Received", pkt.Contents.(string))
 	c.ir = (c.ir + 1) % len(c.pktArray)
 	pkt.owner = p
 	p.ownedPkts++

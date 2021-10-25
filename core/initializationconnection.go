@@ -1,7 +1,7 @@
 package core
 
 import (
-	"fmt"
+	//"fmt"
 	"sync"
 )
 
@@ -33,13 +33,13 @@ func (c *InitializationConnection) receive(p *Process) *Packet {
 	if c.closed {
 		return nil
 	}
-	fmt.Println(p.name, "Receiving IIP")
+	c.network.trace(p.name, "Receiving IIP")
 	var pkt *Packet = new(Packet)
 	pkt.Contents = c.value
 	pkt.owner = p
 	p.ownedPkts++
 	c.Close()
-	fmt.Println(p.name, "Received IIP: ", pkt.Contents)
+	c.network.trace(p.name, "Received IIP: ", pkt.Contents.(string))
 	return pkt
 }
 

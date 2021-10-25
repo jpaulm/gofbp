@@ -2,8 +2,11 @@ package core
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 	//"sync/atomic"
 	//"time"
@@ -24,16 +27,15 @@ var pStack Stack
 
 var stkLevel int
 
-// https://www.educative.io/edpresso/how-to-implement-a-stack-in-golang
-
 type Network struct {
 	Name  string
 	procs map[string]*Process
 	//procList []*Process
 	//driver  Process
 	//logFile string
-	wg     sync.WaitGroup
-	Active int32
+	wg      sync.WaitGroup
+	Active  int32
+	tracing bool
 }
 
 func NewNetwork(name string) *Network {
@@ -216,7 +218,7 @@ func parsePort(in string) portDefinition {
 
 	index, err := strconv.Atoi(indexStr)
 	if err != nil {
-		panic(fmt.Sprintf("Invalid index in %q", in))
+		panic("Invalid index in " + in)
 	}
 
 	return portDefinition{name: root, index: index, indexed: true}
@@ -238,9 +240,42 @@ func (n *Network) Exit() {
 	}
 }
 
+func (n *Network) trace(s ...string) {
+	if n.tracing {
+		fmt.Print(strings.Trim(fmt.Sprint(s), "[]") + "\n")
+	}
+}
+
 // Deadlock detection goroutine has been commented out...
 
 func (n *Network) Run() {
+
+	var rec string
+
+	f, err := os.Open("params.xml")
+	if err == nil {
+		defer f.Close()
+		buf := make([]byte, 1024)
+		for {
+			n, err := f.Read(buf)
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			if n > 0 {
+				//fmt.Println(string(buf[:n]))
+				rec += string(buf[:n])
+			}
+		}
+
+		i := strings.Index(rec, "<tracing>")
+		if i > -1 && rec[i+9:i+13] == "true" {
+			n.tracing = true
+		}
+	}
 
 	// Criterion being used for deadlock: no process has become or is already active in last 200 ms
 

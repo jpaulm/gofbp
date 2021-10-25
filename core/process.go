@@ -1,7 +1,7 @@
 package core
 
 import (
-	"fmt"
+	//"fmt"
 	"sync"
 	"sync/atomic"
 )
@@ -188,8 +188,8 @@ func (p *Process) Run() {
 	defer p.mtx.Unlock()
 	//atomic.StoreInt32(&p.status, Dormant)
 	defer atomic.StoreInt32(&p.status, Terminated)
-	defer fmt.Println(p.GetName(), " terminated")
-	fmt.Println(p.GetName(), " started")
+	defer p.network.trace(p.GetName(), " terminated")
+	p.network.trace(p.GetName(), " started")
 	p.component.Setup(p)
 
 	//var allDrained bool
@@ -203,14 +203,14 @@ func (p *Process) Run() {
 
 	for canRun {
 		// multiple activations, if necessary!
-		fmt.Println(p.GetName(), " activated")
+		p.network.trace(p.GetName(), " activated")
 		atomic.StoreInt32(&p.status, Active)
 		atomic.StoreInt32(&p.network.Active, 1)
 
 		p.component.Execute(p) // single "activation"
 
 		atomic.StoreInt32(&p.status, Dormant)
-		fmt.Println(p.GetName(), " deactivated")
+		p.network.trace(p.GetName(), " deactivated")
 
 		if p.ownedPkts > 0 {
 			panic(p.name + " deactivated without disposing of all owned packets")

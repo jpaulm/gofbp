@@ -1,12 +1,8 @@
 package main
 
 import (
-	//"os"
-
-	//"github.com/jpaulm/gofbp/components/io"
 	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
-	// "runtime"
 )
 
 func main() {
