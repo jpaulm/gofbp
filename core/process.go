@@ -25,6 +25,7 @@ type Process struct {
 	//MustRun   bool
 	status int32
 	mtx    sync.Mutex
+	Mother *Process
 }
 
 func (p *Process) GetName() string {

@@ -18,6 +18,14 @@ const (
 	Terminated
 )
 
+type Stack []*Process
+
+var pStack Stack
+
+var stkLevel int
+
+// https://www.educative.io/edpresso/how-to-implement-a-stack-in-golang
+
 type Network struct {
 	Name  string
 	procs map[string]*Process
@@ -34,6 +42,26 @@ func NewNetwork(name string) *Network {
 		procs: make(map[string]*Process),
 	}
 
+	//stkLevel++
+	if stkLevel >= len(pStack) {
+		pStack = append(pStack, nil)
+	}
+
+	return net
+}
+
+func NewSubnet(name string, p *Process) *Network {
+	net := &Network{
+		Name:  name,
+		procs: make(map[string]*Process),
+	}
+
+	//stkLevel++
+	if stkLevel >= len(pStack) {
+		pStack = append(pStack, nil)
+	}
+	pStack[stkLevel] = p
+	stkLevel++
 	return net
 }
 
@@ -51,6 +79,10 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 
 	proc.inPorts = make(map[string]inputCommon)
 	proc.outPorts = make(map[string]outputCommon)
+	if stkLevel > 0 {
+		proc.Mother = pStack[stkLevel-1]
+	}
+	//pStack[stkLevel] = proc
 
 	return proc
 }
@@ -200,6 +232,13 @@ func (n *Network) Initialize(initValue string, p2 *Process, in string) {
 	conn.value = initValue
 
 }
+func (n *Network) Exit() {
+	if stkLevel > 0 {
+		stkLevel--
+	}
+}
+
+// Deadlock detection goroutine has been commented out...
 
 func (n *Network) Run() {
 
@@ -253,7 +292,8 @@ func (n *Network) Run() {
 
 		}(n)
 	*/
-	//go func() {
+
+	defer n.Exit()
 	defer fmt.Println(n.Name + " Done")
 	fmt.Println(n.Name + " Starting")
 
