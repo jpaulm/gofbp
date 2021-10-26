@@ -41,6 +41,8 @@ The following test cases are now working - thanks to Egon Elbre for all his help
 
 - file records being selected    
 
+- test subnet (SubIn and SubOut)
+
 - force deadlock (separate test file) - this is designed to crash, and in fact will give a message if it does *not* crash!
  
 
@@ -53,6 +55,8 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run DoSelect -count=1`
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 - `go test -run ForceDeadlock -count=1`
+- `go test -run TestSubnet -count=1`
+
 
 **Note**: the last one in this list is constructed differently so that it can "crash" without disrupting the flow of tests: the network definition is in fact in `testdata`, while the test itself contains the code to compile and run the test.
 
