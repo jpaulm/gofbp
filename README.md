@@ -88,6 +88,7 @@ testrtn folder:
 - sender.go
 - writetoconsole.go 
 - writetoconsNL.go   (same, but written as a non-looper)
+- subnet1.go   (this is a subnet, which can be treated as a component - we need to refine the packaging)
 
 io folder:
 - readfile.go
@@ -97,8 +98,8 @@ io folder:
 
 - More and better documentation
 - Convert `panic`s to more standard Go error handling
-- Way too much logging - have to make that optional - use a JSON file...?  Issue raised for this...
-- Add subnet handling
+- Way too much logging - have to make that optional - use a JSON file...?  Issue raised for this... - done!
+- Add subnet handling - done!
 - Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp
 - Add Load Balancing component
 - Add sample code showing use of substreams
