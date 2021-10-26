@@ -93,5 +93,6 @@ func (network *Network) deadlockDetected() {
 	for _, proc := range network.procs {
 		fmt.Printf("\t%-15s\t%s\n", proc.name, proc.status())
 	}
+	fmt.Println(network.goroutineTrace())
 	panic("Deadlock!")
 }

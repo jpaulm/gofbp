@@ -1,7 +1,9 @@
 package core
 
 import (
+	"context"
 	"fmt"
+	"runtime/pprof"
 	"sync/atomic"
 )
 
@@ -84,11 +86,16 @@ func (p *Process) ensureRunning() {
 		return
 	}
 
-	go func() {
-		defer p.network.wg.Done()
-		defer p.transition(Terminated)
-		p.run()
-	}()
+	pprof.Do(context.TODO(), pprof.Labels(
+		"network", p.network.id(),
+		"process", p.name,
+	), func(c context.Context) {
+		go func() {
+			defer p.network.wg.Done()
+			defer p.transition(Terminated)
+			p.run()
+		}()
+	})
 }
 
 func (p *Process) run() {

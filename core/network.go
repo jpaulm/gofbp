@@ -43,6 +43,8 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	return proc
 }
 
+func (n *Network) id() string { return fmt.Sprintf("%p", n) }
+
 func (n *Network) NewConnection(cap int) *Connection {
 	conn := &Connection{
 		network: n,
