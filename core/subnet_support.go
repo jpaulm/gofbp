@@ -30,7 +30,7 @@ func (subIn *SubIn) Execute(p *Process) {
 	param := icpkt.Contents.(string)
 
 	p.Discard(icpkt)
-	mother := p.Mother
+	mother := p.network.Mother
 	subIn.eipt = mother.OpenInPort(param)
 
 	for {
@@ -72,7 +72,7 @@ func (subOut *SubOut) Execute(p *Process) {
 	param := icpkt.Contents.(string)
 
 	p.Discard(icpkt)
-	mother := p.Mother
+	mother := p.network.Mother
 	subOut.eopt = mother.OpenOutPort(param)
 
 	for {

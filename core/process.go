@@ -25,7 +25,7 @@ type Process struct {
 	//MustRun   bool
 	status int32
 	mtx    sync.Mutex
-	Mother *Process
+	//Mother *Process
 }
 
 func (p *Process) GetName() string {
@@ -146,7 +146,7 @@ func (p *Process) ensureRunning() {
 	//p.mtx.Lock()
 	//defer p.mtx.Unlock()
 
-	atomic.StoreInt32(&p.network.Active, 1)
+	//atomic.StoreInt32(&p.network.Active, 1)
 
 	go func() { // Process goroutine
 		defer p.network.wg.Done()
@@ -205,7 +205,7 @@ func (p *Process) Run() {
 		// multiple activations, if necessary!
 		p.network.trace(p.GetName(), " activated")
 		atomic.StoreInt32(&p.status, Active)
-		atomic.StoreInt32(&p.network.Active, 1)
+		//atomic.StoreInt32(&p.network.Active, 1)
 
 		p.component.Execute(p) // single "activation"
 

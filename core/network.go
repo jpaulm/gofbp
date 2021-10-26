@@ -8,8 +8,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	//"sync/atomic"
-	//"time"
 )
 
 const (
@@ -28,14 +26,11 @@ var pStack Stack
 var stkLevel int
 
 type Network struct {
-	Name  string
-	procs map[string]*Process
-	//procList []*Process
-	//driver  Process
-	//logFile string
+	Name    string
+	procs   map[string]*Process
 	wg      sync.WaitGroup
-	Active  int32
 	tracing bool
+	Mother  *Process
 }
 
 func NewNetwork(name string) *Network {
@@ -62,7 +57,9 @@ func NewSubnet(name string, p *Process) *Network {
 	if stkLevel >= len(pStack) {
 		pStack = append(pStack, nil)
 	}
-	pStack[stkLevel] = p
+	net.Mother = p
+	pStack[stkLevel] = net.Mother
+	net.tracing = net.Mother.network.tracing
 	stkLevel++
 	return net
 }
@@ -82,7 +79,7 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	proc.inPorts = make(map[string]inputCommon)
 	proc.outPorts = make(map[string]outputCommon)
 	if stkLevel > 0 {
-		proc.Mother = pStack[stkLevel-1]
+		n.Mother = pStack[stkLevel-1]
 	}
 	//pStack[stkLevel] = proc
 
@@ -252,6 +249,8 @@ func (n *Network) Run() {
 
 	var rec string
 
+	//biDirchan := make(chan string) // handshaking...
+
 	f, err := os.Open("params.xml")
 	if err == nil {
 		defer f.Close()
@@ -277,27 +276,41 @@ func (n *Network) Run() {
 		}
 	}
 
-	// Criterion being used for deadlock: no process has become or is already active in last 200 ms
+	// Criterion being used for deadlock detection: no process has become or is already active in last 200 ms
+	// Commented out
 
 	/*
 		go func(n *Network) {
-
+			//var s string
+			//s := <-biDirchan   // handshaking
+			//_ = s
+			//biDirchan <- "N"
+			statuses := make(map[string]string)
+			var someActive bool
 			for {
-				atomic.StoreInt32(&n.Active, 0)
-				time.Sleep(2 * time.Millisecond) // shd be 200 ms!
+				//atomic.StoreInt32(&n.Active, 0)
+				someActive = false
+				time.Sleep(200 * time.Millisecond) // shd be 200 ms!
 				//atomic.StoreInt32(&n.active, 0)
 				allTerminated := true
 				//deadlockDetected := true
-				for _, proc := range n.procs {
+				for key, proc := range n.procs {
 					proc.mtx.Lock()
 					//defer proc.mtx.Unlock()
 					status := atomic.LoadInt32(&proc.status)
 					if status != Terminated {
 						allTerminated = false
 						if status == Active {
-							atomic.StoreInt32(&n.Active, 1) // in case 200 ms go by without a status change...
+							//atomic.StoreInt32(&n.Active, 1)
+							someActive = true
 						}
 					}
+					statuses[key] = []string{"NotStarted:",
+						"Active:    ",
+						"Dormant:   ",
+						"SuspSend:  ",
+						"SuspRecv:  ",
+						"Terminated:"}[status]
 					proc.mtx.Unlock()
 				}
 				if allTerminated {
@@ -305,20 +318,20 @@ func (n *Network) Run() {
 					return
 				}
 				//if deadlockDetected {
-				if n.Active == 0 {
+				if !someActive {
 					fmt.Println("\nDeadlock detected in", n.Name+"!")
-					for key, proc := range n.procs {
-						proc.mtx.Lock()
+					for _, val := range statuses {
+						//proc.mtx.Lock()
 						//defer proc.mtx.Unlock()
-						status := atomic.LoadInt32(&proc.status)
-						fmt.Println(" ",
-							[]string{"NotStarted:",
-								"Active:    ",
-								"Dormant:   ",
-								"SuspSend:  ",
-								"SuspRecv:  ",
-								"Terminated:"}[status], key)
-						proc.mtx.Unlock()
+						//status := atomic.LoadInt32(&proc.status)
+						fmt.Println(" ", val)
+						//	[]string{"NotStarted:",
+						//		"Active:    ",
+						//		"Dormant:   ",
+						//		"SuspSend:  ",
+						//		"SuspRecv:  ",
+						//		"Terminated:"}[status], key)
+						//proc.mtx.Unlock()
 					}
 					panic("Deadlock!")
 				}
@@ -326,7 +339,13 @@ func (n *Network) Run() {
 			}
 
 		}(n)
+
 	*/
+
+	//biDirchan <- "Y"
+	//s := <-biDirchan
+	//_ = s
+	//close(biDirchan)
 
 	defer n.Exit()
 	defer fmt.Println(n.Name + " Done")
