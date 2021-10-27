@@ -28,6 +28,15 @@ type Process struct {
 	//Mother *Process
 }
 
+const (
+	Notstarted int32 = iota
+	Active
+	Dormant
+	SuspSend
+	SuspRecv
+	Terminated
+)
+
 func (p *Process) GetName() string {
 	return p.name
 }

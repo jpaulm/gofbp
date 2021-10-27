@@ -1,6 +1,7 @@
-package testrtn
+package subnets
 
 import (
+	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
 )
 
@@ -13,7 +14,7 @@ func (subnet *Subnet1) Execute(p *core.Process) {
 
 	proc1 := net.NewProc("SubIn", &core.SubIn{})
 
-	proc2 := net.NewProc("WriteToConsole1", &WriteToConsole{})
+	proc2 := net.NewProc("WriteToConsole1", &testrtn.WriteToConsole{})
 
 	proc3 := net.NewProc("SubOut", &core.SubOut{})
 

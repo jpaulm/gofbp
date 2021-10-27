@@ -8,12 +8,10 @@ type outputCommon interface {
 type OutputConn interface {
 	outputCommon
 	send(*Process, *Packet) bool
-
-	//IsConnected() bool
+	// IsConnected() bool
 }
 
 type OutputArrayConn interface {
-	//OutputConn
 	outputCommon
 	GetArrayItem(i int) *OutPort
 	SetArrayItem(c *OutPort, i int)

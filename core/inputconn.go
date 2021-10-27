@@ -3,10 +3,8 @@ package core
 type inputCommon interface {
 	isDrained() bool
 	resetForNextExecution()
-
 	IsEmpty() bool
 	IsClosed() bool
-	//GetType() string
 }
 
 type InputConn interface {
@@ -16,6 +14,7 @@ type InputConn interface {
 
 type InputArrayConn interface {
 	inputCommon
+
 	GetArrayItem(i int) *InPort
 	SetArrayItem(c *InPort, i int)
 	ArrayLength() int

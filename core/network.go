@@ -10,15 +10,6 @@ import (
 	"sync"
 )
 
-const (
-	Notstarted int32 = iota
-	Active
-	Dormant
-	SuspSend
-	SuspRecv
-	Terminated
-)
-
 type Stack []*Process
 
 var pStack Stack
@@ -335,11 +326,8 @@ func (n *Network) Run() {
 					}
 					panic("Deadlock!")
 				}
-
 			}
-
 		}(n)
-
 	*/
 
 	//biDirchan <- "Y"
