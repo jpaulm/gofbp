@@ -52,7 +52,8 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run Concat -count=1`
 - `go test -run RRDist -count=1`
 - `go test -run CopyFile -count=1`
-- `go test -run DoSelect -count=1`
+- `go test -run DoSelect1 -count=1`
+- `go test -run DoSelect2 -count=1`  (with REJ not connected)
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 - `go test -run ForceDeadlock -count=1`
 - `go test -run TestSubnet -count=1`
