@@ -6,11 +6,11 @@ import (
 )
 
 type InitializationConnection struct {
-	network  *Network
+	network  GenNet
 	portName string
 	fullName string
 	closed   bool
-	value    string
+	value    interface{}
 	mtx      sync.Mutex
 }
 
@@ -33,13 +33,13 @@ func (c *InitializationConnection) receive(p *Process) *Packet {
 	if c.closed {
 		return nil
 	}
-	c.network.trace(p.name, "Receiving IIP")
+	trace(p.name, "Receiving IIP")
 	var pkt *Packet = new(Packet)
 	pkt.Contents = c.value
 	pkt.owner = p
 	p.ownedPkts++
 	c.Close()
-	c.network.trace(p.name, "Received IIP: ", pkt.Contents.(string))
+	trace(p.name, "Received IIP: ", pkt.Contents.(string))
 	return pkt
 }
 

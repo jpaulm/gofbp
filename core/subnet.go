@@ -2,75 +2,25 @@ package core
 
 import (
 	"fmt"
-	"io"
-	"os"
-	"regexp"
-	"strconv"
-	"strings"
 	"sync"
 )
 
-type PStack []*Process
-
-var pStack PStack
-
-var stkLevel int
-var tracing bool
-
-type GenNet interface {
-	//NewNetwork(string) *Network
-	//NewSubnet(string, *Process) *Subnet
-	NewProc(string, Component) *Process
-	id() string
-	NewConnection(int) *InPort
-	NewInitializationConnection() *InitializationConnection
-	NewInArrayPort() *InArrayPort
-	NewOutArrayPort() *OutArrayPort
-	Connect(*Process, string, *Process, string, int)
-	Initialize(interface{}, *Process, string)
-	//GetWG() *sync.WaitGroup
-	Run()
+type Subnet struct {
+	Name   string
+	procs  map[string]*Process
+	Mother *Process
+	wg     sync.WaitGroup
 }
 
-type Network struct {
-	Name  string
-	procs map[string]*Process
-	wg    sync.WaitGroup
+func (n *Subnet) SetMother(p *Process) {
+	n.Mother = p
 }
 
-func NewNetwork(name string) *Network {
-	net := &Network{
-		Name:  name,
-		procs: make(map[string]*Process),
-		wg:    sync.WaitGroup{},
-	}
-
-	//stkLevel++
-	if stkLevel >= len(pStack) {
-		pStack = append(pStack, nil)
-	}
-
-	return net
+func (n *Subnet) GetMother() *Process {
+	return n.Mother
 }
 
-func NewSubnet(name string, p *Process) *Subnet {
-	net := &Subnet{
-		Name:  name,
-		procs: make(map[string]*Process),
-		wg:    sync.WaitGroup{},
-	}
-
-	//stkLevel++
-	if stkLevel >= len(pStack) {
-		pStack = append(pStack, nil)
-	}
-	net.SetMother(p)
-	pStack[stkLevel] = p
-	stkLevel++
-	return net
-}
-
-func (n *Network) NewProc(nm string, comp Component) *Process {
+func (n *Subnet) NewProc(nm string, comp Component) *Process {
 
 	proc := &Process{
 		name:      nm,
@@ -81,29 +31,31 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	}
 
 	n.procs[nm] = proc
+	ns, _ := proc.network.(*Subnet)
 	proc.inPorts = make(map[string]inputCommon)
 	proc.outPorts = make(map[string]outputCommon)
-	//if stkLevel > 0 {
-	//	ns.SetMother(pStack[stkLevel-1])
-	//}
+	if stkLevel > 0 {
+		ns.SetMother(pStack[stkLevel-1])
+	}
 	//pStack[stkLevel] = proc
 
 	return proc
 }
 
-func (n *Network) id() string { return fmt.Sprintf("%p", n) }
+func (n *Subnet) id() string { return fmt.Sprintf("%p", n) }
 
-func (n *Network) NewConnection(cap int) *InPort {
+func (n *Subnet) NewConnection(cap int) *InPort {
 	conn := &InPort{
-		network: n,
+		//network: n,
 	}
+	conn.network = n
 	conn.condNE.L = &conn.mtx
 	conn.condNF.L = &conn.mtx
 	conn.pktArray = make([]*Packet, cap)
 	return conn
 }
 
-func (n *Network) NewInitializationConnection() *InitializationConnection {
+func (n *Subnet) NewInitializationConnection() *InitializationConnection {
 	conn := &InitializationConnection{
 		network: n,
 	}
@@ -111,7 +63,7 @@ func (n *Network) NewInitializationConnection() *InitializationConnection {
 	return conn
 }
 
-func (n *Network) NewInArrayPort() *InArrayPort {
+func (n *Subnet) NewInArrayPort() *InArrayPort {
 	conn := &InArrayPort{
 		network: n,
 	}
@@ -119,7 +71,7 @@ func (n *Network) NewInArrayPort() *InArrayPort {
 	return conn
 }
 
-func (n *Network) NewOutArrayPort() *OutArrayPort {
+func (n *Subnet) NewOutArrayPort() *OutArrayPort {
 	port := &OutArrayPort{
 		network: n,
 	}
@@ -127,7 +79,7 @@ func (n *Network) NewOutArrayPort() *OutArrayPort {
 	return port
 }
 
-func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
+func (n *Subnet) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
 
 	inPort := parsePort(in)
 
@@ -205,30 +157,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	connxn.incUpstream()
 }
 
-type portDefinition struct {
-	name    string
-	index   int
-	indexed bool
-}
-
-var rePort = regexp.MustCompile(`^(.+)\[(\d+)\]$`)
-
-func parsePort(in string) portDefinition {
-	matches := rePort.FindStringSubmatch(in)
-	if len(matches) == 0 {
-		return portDefinition{name: in}
-	}
-	root, indexStr := matches[1], matches[2]
-
-	index, err := strconv.Atoi(indexStr)
-	if err != nil {
-		panic("Invalid index in " + in)
-	}
-
-	return portDefinition{name: root, index: index, indexed: true}
-}
-
-func (n *Network) Initialize(initValue interface{}, p2 *Process, in string) {
+func (n *Subnet) Initialize(initValue interface{}, p2 *Process, in string) {
 
 	conn := n.NewInitializationConnection()
 	p2.inPorts[in] = conn
@@ -238,58 +167,27 @@ func (n *Network) Initialize(initValue interface{}, p2 *Process, in string) {
 	conn.value = initValue
 
 }
-func (n *Network) Exit() {
+func (n *Subnet) Exit() {
 	if stkLevel > 0 {
-		panic("Exit - stack level incorrect")
+		stkLevel--
 	}
 }
 
-func trace(s ...string) {
-	if tracing {
-		fmt.Print(strings.Trim(fmt.Sprint(s), "[]") + "\n")
-	}
-}
+//func (n *Subnet) trace(s ...string) {
+//	if tracing {
+//		fmt.Print(strings.Trim(fmt.Sprint(s), "[]") + "\n")
+//	}
+//}
 
 // Deadlock detection goroutine has been commented out...
 
-func (n *Network) Run() {
-
-	var rec string
-
-	//biDirchan := make(chan string) // handshaking...
-
-	f, err := os.Open("params.xml")
-	if err == nil {
-		defer f.Close()
-		buf := make([]byte, 1024)
-		for {
-			n, err := f.Read(buf)
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			if n > 0 {
-				//fmt.Println(string(buf[:n]))
-				rec += string(buf[:n])
-			}
-		}
-
-		i := strings.Index(rec, "<tracing>")
-		if i > -1 && rec[i+9:i+13] == "true" {
-			tracing = true
-		}
-	}
-
-	// Commented out
+func (n *Subnet) Run() {
 
 	// Criterion being used for deadlock detection: no process has become or is already active in last 200 ms
+	// Commented out
 
 	/*
-
-		go func(n *Network) {
+		go func(n *Subnet) {
 			//var s string
 			//s := <-biDirchan   // handshaking
 			//_ = s
@@ -304,7 +202,7 @@ func (n *Network) Run() {
 				allTerminated := true
 				//deadlockDetected := true
 				for key, proc := range n.procs {
-					//proc.mtx.Lock()
+					proc.mtx.Lock()
 					//defer proc.mtx.Unlock()
 					status := atomic.LoadInt32(&proc.status)
 					if status != Terminated {
@@ -320,7 +218,7 @@ func (n *Network) Run() {
 						"SuspSend:  ",
 						"SuspRecv:  ",
 						"Terminated:"}[status]
-					//proc.mtx.Unlock()
+					proc.mtx.Unlock()
 				}
 				if allTerminated {
 					//fmt.Println(n.Name, " terminated")
@@ -346,7 +244,6 @@ func (n *Network) Run() {
 				}
 			}
 		}(n)
-
 	*/
 
 	//biDirchan <- "Y"
@@ -390,6 +287,6 @@ func (n *Network) Run() {
 		n.wg.Add(0 - len(n.procs))
 		panic("No process can start")
 	}
-	//}()
+
 	//n.wg.Wait()
 }

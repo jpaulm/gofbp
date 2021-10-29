@@ -3,7 +3,7 @@ package core
 //var _ Conn = (*InArrayPort)(nil)
 
 type OutArrayPort struct {
-	network *Network
+	network GenNet
 
 	//portName  string
 	name  string // full name

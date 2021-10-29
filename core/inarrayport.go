@@ -1,7 +1,7 @@
 package core
 
 type InArrayPort struct {
-	network *Network
+	network GenNet
 
 	//portName string
 	//fullName string

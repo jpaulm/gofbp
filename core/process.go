@@ -2,6 +2,7 @@ package core
 
 import (
 	//"fmt"
+
 	"sync"
 	"sync/atomic"
 )
@@ -12,7 +13,7 @@ import (
 
 type Process struct {
 	name    string
-	network *Network
+	network GenNet
 
 	inPorts  map[string]inputCommon
 	outPorts map[string]outputCommon
@@ -152,16 +153,26 @@ func (p *Process) ensureRunning() {
 		return
 	}
 
-	//p.mtx.Lock()
-	//defer p.mtx.Unlock()
+	netx, b := p.network.(*Network)
 
-	//atomic.StoreInt32(&p.network.Active, 1)
+	var wg *sync.WaitGroup
+	if b {
+		//s = netx.id()
+		wg = &netx.wg
+	} else {
+		nets, _ := p.network.(*Subnet)
+		wg = &nets.wg
+	}
 
+	//pprof.Do(context.TODO(), pprof.Labels(
+	//	"network", p.network.(*Network).id(),
+	//	"process", p.name,
+	//), func(c context.Context) {
 	go func() { // Process goroutine
-		defer p.network.wg.Done()
-
+		defer wg.Done()
 		p.Run()
 	}()
+	//})
 }
 
 func (p *Process) inputState() (bool, bool) {
@@ -197,8 +208,8 @@ func (p *Process) Run() {
 	defer p.mtx.Unlock()
 	//atomic.StoreInt32(&p.status, Dormant)
 	defer atomic.StoreInt32(&p.status, Terminated)
-	defer p.network.trace(p.GetName(), " terminated")
-	p.network.trace(p.GetName(), " started")
+	defer trace(p.GetName(), " terminated")
+	trace(p.GetName(), " started")
 	p.component.Setup(p)
 
 	//var allDrained bool
@@ -212,14 +223,14 @@ func (p *Process) Run() {
 
 	for canRun {
 		// multiple activations, if necessary!
-		p.network.trace(p.GetName(), " activated")
+		trace(p.GetName(), " activated")
 		atomic.StoreInt32(&p.status, Active)
 		//atomic.StoreInt32(&p.network.Active, 1)
 
 		p.component.Execute(p) // single "activation"
 
 		atomic.StoreInt32(&p.status, Dormant)
-		p.network.trace(p.GetName(), " deactivated")
+		trace(p.GetName(), " deactivated")
 
 		if p.ownedPkts > 0 {
 			panic(p.name + " deactivated without disposing of all owned packets")
