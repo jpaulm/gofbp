@@ -1,8 +1,10 @@
 package core
 
 import (
-	//"fmt"
-
+	"bytes"
+	"fmt"
+	"runtime"
+	"strconv"
 	"sync"
 	"sync/atomic"
 )
@@ -210,6 +212,9 @@ func (p *Process) Run() {
 	defer atomic.StoreInt32(&p.status, Terminated)
 	defer trace(p.GetName(), " terminated")
 	trace(p.GetName(), " started")
+
+	fmt.Println("Goroutine", p.GetName()+":", "no.", getGID())
+
 	p.component.Setup(p)
 
 	//var allDrained bool
@@ -291,4 +296,15 @@ func (p *Process) Discard(pkt *Packet) {
 	}
 	p.ownedPkts--
 	pkt = nil
+}
+
+//https://blog.sgmansfield.com/2015/12/goroutine-ids/
+
+func getGID() uint64 {
+	b := make([]byte, 64)
+	b = b[:runtime.Stack(b, false)]
+	b = bytes.TrimPrefix(b, []byte("goroutine "))
+	b = b[:bytes.IndexByte(b, ' ')]
+	n, _ := strconv.ParseUint(string(b), 10, 64)
+	return n
 }
