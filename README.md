@@ -73,14 +73,14 @@ To troubleshoot FBP deadlocks, look at the list of goroutines involved, and add 
 
 As of this release (v2.1.1), a stand-alone program has been added, `analyze_deadlock.go`, which can be used to analyze the Go stack trace. Its `.exe` file can be found in the project `bin` directory.  Therefore, to analyze the deadlock, send the `go test` output for one test to `logfile`, i.e. `go test -run ForceDeadlock -count=1 > logfile`, then execute `bin\analyze_deadlock.exe`.  The output should be something like the following (based on running `go test -run ForceDeadlock -count=1`):
 
-`
+<code>
 Sender Goroutine no.: 19
 Counter Goroutine no.: 20
 Concat Goroutine no.: 21
 Process: Sender, Status: Send
 Process: Counter, Status: Send
 Process: Concat, Status: Receive
-`
+</code>
 
 More information will be added, as we figured out how to extract it!
 
