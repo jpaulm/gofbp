@@ -67,13 +67,22 @@ You will occasionally see a message like `TempDir RemoveAll cleanup: remove ...\
 
 # Deadlocks
 
-FBP deadlocks are well understood, and are handled well by other FBP implementations on https://github.com/jpaulm .  They seem to be well detected by the Go scheduler - unfortunately, they are not so easy to troubleshhot, as Go deadlock detection is not "FBP-aware".  This has been raised as an issue - #28 .
+FBP deadlocks are well understood, and are handled well by other FBP implementations on https://github.com/jpaulm .  They also seem to be well detected by the Go scheduler - unfortunately, they are not so easy to troubleshoot, as Go deadlock detection is not "FBP-aware", and occurs before the GoFBP scheduler can analyze the process states to determine where the problem is occurring.  This has been raised as an issue - #28 .
 
-To troubleshoot FBP deadlocks, look at the list of goroutines involved, and add the component names to your diagram, together with the "state", deducible from the functions being executed.  Unfortunately, if you have multiple processes (goroutines) executing the same component, there is currently no easy way to determine which processes are involved.
+To troubleshoot FBP deadlocks, look at the list of goroutines involved, and add the component names to your diagram, together with the "state".
 
-# Debugging Deadlocks
+As of this release (v2.1.1), a stand-alone program has been added, `analyze_deadlock.go`, which can be used to analyze the Go stack trace. Its `.exe` file can be found in the project `bin` directory.  Therefore, to analyze the deadlock, send the `go test` output for one test to `logfile`, i.e. `go test -run ForceDeadlock -count=1 > logfile`, then execute `bin\analyze_deadlock.exe`.  The output should be something like the following (based on running `go test -run ForceDeadlock -count=1`):
 
-As of this release (v2.1.0), go through the listed goroutines, looking for `Execute` - this will show the Component name (in the line below); now go up 2 lines, which should show `Send` or `Receive`: other goroutines can be ignored.  Mark `S`s or `R`s on your diagram, and this should give you an indication as to where in your diagram the deadlock is occurring.
+`
+Sender Goroutine no.: 19
+Counter Goroutine no.: 20
+Concat Goroutine no.: 21
+Process: Sender, Status: Send
+Process: Counter, Status: Send
+Process: Concat, Status: Receive
+`
+
+More information will be added, as we figured out how to extract it!
 
 ## Components
 
