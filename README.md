@@ -71,7 +71,7 @@ FBP deadlocks are well understood, and are handled well by other FBP implementat
 
 To troubleshoot FBP deadlocks, look at the list of goroutines involved, and add the component names to your diagram, together with the "state".
 
-As of this release (v2.1.1), a stand-alone program has been added, `analyze_deadlock.go`, which can be used to analyze the Go stack trace. Its `.exe` file can be found in the project `bin` directory.  Therefore, to analyze the deadlock, send the `go test` output for one test to `logfile`, i.e. `go test -run ForceDeadlock -count=1 > logfile`, then execute `bin\analyze_deadlock.exe`.  The output should be something like the following (based on running `go test -run ForceDeadlock -count=1`):
+As of this release (v2.2.1), a stand-alone program has been added, `analyze_deadlock.go`, which can be used to analyze the Go stack trace. Its `.exe` file can be found in the project `bin` directory.  Therefore, to analyze the deadlock, send the `go test` output for one test to `logfile`, i.e. `go test -run ForceDeadlock -count=1 > logfile`, then execute `bin\analyze_deadlock.exe`.  The output should be something like the following (based on running `go test -run ForceDeadlock -count=1`):
 
 <pre>
 Sender Goroutine no.: 19
