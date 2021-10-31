@@ -115,3 +115,4 @@ io folder:
 - Add Load Balancing component
 - Add sample code showing use of substreams
 - "Automatic" ports
+- Add Lua interface - see https://jpaulm.github.io/fbp/thlua.html
