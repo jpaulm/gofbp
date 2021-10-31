@@ -83,7 +83,11 @@ Process: Counter, Status: Send
 Process: Concat, Status: Receive
 </pre>
 
-More information will be added, as we figured out how to extract it!
+In MSDOS, you can do this all on one line, as follows:
+
+<pre>
+go test -run ForceDeadlock -count=1 > logfile & bin\analyze_deadlock.exe
+</pre>
 
 ## Components
 
