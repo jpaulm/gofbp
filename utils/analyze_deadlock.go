@@ -34,6 +34,9 @@ func main() {
 			s := rec[i+10 : i+10+j-1]
 			i += 10 + j + 5
 			j = strings.Index(rec[i:], "\r")
+			if j == -1 {
+				j = strings.Index(rec[i:], "\n")
+			}
 			procs[rec[i:i+j]] = s
 			fmt.Println(s, "Goroutine no.:", rec[i:i+j])
 			i += 16 + j
