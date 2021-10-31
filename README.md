@@ -25,6 +25,7 @@ GoFBP Network Definition Syntax and Component API:
 - delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
 - the reason for `MustRun` is that components are not triggered if there is no data incoming on their non-IIP input ports (apart from closing down downstream processes as appropriate);  some components however need to execute in spite of this, e.g. `components\io\writefile.go` (which must clear the output file), and counter-type components.
 - optional output ports - see `components\testrtn\writetoconsole.go`
+- "subnets"- these are FBP networks where some of the connections are "sticky" - they can therefore act as (semi-) black box components
 
 ## Test Cases
 The following test cases are now working - thanks to Egon Elbre for all his help!
