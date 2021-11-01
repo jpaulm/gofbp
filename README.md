@@ -26,6 +26,7 @@ GoFBP Network Definition Syntax and Component API:
 - the reason for `MustRun` is that components are not triggered if there is no data incoming on their non-IIP input ports (apart from closing down downstream processes as appropriate);  some components however need to execute in spite of this, e.g. `components\io\writefile.go` (which must clear the output file), and counter-type components.
 - optional output ports - see `components\testrtn\writetoconsole.go`
 - "subnets"- these are FBP networks where some of the connections are "sticky" - they can therefore act as (semi-) black box components
+- "automatic" in- and out-ports - notation is port name = "*"
 
 ## Test Cases
 The following test cases are now working - thanks to Egon Elbre for all his help!
@@ -58,9 +59,10 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 - `go test -run ForceDeadlock -count=1`
 - `go test -run TestSubnet -count=1`
+- `go test -run TestInfQueueAsMain -count=1` (note the "automatic" ports between WriteFile and ReadFile)
 
 
-**Note**: the last one in this list is constructed differently so that it can "crash" without disrupting the flow of tests: the network definition is in fact in `testdata`, while the test itself contains the code to compile and run the test.
+**Note**: ForceDeadlock is constructed differently so that it can "crash" without disrupting the flow of tests: the network definition has to be compiled "on the fly", so it is actually in `testdata`, while the test itself contains the code to compile and run the test.
 
 You will occasionally see a message like `TempDir RemoveAll cleanup: remove ...\deadlock.exe: Access is denied.` - this is thought to be due to whatver AntiVirus software you are running.  I believe it can be ignored.
 
@@ -70,9 +72,7 @@ You will occasionally see a message like `TempDir RemoveAll cleanup: remove ...\
 
 FBP deadlocks are well understood, and are handled well by other FBP implementations on https://github.com/jpaulm .  They also seem to be well detected by the Go scheduler - unfortunately, they are not so easy to troubleshoot, as Go deadlock detection is not "FBP-aware", and occurs before the GoFBP scheduler can analyze the process states to determine where the problem is occurring.  This has been raised as an issue - #28 .
 
-To troubleshoot FBP deadlocks, look at the list of goroutines involved, and add the component names to your diagram, together with the "state".
-
-As of this release (v2.2.1), a stand-alone program has been added, `analyze_deadlock.go`, which can be used to analyze the Go stack trace. Its `.exe` file can be found in the project `bin` directory.  Therefore, to analyze the deadlock, send the `go test` output for one test to `logfile`, i.e. `go test -run ForceDeadlock -count=1 > logfile`, then execute `bin\analyze_deadlock.exe`.  The output should be something like the following (based on running `go test -run ForceDeadlock -count=1`):
+As of this release (v2.2.1), a stand-alone program has been added, `analyze_deadlock.go`, which can be used to analyze the Go stack trace. Its `.exe` file can be found in the project `bin` directory.  To analyze the deadlock, send the `go test` output to `logfile`, i.e. `go test -run ForceDeadlock -count=1 > logfile`, then execute `bin\analyze_deadlock.exe`.  The output should be something like the following (based on running `go test -run ForceDeadlock -count=1`):
 
 <pre>
 Sender Goroutine no.: 19
@@ -83,11 +83,16 @@ Process: Counter, Status: Send
 Process: Concat, Status: Receive
 </pre>
 
-In MSDOS, you can do this all on one line, as follows:
+Now look at the list of goroutines involved, and add the component names to your diagram, together with the "state".  Typically the deadlock will be "between" the goroutines waiting to Send and those waiting to Receive.
+
+
+In MS-DOS, you can do the above all on one line, as follows:
 
 <pre>
 go test -run ForceDeadlock -count=1 > logfile & bin\analyze_deadlock.exe
 </pre>
+
+(Not sure if you can do this with PowerShell...?)
 
 ## Components
 
