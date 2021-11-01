@@ -33,8 +33,8 @@ GoFBP Network Definition Syntax and Component API:
 An XML file has been provided in the root, called `params.xml`.  So far there is only one parameter:
 
 <pre>
-<?xml version="1.0"?> 
-<tracing>true|false</tracing>
+&lt;?xml version="1.0"?&gt;
+&lt;tracing>true|false</tracing&gt;
 </pre>
 
 ## Test Cases
