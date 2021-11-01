@@ -28,6 +28,15 @@ GoFBP Network Definition Syntax and Component API:
 - "subnets"- these are FBP networks where some of the connections are "sticky" - they can therefore act as (semi-) black box components
 - "automatic" in- and out-ports - notation is port name = "*"
 
+## Tracing
+
+An XML file has been provided in the root, called `params.xml`.  So far there is only one parameter:
+
+<pre>
+<?xml version="1.0"?> 
+<tracing>true|false</tracing>
+</pre>
+
 ## Test Cases
 The following test cases are now working - thanks to Egon Elbre for all his help!
 
@@ -98,7 +107,7 @@ go test -run ForceDeadlock -count=1 > logfile & bin\analyze_deadlock.exe
 
 The following components are available:
 
-testrtn folder:
+"testrtn" folder:
 - concatstr.go
 - discard.go
 - kick.go
@@ -108,9 +117,11 @@ testrtn folder:
 - sender.go
 - writetoconsole.go 
 - writetoconsNL.go   (same, but written as a non-looper)
-- subnet1.go   (this is a subnet, which can be treated as a component - we need to refine the packaging)
 
-io folder:
+"subnets" folder:
+- subnet1.go   (this is a subnet, i.e. a "network" with "sticky" connections - this can be treated as a component)
+
+"io" folder:
 - readfile.go
 - writefile.go
 
@@ -118,10 +129,10 @@ io folder:
 
 - More and better documentation
 - Convert `panic`s to more standard Go error handling
-- Way too much logging - have to make that optional - use a JSON file...?  Issue raised for this... - done!
-- Add subnet handling - done!
+- Way too much logging - have to make that optional - issue raised for this... - *done!*
+- Add subnet handling - *done!*
 - Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp
 - Add Load Balancing component
 - Add sample code showing use of substreams
-- "Automatic" ports
+- "Automatic" ports - *done!*
 - Add Lua interface - see https://jpaulm.github.io/fbp/thlua.html
