@@ -34,7 +34,7 @@ An XML file has been provided in the root, called `params.xml`.  So far there is
 
 <pre>
 &lt;?xml version="1.0"?&gt;
-&lt;tracing>true|false</tracing&gt;
+&lt;tracing&gt;true|false&lt;/tracing&gt;
 </pre>
 
 ## Test Cases
