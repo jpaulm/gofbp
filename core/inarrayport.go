@@ -64,3 +64,5 @@ func (c *InArrayPort) SetArrayItem(c2 *InPort, i int) {
 func (c *InArrayPort) ArrayLength() int {
 	return len(c.array)
 }
+
+func (c *InArrayPort) Close() {}

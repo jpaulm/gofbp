@@ -5,6 +5,7 @@ type inputCommon interface {
 	resetForNextExecution()
 	IsEmpty() bool
 	IsClosed() bool
+	Close()
 }
 
 type InputConn interface {

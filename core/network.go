@@ -170,9 +170,11 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		}
 	}
 
-	// connxn built; input port array built if necessary
+	if inPort.name == "*" {
+		p2.autoInput = connxn
+	}
 
-	//var anyOutConn OutputConn
+	// connxn built; input port array built if necessary
 
 	outPort := parsePort(out)
 
@@ -203,6 +205,9 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	}
 
 	connxn.incUpstream()
+	if outPort.name == "*" {
+		p1.autoOutput = connxn
+	}
 }
 
 type portDefinition struct {
@@ -211,10 +216,10 @@ type portDefinition struct {
 	indexed bool
 }
 
-var rePort = regexp.MustCompile(`^(.+)\[(\d+)\]$`)
+var portPattern = regexp.MustCompile(`^(.+)\[(\d+)\]$`)
 
 func parsePort(in string) portDefinition {
-	matches := rePort.FindStringSubmatch(in)
+	matches := portPattern.FindStringSubmatch(in)
 	if len(matches) == 0 {
 		return portDefinition{name: in}
 	}

@@ -26,9 +26,10 @@ type Process struct {
 	//done         bool
 	selfStarting bool // process has no non-IIP input ports
 	//MustRun   bool
-	status int32
-	mtx    sync.Mutex
-	//Mother *Process
+	status     int32
+	mtx        sync.Mutex
+	autoInput  inputCommon
+	autoOutput inputCommon
 }
 
 const (
@@ -224,7 +225,7 @@ func (p *Process) Run() {
 
 	allDrained, hasData := p.inputState()
 
-	canRun := p.selfStarting || hasData || !allDrained || p.isMustRun() && allDrained
+	canRun := p.selfStarting || hasData || !allDrained || p.autoInput != nil || p.isMustRun() && allDrained
 
 	for canRun {
 		// multiple activations, if necessary!
@@ -262,7 +263,11 @@ func (p *Process) Run() {
 		if v.IsConnected() {
 			v.Close()
 		}
-		// if anything else, just continue
+	}
+	if p.autoOutput != nil {
+		//Packet p = create("");
+		//autoOutput.send(p);
+		p.autoOutput.Close()
 	}
 }
 
