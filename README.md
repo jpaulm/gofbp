@@ -27,6 +27,7 @@ GoFBP Network Definition Syntax and Component API:
 - optional output ports - see `components\testrtn\writetoconsole.go`
 - "subnets"- these are FBP networks where some of the connections are "sticky" - they can therefore act as (semi-) black box components
 - "automatic" in- and out-ports - notation is port name = "*"
+- GoFBP (and the other FBP implementations on https://github.com/jpaulm distingish between "invocation" and "activation" of processes: a process is invoked once, but may be activated multiple times (if it does a return before all its input ports have been drained) 
 
 ## Tracing
 
