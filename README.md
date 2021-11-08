@@ -36,6 +36,7 @@ An XML file has been provided in the root, called `params.xml`.  So far there is
 <pre>
 &lt;?xml version="1.0"?&gt;
 &lt;tracing&gt;true|false&lt;/tracing&gt;
+&lt;tracelocks&gt;true|false&lt;/tracelocks&gt;
 </pre>
 
 ## Test Cases
