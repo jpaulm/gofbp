@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	//"github.com/jpaulm/gofbp/src/core"
 )
 
 type SubIn struct {

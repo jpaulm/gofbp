@@ -10,6 +10,7 @@ type OutArrayPort struct {
 	array []*OutPort
 	//closed    bool
 	connected bool
+	sender    *Process
 }
 
 func (o *OutArrayPort) send(p *Process, pkt *Packet) bool { panic("send on array port") }
@@ -43,4 +44,12 @@ func (o *OutArrayPort) Close() {
 func (o *OutArrayPort) IsConnected() bool {
 	//return o.connected
 	return true
+}
+
+func (o *OutArrayPort) GetSender() *Process {
+	return o.sender
+}
+
+func (o *OutArrayPort) SetSender(p *Process) {
+	o.sender = p
 }

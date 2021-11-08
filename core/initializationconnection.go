@@ -6,15 +6,15 @@ import (
 )
 
 type InitializationConnection struct {
-	network  GenNet
-	portName string
+	network GenNet
+	//portName string
 	fullName string
 	closed   bool
 	value    interface{}
 	mtx      sync.Mutex
 }
 
-func (c *InitializationConnection) isDrained() bool {
+func (c *InitializationConnection) IsDrained() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 

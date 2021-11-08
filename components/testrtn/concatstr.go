@@ -1,8 +1,6 @@
 package testrtn
 
-import (
-	"github.com/jpaulm/gofbp/core"
-)
+import "github.com/jpaulm/gofbp/core"
 
 type ConcatStr struct {
 	ipt core.InputArrayConn

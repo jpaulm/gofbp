@@ -1,7 +1,7 @@
 package core
 
 type inputCommon interface {
-	isDrained() bool
+	IsDrained() bool
 	resetForNextExecution()
 	IsEmpty() bool
 	IsClosed() bool

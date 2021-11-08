@@ -11,126 +11,92 @@ type InPort struct {
 	pktArray  []*Packet
 	is, ir    int // send index and receive index
 	mtx       sync.Mutex
-	condNE    sync.Cond
-	condNF    sync.Cond
+	condNE    *sync.Cond
+	condNF    *sync.Cond
 	closed    bool
 	upStrmCnt int
-	portName  string
-	fullName  string
+	//portName  string
+	name string
 	//array       []*InPort
 	downStrProc *Process
 }
 
-func (c *InPort) send(p *Process, pkt *Packet) bool {
-	if pkt == nil {
-		panic("Sending nil packet")
-	}
-	if pkt.owner != p {
-		panic("Sending packet not owned by this process")
-	}
-	c.condNF.L.Lock()
-	defer c.condNF.L.Unlock()
-	trace(p.name, "Sending", pkt.Contents.(string))
-	c.downStrProc.ensureRunning()
-	c.condNE.Broadcast()
-	for c.nolockIsFull() { // InPort is full
-		atomic.StoreInt32(&p.status, SuspSend)
-		c.condNF.Wait()
-		atomic.StoreInt32(&p.status, Active)
-		//atomic.StoreInt32(&p.network.Active, 1)
-	}
-	trace(p.name, "Sent", pkt.Contents.(string))
-	c.pktArray[c.is] = pkt
-	c.is = (c.is + 1) % len(c.pktArray)
-	//pkt.owner = nil
-	p.ownedPkts--
-	pkt = nil
-	return true
-}
-
 func (c *InPort) receive(p *Process) *Packet {
-	c.condNE.L.Lock()
-	defer c.condNE.L.Unlock()
+	LockTr(c.condNE, "recv L", p)
+	defer UnlockTr(c.condNE, "recv U", p)
 
-	trace(p.name, "Receiving")
-	for c.nolockIsEmpty() { // InPort is empty
+	trace(p.name, "Receiving from "+c.name+":")
+	for c.isEmpty() { // InPort is empty
 		if c.closed {
-			c.condNF.Broadcast()
+			//c.condNF.Broadcast()
+			BdcastTr(c.condNF, "bdcast in NF", p)
 			return nil
 		}
 		atomic.StoreInt32(&p.status, SuspRecv)
-		c.condNE.Wait()
+		//c.condNE.Wait()
+		WaitTr(c.condNE, "wait in recv", p)
 		atomic.StoreInt32(&p.status, Active)
-		//atomic.StoreInt32(&p.network.Active, 1)
 
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
-	trace(p.name, "Received", pkt.Contents.(string))
+	trace(p.name, "Received from "+c.name+":", pkt.Contents.(string))
 	c.ir = (c.ir + 1) % len(c.pktArray)
 	pkt.owner = p
 	p.ownedPkts++
-	c.condNF.Broadcast()
+	//c.condNF.Broadcast()
+	BdcastTr(c.condNF, "bdcast in NF", p)
 
 	return pkt
 }
 
 func (c *InPort) incUpstream() {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	LockTr(c.condNE, "IUS L", c.downStrProc)
+	defer UnlockTr(c.condNE, "IUS U", c.downStrProc)
 
 	c.upStrmCnt++
 }
 
-/*
-func (c *InPort) decUpstream() {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
-
-	c.upStrmCnt--
-	if c.upStrmCnt == 0 {
-		c.closed = true
-		c.condNE.Broadcast()
-		c.downStrProc.ensureRunning()
-
-	}
-}
-*/
 func (c *InPort) Close() {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	LockTr(c.condNE, "ClsI L", c.downStrProc)
+	defer UnlockTr(c.condNE, "ClsI U", c.downStrProc)
 
 	c.closed = true
-	c.condNE.Broadcast()
-	c.downStrProc.ensureRunning()
+	//c.condNE.Broadcast()
+	BdcastTr(c.condNE, "bdcast in NE", c.downStrProc)
+	//c.downStrProc.activate()
+}
+
+func (c *InPort) IsDrained() bool {
+	LockTr(c.condNE, "IDr L", c.downStrProc)
+	defer UnlockTr(c.condNE, "IDr U", c.downStrProc)
+
+	return c.isDrained()
 }
 
 func (c *InPort) isDrained() bool {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
-
-	return c.nolockIsEmpty() && c.closed
+	return c.isEmpty() && c.closed
 }
 
 func (c *InPort) IsEmpty() bool {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	LockTr(c.condNE, "IE L", c.downStrProc)
+	defer UnlockTr(c.condNE, "IE U", c.downStrProc)
 
-	return c.nolockIsEmpty()
+	return c.isEmpty()
 }
 
-func (c *InPort) nolockIsEmpty() bool {
+func (c *InPort) isEmpty() bool {
 	return c.ir == c.is && c.pktArray[c.is] == nil
 }
 
 func (c *InPort) IsClosed() bool {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	LockTr(c.condNE, "IC L", c.downStrProc)
+	defer UnlockTr(c.condNE, "IC U", c.downStrProc)
 
 	return c.closed
 }
 
-func (c *InPort) nolockIsFull() bool {
+func (c *InPort) isFull() bool {
 	return c.ir == c.is && c.pktArray[c.is] != nil
 }
 

@@ -49,8 +49,9 @@ func (n *Subnet) NewConnection(cap int) *InPort {
 		//network: n,
 	}
 	conn.network = n
-	conn.condNE.L = &conn.mtx
-	conn.condNF.L = &conn.mtx
+	conn.mtx = sync.Mutex{}
+	conn.condNE = sync.NewCond(&conn.mtx)
+	conn.condNF = sync.NewCond(&conn.mtx)
 	conn.pktArray = make([]*Packet, cap)
 	return conn
 }
@@ -99,8 +100,8 @@ func (n *Subnet) Connect(p1 *Process, out string, p2 *Process, in string, cap in
 
 		if connxn == nil {
 			connxn = n.NewConnection(cap)
-			connxn.portName = inPort.name
-			connxn.fullName = p2.name + "." + inPort.name
+			//connxn.portName = inPort.name
+			connxn.name = p2.name + "." + inPort.name
 			connxn.downStrProc = p2
 			connxn.network = n
 			if anyInConn == nil {
@@ -112,8 +113,8 @@ func (n *Subnet) Connect(p1 *Process, out string, p2 *Process, in string, cap in
 	} else {
 		if p2.inPorts[inPort.name] == nil {
 			connxn = n.NewConnection(cap)
-			connxn.portName = inPort.name
-			connxn.fullName = p2.name + "." + inPort.name
+			//connxn.portName = inPort.name
+			connxn.name = p2.name + "." + inPort.name
 			connxn.downStrProc = p2
 			connxn.network = n
 			p2.inPorts[inPort.name] = connxn
@@ -161,7 +162,7 @@ func (n *Subnet) Initialize(initValue interface{}, p2 *Process, in string) {
 
 	conn := n.NewInitializationConnection()
 	p2.inPorts[in] = conn
-	conn.portName = in
+	//conn.portName = in
 	conn.fullName = p2.name + "." + in
 
 	conn.value = initValue
@@ -173,87 +174,13 @@ func (n *Subnet) Exit() {
 	}
 }
 
-//func (n *Subnet) trace(s ...string) {
-//	if tracing {
-//		fmt.Print(strings.Trim(fmt.Sprint(s), "[]") + "\n")
-//	}
-//}
-
 // Deadlock detection goroutine has been commented out...
 
 func (n *Subnet) Run() {
 
-	// Criterion being used for deadlock detection: no process has become or is already active in last 200 ms
-	// Commented out
-
-	/*
-		go func(n *Subnet) {
-			//var s string
-			//s := <-biDirchan   // handshaking
-			//_ = s
-			//biDirchan <- "N"
-			statuses := make(map[string]string)
-			var someActive bool
-			for {
-				//atomic.StoreInt32(&n.Active, 0)
-				someActive = false
-				time.Sleep(200 * time.Millisecond) // shd be 200 ms!
-				//atomic.StoreInt32(&n.active, 0)
-				allTerminated := true
-				//deadlockDetected := true
-				for key, proc := range n.procs {
-					proc.mtx.Lock()
-					//defer proc.mtx.Unlock()
-					status := atomic.LoadInt32(&proc.status)
-					if status != Terminated {
-						allTerminated = false
-						if status == Active {
-							//atomic.StoreInt32(&n.Active, 1)
-							someActive = true
-						}
-					}
-					statuses[key] = []string{"NotStarted:",
-						"Active:    ",
-						"Dormant:   ",
-						"SuspSend:  ",
-						"SuspRecv:  ",
-						"Terminated:"}[status]
-					proc.mtx.Unlock()
-				}
-				if allTerminated {
-					//fmt.Println(n.Name, " terminated")
-					return
-				}
-				//if deadlockDetected {
-				if !someActive {
-					fmt.Println("\nDeadlock detected in", n.Name+"!")
-					for _, val := range statuses {
-						//proc.mtx.Lock()
-						//defer proc.mtx.Unlock()
-						//status := atomic.LoadInt32(&proc.status)
-						fmt.Println(" ", val)
-						//	[]string{"NotStarted:",
-						//		"Active:    ",
-						//		"Dormant:   ",
-						//		"SuspSend:  ",
-						//		"SuspRecv:  ",
-						//		"Terminated:"}[status], key)
-						//proc.mtx.Unlock()
-					}
-					panic("Deadlock!")
-				}
-			}
-		}(n)
-	*/
-
-	//biDirchan <- "Y"
-	//s := <-biDirchan
-	//_ = s
-	//close(biDirchan)
-
 	defer n.Exit()
 	defer fmt.Println(n.Name + " Done")
-	fmt.Println(n.Name + " Starting")
+	fmt.Println(n.Name + " Starting subnet")
 
 	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
 	// reactivated many times during the process "run"
@@ -264,8 +191,7 @@ func (n *Subnet) Run() {
 	var someProcsCanRun bool = false
 	//time.Sleep(1 * time.Millisecond)
 	for _, proc := range n.procs {
-		proc.mtx.Lock()
-		defer proc.mtx.Unlock()
+
 		proc.selfStarting = true
 		if proc.inPorts != nil {
 			for _, conn := range proc.inPorts {
@@ -280,7 +206,7 @@ func (n *Subnet) Run() {
 			continue
 		}
 
-		proc.ensureRunning()
+		proc.activate()
 		someProcsCanRun = true
 	}
 	if !someProcsCanRun {

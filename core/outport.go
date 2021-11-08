@@ -1,16 +1,51 @@
 package core
 
+import (
+	"sync/atomic"
+)
+
 type OutPort struct {
 	name      string
 	Conn      *InPort
 	connected bool
+	sender    *Process
 }
 
 func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	if o == nil {
 		return false
 	}
-	return o.Conn.send(p, pkt)
+	//return o.Conn.send(p, pkt)
+	//func (c *InPort) send(p *Process, pkt *Packet) bool {
+	if pkt == nil {
+		panic("Sending nil packet")
+	}
+	if pkt.owner != p {
+		panic("Sending packet not owned by this process")
+	}
+
+	LockTr(o.Conn.condNF, "send L", p)
+	defer UnlockTr(o.Conn.condNF, "send U", p)
+	trace(p.name, "Sending to "+o.name+":", pkt.Contents.(string))
+
+	o.Conn.downStrProc.activate()
+	//o.Conn.downStrProc.canGo.Broadcast()
+	BdcastTr(o.Conn.condNE, "bdcast out", p)
+
+	for o.Conn.isFull() { // InPort is full
+		atomic.StoreInt32(&p.status, SuspSend)
+		//o.Conn.condNF.Wait()
+		WaitTr(o.Conn.condNF, "wait in send", p)
+		atomic.StoreInt32(&p.status, Active)
+	}
+	trace(p.name, "Sent  to "+o.name)
+	o.Conn.pktArray[o.Conn.is] = pkt
+	o.Conn.is = (o.Conn.is + 1) % len(o.Conn.pktArray)
+	//pkt.owner = nil
+	p.ownedPkts--
+	pkt = nil
+	return true
+
 }
 
 func (o *OutPort) IsConnected() bool {
@@ -35,14 +70,24 @@ func (o *OutPort) ArrayLength() int {
 //}
 
 func (o *OutPort) Close() {
-	o.Conn.mtx.Lock()
-	defer o.Conn.mtx.Unlock()
+	LockTr(o.Conn.condNF, "close L", o.sender)
+	defer UnlockTr(o.Conn.condNF, "close U", o.sender)
 
 	o.Conn.upStrmCnt--
 	if o.Conn.upStrmCnt == 0 {
 		o.Conn.closed = true
-		o.Conn.condNE.Broadcast()
-		o.Conn.downStrProc.ensureRunning()
+		//o.Conn.condNE.Broadcast()
+		BdcastTr(o.Conn.condNE, "bdcast out", o.sender)
+		o.Conn.downStrProc.activate()
+		//o.Conn.downStrProc.canGo.Signal()
 
 	}
+}
+
+func (o *OutPort) GetSender() *Process {
+	return o.sender
+}
+
+func (o *OutPort) SetSender(p *Process) {
+	o.sender = p
 }

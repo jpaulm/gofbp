@@ -1,17 +1,25 @@
 package core
 
 type NullOutPort struct {
-	name string
+	sender *Process
 }
 
 // NullOutPort by default discards the packet.
-func (*NullOutPort) send(p *Process, pkt *Packet) bool {
+func (o *NullOutPort) send(p *Process, pkt *Packet) bool {
 	p.Discard(pkt)
 	return true
 }
 
-func (*NullOutPort) IsConnected() bool {
+func (o *NullOutPort) IsConnected() bool {
 	return false
 }
 
-func (*NullOutPort) Close() {}
+func (o *NullOutPort) Close() {}
+
+func (o *NullOutPort) GetSender() *Process {
+	return o.sender
+}
+
+func (o *NullOutPort) SetSender(p *Process) {
+	o.sender = p
+}

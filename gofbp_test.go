@@ -123,7 +123,7 @@ func TestDoSelect2(t *testing.T) {
 }
 func TestWriteToConsUsingNL(t *testing.T) {
 
-	net := core.NewNetwork("MergeToCons")
+	net := core.NewNetwork("TestWriteToConsUsingNL")
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 	proc2 := net.NewProc("Sender2", &testrtn.Sender{})

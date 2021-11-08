@@ -1,8 +1,6 @@
 package testrtn
 
 import (
-	"fmt"
-
 	"github.com/jpaulm/gofbp/core"
 )
 
@@ -17,7 +15,6 @@ func (rrsender *RoundRobinSender) Setup(p *core.Process) {
 }
 
 func (rrsender *RoundRobinSender) Execute(p *core.Process) {
-	//fmt.Println(p.GetName() + " started")
 
 	var i = 0
 
@@ -28,7 +25,7 @@ func (rrsender *RoundRobinSender) Execute(p *core.Process) {
 		if pkt == nil {
 			break
 		}
-		fmt.Println("Output: ", pkt.Contents)
+		//fmt.Println("Output: ", pkt.Contents)
 
 		opt := rrsender.out.GetArrayItem(i)
 
@@ -36,5 +33,4 @@ func (rrsender *RoundRobinSender) Execute(p *core.Process) {
 		i = (i + 1) % j
 	}
 
-	//fmt.Println(p.GetName() + " ended")
 }

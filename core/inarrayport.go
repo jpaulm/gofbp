@@ -8,9 +8,9 @@ type InArrayPort struct {
 	array []*InPort
 }
 
-func (c *InArrayPort) isDrained() bool {
+func (c *InArrayPort) IsDrained() bool {
 	for _, v := range c.array {
-		if !v.isDrained() {
+		if !v.IsDrained() {
 			return false
 		}
 	}

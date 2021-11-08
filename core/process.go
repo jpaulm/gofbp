@@ -28,8 +28,12 @@ type Process struct {
 	//MustRun   bool
 	status     int32
 	mtx        sync.Mutex
+	canGo      *sync.Cond
 	autoInput  inputCommon
 	autoOutput inputCommon
+	allDrained bool
+	hasData    bool
+	//repeat     bool
 }
 
 const (
@@ -141,6 +145,7 @@ func (p *Process) OpenOutArrayPort(s string) *OutArrayPort {
 // Send sends a packet to the output connection.
 // Returns false when fails to send.
 func (p *Process) Send(o OutputConn, pkt *Packet) bool {
+	//o.SetSender(p)
 	return o.send(p, pkt)
 }
 
@@ -150,9 +155,21 @@ func (p *Process) Receive(c InputConn) *Packet {
 	return c.receive(p)
 }
 
-func (p *Process) ensureRunning() {
+func (p *Process) activate() {
+
+	//
+	// This function starts a goroutine if it is not started, and signal if not
+	//
+
+	//LockTr(p.canGo, "act L", p)
+	//defer UnlockTr(p.canGo, "act L", p)
 
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
+
+		LockTr(p.canGo, "act L", p)
+		BdcastTr(p.canGo, "bdcast IS", p)
+		UnlockTr(p.canGo, "act U", p)
+
 		return
 	}
 
@@ -160,56 +177,60 @@ func (p *Process) ensureRunning() {
 
 	var wg *sync.WaitGroup
 	if b {
-		//s = netx.id()
 		wg = &netx.wg
 	} else {
 		nets, _ := p.network.(*Subnet)
 		wg = &nets.wg
 	}
 
-	//pprof.Do(context.TODO(), pprof.Labels(
-	//	"network", p.network.(*Network).id(),
-	//	"process", p.name,
-	//), func(c context.Context) {
 	go func() { // Process goroutine
 		defer wg.Done()
-		p.Run()
+		fmt.Println("Starting goroutine", p.GetName())
+		p.Run() //   <-------
 	}()
-	//})
 }
 
 func (p *Process) inputState() (bool, bool) {
 
-	allDrained := true
-	hasData := false
-	for _, v := range p.inPorts {
-		//if v.GetType() == "InArrayPort" {
-		_, b := v.(*InArrayPort)
-		if b {
-			//allClosed = true
-			for _, w := range v.(*InArrayPort).array {
-				if !w.isDrained() /* || !w.IsClosed() */ {
-					allDrained = false
-				}
-				hasData = hasData || !w.IsEmpty()
-			}
-		} else {
-			_, b := v.(*InPort)
+	p.allDrained = true
+	p.hasData = false
+
+	//LockTr(p.canGo, "IS L", p)
+	//defer UnlockTr(p.canGo, "IS U", p)
+
+	for {
+
+		for _, v := range p.inPorts {
+			_, b := v.(*InArrayPort)
 			if b {
-				if !v.(*InPort).isDrained() /*|| !v.IsClosed() */ {
-					allDrained = false
+				for _, w := range v.(*InArrayPort).array {
+					p.allDrained = p.allDrained && w.IsDrained()
+					p.hasData = p.hasData || !w.IsEmpty()
 				}
-				hasData = hasData || !v.(*InPort).IsEmpty()
+			} else {
+				w, b := v.(*InPort)
+				if b {
+					p.allDrained = p.allDrained && v.IsDrained()
+					p.hasData = p.hasData || !w.IsEmpty()
+				}
 			}
 		}
+		if p.allDrained || p.hasData {
+			return p.allDrained, p.hasData
+		}
+
+		//fmt.Println("waiting for more data on canGo")
+		//p.canGo.Wait()
+		WaitTr(p.canGo, "wait in IS", p)
 	}
-	return allDrained, hasData
+
 }
 
 func (p *Process) Run() {
-	p.mtx.Lock()
-	defer p.mtx.Unlock()
-	//atomic.StoreInt32(&p.status, Dormant)
+
+	//var autoStarting bool
+
+	//defer UnlockTr(p.canGo, "act L", p)
 	defer atomic.StoreInt32(&p.status, Terminated)
 	defer trace(p.GetName(), " terminated")
 	trace(p.GetName(), " started")
@@ -218,20 +239,23 @@ func (p *Process) Run() {
 
 	p.component.Setup(p)
 
-	//var allDrained bool
-	//var hasData bool
+	//if p.selfStarting {
+	//	autoStarting = true
+	//}
+	p.allDrained, p.hasData = p.inputState()
 
-	//atomic.StoreInt32(&p.status, Dormant)
-
-	allDrained, hasData := p.inputState()
-
-	canRun := p.selfStarting || hasData || !allDrained || p.autoInput != nil || p.isMustRun() && allDrained
+	canRun := p.selfStarting || p.hasData || !p.allDrained || p.autoInput != nil || p.isMustRun() && p.allDrained
 
 	for canRun {
+
 		// multiple activations, if necessary!
+
+		//if p.repeat {
+		//	LockTr(p.canGo, "act L", p)
+		//}
+
 		trace(p.GetName(), " activated")
 		atomic.StoreInt32(&p.status, Active)
-		//atomic.StoreInt32(&p.network.Active, 1)
 
 		p.component.Execute(p) // single "activation"
 
@@ -242,20 +266,26 @@ func (p *Process) Run() {
 			panic(p.name + " deactivated without disposing of all owned packets")
 		}
 
+		if p.selfStarting {
+			break
+		}
+
 		allDrained, _ := p.inputState()
 
 		if allDrained {
-			canRun = false
-		} else {
-			for _, v := range p.inPorts {
-				//_, b := v.(InitializationConnection)
-				//if b {
-				//v.(*InitializationConnection).resetForNextExecution()
-				v.resetForNextExecution()
-				//}
+			if p.autoOutput != nil {
+				p.autoOutput.Close()
 			}
+			break
 		}
 
+		for _, v := range p.inPorts {
+			v.resetForNextExecution() // resets IIPs
+		}
+		//}
+
+		//UnlockTr(p.canGo, "act L", p)
+		//p.repeat = true
 	}
 
 	for _, v := range p.outPorts {
@@ -264,11 +294,7 @@ func (p *Process) Run() {
 			v.Close()
 		}
 	}
-	if p.autoOutput != nil {
-		//Packet p = create("");
-		//autoOutput.send(p);
-		p.autoOutput.Close()
-	}
+
 }
 
 func (p *Process) isMustRun() bool {

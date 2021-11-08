@@ -16,6 +16,7 @@ var pStack PStack
 
 var stkLevel int
 var tracing bool
+var tracelocks bool
 
 type GenNet interface {
 	//NewNetwork(string) *Network
@@ -33,14 +34,14 @@ type GenNet interface {
 }
 
 type Network struct {
-	Name  string
+	name  string
 	procs map[string]*Process
 	wg    sync.WaitGroup
 }
 
 func NewNetwork(name string) *Network {
 	net := &Network{
-		Name:  name,
+		name:  name,
 		procs: make(map[string]*Process),
 		wg:    sync.WaitGroup{},
 	}
@@ -83,22 +84,49 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	n.procs[nm] = proc
 	proc.inPorts = make(map[string]inputCommon)
 	proc.outPorts = make(map[string]outputCommon)
-	//if stkLevel > 0 {
-	//	ns.SetMother(pStack[stkLevel-1])
-	//}
-	//pStack[stkLevel] = proc
+	proc.mtx = sync.Mutex{}
+	proc.canGo = sync.NewCond(&proc.mtx)
 
 	return proc
 }
 
 func (n *Network) id() string { return fmt.Sprintf("%p", n) }
 
+func LockTr(sc *sync.Cond, s string, p *Process) {
+	sc.L.Lock()
+	if tracelocks {
+		fmt.Println(p.GetName(), s)
+	}
+}
+
+func UnlockTr(sc *sync.Cond, s string, p *Process) {
+	sc.L.Unlock()
+	if tracelocks {
+		fmt.Println(p.GetName(), s)
+	}
+}
+
+func BdcastTr(sc *sync.Cond, s string, p *Process) {
+	sc.Broadcast()
+	if tracelocks {
+		fmt.Println(p.GetName(), s)
+	}
+}
+
+func WaitTr(sc *sync.Cond, s string, p *Process) {
+	sc.Wait()
+	if tracelocks {
+		fmt.Println(p.GetName(), s)
+	}
+}
+
 func (n *Network) NewConnection(cap int) *InPort {
 	conn := &InPort{
 		network: n,
 	}
-	conn.condNE.L = &conn.mtx
-	conn.condNF.L = &conn.mtx
+	conn.mtx = sync.Mutex{}
+	conn.condNE = sync.NewCond(&conn.mtx)
+	conn.condNF = sync.NewCond(&conn.mtx)
 	conn.pktArray = make([]*Packet, cap)
 	return conn
 }
@@ -147,8 +175,8 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 
 		if connxn == nil {
 			connxn = n.NewConnection(cap)
-			connxn.portName = inPort.name
-			connxn.fullName = p2.name + "." + inPort.name
+			//connxn.portName = inPort.name
+			connxn.name = p2.name + "." + inPort.name + "[" + strconv.Itoa(inPort.index) + "]"
 			connxn.downStrProc = p2
 			connxn.network = n
 			if anyInConn == nil {
@@ -160,8 +188,8 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	} else {
 		if p2.inPorts[inPort.name] == nil {
 			connxn = n.NewConnection(cap)
-			connxn.portName = inPort.name
-			connxn.fullName = p2.name + "." + inPort.name
+			//connxn.portName = inPort.name
+			connxn.name = p2.name + "." + inPort.name
 			connxn.downStrProc = p2
 			connxn.network = n
 			p2.inPorts[inPort.name] = connxn
@@ -178,6 +206,8 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 
 	outPort := parsePort(out)
 
+	var opt *OutPort
+
 	if outPort.indexed {
 		var anyOutConn = p1.outPorts[outPort.name]
 		if anyOutConn == nil {
@@ -186,23 +216,23 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		}
 
 		//opt := new(OutArrayPort)
-		out := anyOutConn.(*OutArrayPort)
+		outConn := anyOutConn.(*OutArrayPort)
 		//p1.outPorts[out] = anyOutConn
 		//opt.name = out
-		opt := new(OutPort)
-		out.SetArrayItem(opt, outPort.index)
-		opt.Conn = connxn
-		opt.connected = true
-
+		opt = new(OutPort)
+		outConn.SetArrayItem(opt, outPort.index)
+		opt.name = p1.name + "." + out
 	} else {
 		//var opt OutputConn
-		opt := new(OutPort)
+		opt = new(OutPort)
 		p1.outPorts[out] = opt
-		opt.name = out
-		opt.Conn = connxn
-		opt.connected = true
-		//fmt.Println(opt)
+		opt.name = p1.name + "." + out
+
 	}
+
+	opt.SetSender(p1)
+	opt.Conn = connxn
+	opt.connected = true
 
 	connxn.incUpstream()
 	if outPort.name == "*" {
@@ -237,7 +267,7 @@ func (n *Network) Initialize(initValue interface{}, p2 *Process, in string) {
 
 	conn := n.NewInitializationConnection()
 	p2.inPorts[in] = conn
-	conn.portName = in
+	//conn.portName = in
 	conn.fullName = p2.name + "." + in
 
 	conn.value = initValue
@@ -286,82 +316,16 @@ func (n *Network) Run() {
 		if i > -1 && rec[i+9:i+13] == "true" {
 			tracing = true
 		}
+
+		i = strings.Index(rec, "<tracelocks>")
+		if i > -1 && rec[i+12:i+16] == "true" {
+			tracelocks = true
+		}
 	}
 
-	// Commented out
-
-	// Criterion being used for deadlock detection: no process has become or is already active in last 200 ms
-
-	/*
-
-		go func(n *Network) {
-			//var s string
-			//s := <-biDirchan   // handshaking
-			//_ = s
-			//biDirchan <- "N"
-			statuses := make(map[string]string)
-			var someActive bool
-			for {
-				//atomic.StoreInt32(&n.Active, 0)
-				someActive = false
-				time.Sleep(200 * time.Millisecond) // shd be 200 ms!
-				//atomic.StoreInt32(&n.active, 0)
-				allTerminated := true
-				//deadlockDetected := true
-				for key, proc := range n.procs {
-					//proc.mtx.Lock()
-					//defer proc.mtx.Unlock()
-					status := atomic.LoadInt32(&proc.status)
-					if status != Terminated {
-						allTerminated = false
-						if status == Active {
-							//atomic.StoreInt32(&n.Active, 1)
-							someActive = true
-						}
-					}
-					statuses[key] = []string{"NotStarted:",
-						"Active:    ",
-						"Dormant:   ",
-						"SuspSend:  ",
-						"SuspRecv:  ",
-						"Terminated:"}[status]
-					//proc.mtx.Unlock()
-				}
-				if allTerminated {
-					//fmt.Println(n.Name, " terminated")
-					return
-				}
-				//if deadlockDetected {
-				if !someActive {
-					fmt.Println("\nDeadlock detected in", n.Name+"!")
-					for _, val := range statuses {
-						//proc.mtx.Lock()
-						//defer proc.mtx.Unlock()
-						//status := atomic.LoadInt32(&proc.status)
-						fmt.Println(" ", val)
-						//	[]string{"NotStarted:",
-						//		"Active:    ",
-						//		"Dormant:   ",
-						//		"SuspSend:  ",
-						//		"SuspRecv:  ",
-						//		"Terminated:"}[status], key)
-						//proc.mtx.Unlock()
-					}
-					panic("Deadlock!")
-				}
-			}
-		}(n)
-
-	*/
-
-	//biDirchan <- "Y"
-	//s := <-biDirchan
-	//_ = s
-	//close(biDirchan)
-
 	defer n.Exit()
-	defer fmt.Println(n.Name + " Done")
-	fmt.Println(n.Name + " Starting")
+	defer fmt.Println(n.name + " Done")
+	fmt.Println(n.name + " Starting network")
 
 	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
 	// reactivated many times during the process "run"
@@ -372,8 +336,7 @@ func (n *Network) Run() {
 	var someProcsCanRun bool = false
 	//time.Sleep(1 * time.Millisecond)
 	for _, proc := range n.procs {
-		proc.mtx.Lock()
-		defer proc.mtx.Unlock()
+
 		proc.selfStarting = true
 		if proc.inPorts != nil {
 			for _, conn := range proc.inPorts {
@@ -388,7 +351,7 @@ func (n *Network) Run() {
 			continue
 		}
 
-		proc.ensureRunning()
+		proc.activate()
 		someProcsCanRun = true
 	}
 	if !someProcsCanRun {

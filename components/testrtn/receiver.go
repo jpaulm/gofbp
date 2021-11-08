@@ -24,7 +24,7 @@ func (receiver *Receiver) Execute(p *core.Process) {
 		if pkt == nil {
 			break
 		}
-		fmt.Println("Output: ", pkt.Contents)
+		fmt.Println("Input to Receiver: ", pkt.Contents)
 		p.Discard(pkt)
 	}
 
