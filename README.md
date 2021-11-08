@@ -2,10 +2,6 @@
 
 This repo holds the beginning of an FBP implementation in Go
 
-*As of 17 Oct., 2021, all test cases are working again.*
-
-*Apologies: if you downloaded GoFBP before 17 Oct., please download it again, and use the current component definitions as a model for developing your own components*
-
 There may well be further internal changes, but I am hoping that the "external" APIs (network and component definitions) are now firm. 
 
 ## General
