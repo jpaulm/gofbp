@@ -24,15 +24,15 @@ type Process struct {
 	component Component
 	ownedPkts int
 	//done         bool
-	selfStarting bool // process has no non-IIP input ports
+	//selfStarting bool // process has no non-IIP input ports
 	//MustRun   bool
 	status     int32
 	mtx        sync.Mutex
 	canGo      *sync.Cond
 	autoInput  inputCommon
 	autoOutput inputCommon
-	allDrained bool
-	hasData    bool
+	//allDrained bool
+	//hasData    bool
 	//repeat     bool
 }
 
@@ -190,33 +190,36 @@ func (p *Process) activate() {
 	}()
 }
 
-func (p *Process) inputState() (bool, bool) {
-
-	p.allDrained = true
-	p.hasData = false
+func (p *Process) inputState() (bool, bool, bool) {
 
 	//LockTr(p.canGo, "IS L", p)
 	//defer UnlockTr(p.canGo, "IS U", p)
 
-	for {
+	allDrained := true
+	hasData := false
+	selfStarting := true
 
+	for {
 		for _, v := range p.inPorts {
 			_, b := v.(*InArrayPort)
 			if b {
 				for _, w := range v.(*InArrayPort).array {
-					p.allDrained = p.allDrained && w.IsDrained()
-					p.hasData = p.hasData || !w.IsEmpty()
+					allDrained = allDrained && w.IsDrained()
+					hasData = hasData || !w.IsEmpty()
 				}
+				selfStarting = false
 			} else {
 				w, b := v.(*InPort)
 				if b {
-					p.allDrained = p.allDrained && v.IsDrained()
-					p.hasData = p.hasData || !w.IsEmpty()
+					allDrained = allDrained && v.IsDrained()
+					hasData = hasData || !w.IsEmpty()
+					selfStarting = false
 				}
 			}
 		}
-		if p.allDrained || p.hasData {
-			return p.allDrained, p.hasData
+
+		if allDrained || hasData || selfStarting {
+			return allDrained, hasData, selfStarting
 		}
 
 		//fmt.Println("waiting for more data on canGo")
@@ -242,9 +245,9 @@ func (p *Process) Run() {
 	//if p.selfStarting {
 	//	autoStarting = true
 	//}
-	p.allDrained, p.hasData = p.inputState()
+	allDrained, hasData, selfStarting := p.inputState()
 
-	canRun := p.selfStarting || p.hasData || !p.allDrained || p.autoInput != nil || p.isMustRun() && p.allDrained
+	canRun := selfStarting || hasData || !allDrained || p.autoInput != nil || p.isMustRun() && allDrained
 
 	for canRun {
 
@@ -266,11 +269,11 @@ func (p *Process) Run() {
 			panic(p.name + " deactivated without disposing of all owned packets")
 		}
 
-		if p.selfStarting {
+		if selfStarting {
 			break
 		}
 
-		allDrained, _ := p.inputState()
+		allDrained, _, _ := p.inputState()
 
 		if allDrained {
 			if p.autoOutput != nil {

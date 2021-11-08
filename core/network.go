@@ -337,17 +337,17 @@ func (n *Network) Run() {
 	//time.Sleep(1 * time.Millisecond)
 	for _, proc := range n.procs {
 
-		proc.selfStarting = true
+		selfStarting := true
 		if proc.inPorts != nil {
 			for _, conn := range proc.inPorts {
 				//if conn.GetType() != "InitializationPort" {
 				_, b := conn.(*InitializationConnection)
 				if !b {
-					proc.selfStarting = false
+					selfStarting = false
 				}
 			}
 		}
-		if !proc.selfStarting {
+		if !selfStarting {
 			continue
 		}
 
