@@ -166,9 +166,9 @@ func (p *Process) activate() {
 
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 
-		LockTr(p.canGo, "act L", p)
+		//LockTr(p.canGo, "act L", p)
 		BdcastTr(p.canGo, "bdcast IS", p)
-		UnlockTr(p.canGo, "act U", p)
+		//UnlockTr(p.canGo, "act U", p)
 
 		return
 	}

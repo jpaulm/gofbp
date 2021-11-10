@@ -29,7 +29,7 @@ func (c *InPort) receive(p *Process) *Packet {
 	for c.isEmpty() { // InPort is empty
 		if c.closed {
 			//c.condNF.Broadcast()
-			BdcastTr(c.condNF, "bdcast in NF", p)
+			BdcastTr(c.condNF, "bdcast in NF cl", p)
 			return nil
 		}
 		atomic.StoreInt32(&p.status, SuspRecv)

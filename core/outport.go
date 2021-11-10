@@ -15,8 +15,7 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	if o == nil {
 		return false
 	}
-	//return o.Conn.send(p, pkt)
-	//func (c *InPort) send(p *Process, pkt *Packet) bool {
+
 	if pkt == nil {
 		panic("Sending nil packet")
 	}
@@ -30,7 +29,6 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 
 	o.Conn.downStrProc.activate()
 	//o.Conn.downStrProc.canGo.Broadcast()
-	BdcastTr(o.Conn.condNE, "bdcast out", p)
 
 	for o.Conn.isFull() { // InPort is full
 		atomic.StoreInt32(&p.status, SuspSend)
@@ -38,6 +36,9 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 		WaitTr(o.Conn.condNF, "wait in send", p)
 		atomic.StoreInt32(&p.status, Active)
 	}
+
+	BdcastTr(o.Conn.condNE, "bdcast out", p)
+
 	trace(p.name, "Sent  to "+o.name)
 	o.Conn.pktArray[o.Conn.is] = pkt
 	o.Conn.is = (o.Conn.is + 1) % len(o.Conn.pktArray)

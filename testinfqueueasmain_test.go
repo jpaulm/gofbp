@@ -9,7 +9,7 @@ import (
 )
 
 func TestInfQueueAsMain(t *testing.T) {
-	net := core.NewNetwork("TestInfQueueAsMain")
+	net := core.NewNetwork("InfQueueAsMain")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 	proc2 := net.NewProc("WriteFile", &io.WriteFile{})

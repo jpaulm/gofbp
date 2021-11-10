@@ -5,11 +5,14 @@ import (
 	"sync"
 )
 
+// A subnet is like a combination of a Network and a Process...
+
 type Subnet struct {
-	Name   string
-	procs  map[string]*Process
+	Network
+	//name   string
+	//procs  map[string]*Process
 	Mother *Process
-	wg     sync.WaitGroup
+	//wg     sync.WaitGroup
 }
 
 func (n *Subnet) SetMother(p *Process) {
@@ -18,6 +21,18 @@ func (n *Subnet) SetMother(p *Process) {
 
 func (n *Subnet) GetMother() *Process {
 	return n.Mother
+}
+
+//func (n *Subnet) GetNetwork() GenNet {
+//	return n
+//}
+
+func (n *Subnet) GetProc(nm string) *Process {
+	return n.procs[nm]
+}
+
+func (n *Subnet) SetProc(p *Process, nm string) {
+	n.procs[nm] = p
 }
 
 func (n *Subnet) NewProc(nm string, comp Component) *Process {
@@ -30,157 +45,23 @@ func (n *Subnet) NewProc(nm string, comp Component) *Process {
 		network:   n,
 	}
 
-	n.procs[nm] = proc
-	ns, _ := proc.network.(*Subnet)
+	n.SetProc(proc, nm)
 	proc.inPorts = make(map[string]inputCommon)
 	proc.outPorts = make(map[string]outputCommon)
+	proc.mtx = sync.Mutex{}
+	proc.canGo = sync.NewCond(&proc.mtx)
 	if stkLevel > 0 {
-		ns.SetMother(pStack[stkLevel-1])
+		n.SetMother(pStack[stkLevel-1])
 	}
-	//pStack[stkLevel] = proc
 
 	return proc
 }
 
-func (n *Subnet) id() string { return fmt.Sprintf("%p", n) }
-
-func (n *Subnet) NewConnection(cap int) *InPort {
-	conn := &InPort{
-		//network: n,
-	}
-	conn.network = n
-	conn.mtx = sync.Mutex{}
-	conn.condNE = sync.NewCond(&conn.mtx)
-	conn.condNF = sync.NewCond(&conn.mtx)
-	conn.pktArray = make([]*Packet, cap)
-	return conn
-}
-
-func (n *Subnet) NewInitializationConnection() *InitializationConnection {
-	conn := &InitializationConnection{
-		network: n,
-	}
-
-	return conn
-}
-
-func (n *Subnet) NewInArrayPort() *InArrayPort {
-	conn := &InArrayPort{
-		network: n,
-	}
-
-	return conn
-}
-
-func (n *Subnet) NewOutArrayPort() *OutArrayPort {
-	port := &OutArrayPort{
-		network: n,
-	}
-
-	return port
-}
-
-func (n *Subnet) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
-
-	inPort := parsePort(in)
-
-	var connxn *InPort
-	//var anyInConn InputConn
-
-	if inPort.indexed {
-		var anyInConn = p2.inPorts[inPort.name]
-		if anyInConn == nil {
-
-			anyInConn = n.NewInArrayPort()
-			p2.inPorts[inPort.name] = anyInConn
-		}
-
-		//anyInConn = anyInConn.(InputArrayConn)
-		connxn = anyInConn.(InputArrayConn).GetArrayItem(inPort.index)
-
-		if connxn == nil {
-			connxn = n.NewConnection(cap)
-			//connxn.portName = inPort.name
-			connxn.name = p2.name + "." + inPort.name
-			connxn.downStrProc = p2
-			connxn.network = n
-			if anyInConn == nil {
-				p2.inPorts[inPort.name] = connxn
-			} else {
-				anyInConn.(InputArrayConn).SetArrayItem(connxn, inPort.index)
-			}
-		}
-	} else {
-		if p2.inPorts[inPort.name] == nil {
-			connxn = n.NewConnection(cap)
-			//connxn.portName = inPort.name
-			connxn.name = p2.name + "." + inPort.name
-			connxn.downStrProc = p2
-			connxn.network = n
-			p2.inPorts[inPort.name] = connxn
-		} else {
-			connxn = p2.inPorts[inPort.name].(*InPort)
-		}
-	}
-
-	// connxn built; input port array built if necessary
-
-	//var anyOutConn OutputConn
-
-	outPort := parsePort(out)
-
-	if outPort.indexed {
-		var anyOutConn = p1.outPorts[outPort.name]
-		if anyOutConn == nil {
-			anyOutConn = n.NewOutArrayPort()
-			p1.outPorts[outPort.name] = anyOutConn
-		}
-
-		//opt := new(OutArrayPort)
-		out := anyOutConn.(*OutArrayPort)
-		//p1.outPorts[out] = anyOutConn
-		//opt.name = out
-		opt := new(OutPort)
-		out.SetArrayItem(opt, outPort.index)
-		opt.Conn = connxn
-		opt.connected = true
-
-	} else {
-		//var opt OutputConn
-		opt := new(OutPort)
-		p1.outPorts[out] = opt
-		opt.name = out
-		opt.Conn = connxn
-		opt.connected = true
-		//fmt.Println(opt)
-	}
-
-	connxn.incUpstream()
-}
-
-func (n *Subnet) Initialize(initValue interface{}, p2 *Process, in string) {
-
-	conn := n.NewInitializationConnection()
-	p2.inPorts[in] = conn
-	//conn.portName = in
-	conn.fullName = p2.name + "." + in
-
-	conn.value = initValue
-
-}
-func (n *Subnet) Exit() {
-	if stkLevel > 0 {
-		stkLevel--
-	}
-}
-
-// Deadlock detection goroutine has been commented out...
-
 func (n *Subnet) Run() {
 
 	defer n.Exit()
-	defer fmt.Println(n.Name + " Done")
-	fmt.Println(n.Name + " Starting subnet")
+	defer fmt.Println(n.name + " Subnet done")
+	fmt.Println(n.name + " Starting subnet")
 
 	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
 	// reactivated many times during the process "run"
@@ -211,8 +92,14 @@ func (n *Subnet) Run() {
 	}
 	if !someProcsCanRun {
 		n.wg.Add(0 - len(n.procs))
-		panic("No process can start")
+		panic("No process can start in subnet " + n.name)
 	}
-
+	//}()
 	//n.wg.Wait()
+}
+
+func (n *Subnet) Exit() {
+	if stkLevel > 0 {
+		stkLevel--
+	}
 }

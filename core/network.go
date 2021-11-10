@@ -10,18 +10,13 @@ import (
 	"sync"
 )
 
-type PStack []*Process
-
-var pStack PStack
+var pStack []*Process
 
 var stkLevel int
 var tracing bool
 var tracelocks bool
 
 type GenNet interface {
-	//NewNetwork(string) *Network
-	//NewSubnet(string, *Process) *Subnet
-	NewProc(string, Component) *Process
 	id() string
 	NewConnection(int) *InPort
 	NewInitializationConnection() *InitializationConnection
@@ -29,7 +24,9 @@ type GenNet interface {
 	NewOutArrayPort() *OutArrayPort
 	Connect(*Process, string, *Process, string, int)
 	Initialize(interface{}, *Process, string)
-	//GetWG() *sync.WaitGroup
+	Exit()
+	GetProc(string) *Process
+	SetProc(*Process, string)
 	Run()
 }
 
@@ -39,6 +36,10 @@ type Network struct {
 	wg    sync.WaitGroup
 }
 
+//func (n *Network) GetNetwork() *Network {
+//	return n
+//}
+
 func NewNetwork(name string) *Network {
 	net := &Network{
 		name:  name,
@@ -47,50 +48,30 @@ func NewNetwork(name string) *Network {
 	}
 
 	//stkLevel++
-	if stkLevel >= len(pStack) {
-		pStack = append(pStack, nil)
-	}
+	//if stkLevel >= len(pStack) {
+	pStack = append(pStack, nil)
+	//}
 
 	return net
 }
 
 func NewSubnet(name string, p *Process) *Subnet {
-	net := &Subnet{
-		Name:  name,
-		procs: make(map[string]*Process),
-		wg:    sync.WaitGroup{},
-	}
-
+	net := &Subnet{}
 	//stkLevel++
-	if stkLevel >= len(pStack) {
-		pStack = append(pStack, nil)
-	}
+	//if stkLevel >= len(pStack) {
+	//	pStack = append(pStack, nil)
+	//}
+	net.name = name
+	net.procs = make(map[string]*Process)
+	net.wg = sync.WaitGroup{}
 	net.SetMother(p)
 	pStack[stkLevel] = p
 	stkLevel++
+	if stkLevel >= len(pStack) {
+		pStack = append(pStack, nil)
+	}
 	return net
 }
-
-func (n *Network) NewProc(nm string, comp Component) *Process {
-
-	proc := &Process{
-		name:      nm,
-		logFile:   "",
-		component: comp,
-		status:    Notstarted,
-		network:   n,
-	}
-
-	n.procs[nm] = proc
-	proc.inPorts = make(map[string]inputCommon)
-	proc.outPorts = make(map[string]outputCommon)
-	proc.mtx = sync.Mutex{}
-	proc.canGo = sync.NewCond(&proc.mtx)
-
-	return proc
-}
-
-func (n *Network) id() string { return fmt.Sprintf("%p", n) }
 
 func LockTr(sc *sync.Cond, s string, p *Process) {
 	sc.L.Lock()
@@ -118,6 +99,36 @@ func WaitTr(sc *sync.Cond, s string, p *Process) {
 	if tracelocks {
 		fmt.Println(p.GetName(), s)
 	}
+}
+
+func (n *Network) id() string { return fmt.Sprintf("%p", n) }
+
+func (n *Network) GetProc(nm string) *Process {
+	return n.procs[nm]
+}
+
+func (n *Network) SetProc(p *Process, nm string) {
+	n.procs[nm] = p
+}
+
+func (n *Network) NewProc(nm string, comp Component) *Process {
+
+	proc := &Process{
+		name:      nm,
+		logFile:   "",
+		component: comp,
+		status:    Notstarted,
+		network:   n,
+	}
+
+	//proc.network = n
+	n.SetProc(proc, nm)
+	proc.inPorts = make(map[string]inputCommon)
+	proc.outPorts = make(map[string]outputCommon)
+	proc.mtx = sync.Mutex{}
+	proc.canGo = sync.NewCond(&proc.mtx)
+
+	return proc
 }
 
 func (n *Network) NewConnection(cap int) *InPort {
@@ -274,8 +285,8 @@ func (n *Network) Initialize(initValue interface{}, p2 *Process, in string) {
 
 }
 func (n *Network) Exit() {
-	if stkLevel > 0 {
-		panic("Exit - stack level incorrect")
+	if stkLevel != 0 {
+		panic("Exit - stack level incorrect: " + strconv.Itoa(stkLevel))
 	}
 }
 
@@ -285,13 +296,10 @@ func trace(s ...string) {
 	}
 }
 
-// Deadlock detection goroutine has been commented out...
 
 func (n *Network) Run() {
 
 	var rec string
-
-	//biDirchan := make(chan string) // handshaking...
 
 	f, err := os.Open("params.xml")
 	if err == nil {
