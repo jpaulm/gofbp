@@ -22,6 +22,8 @@ func (sender *Sender) Execute(p *core.Process) {
 	icpkt := p.Receive(sender.ipt)
 	j, _ := strconv.Atoi(icpkt.Contents.(string))
 	p.Discard(icpkt)
+	p.Close(sender.ipt)
+
 	var pkt *core.Packet
 	for i := 0; i < j; i++ {
 		pkt = p.Create("IP - # " + strconv.Itoa(i))

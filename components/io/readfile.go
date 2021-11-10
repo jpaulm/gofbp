@@ -29,6 +29,7 @@ func (readFile *ReadFile) Execute(p *core.Process) {
 		panic("Unable to read file: " + fname)
 	}
 	p.Discard(icpkt)
+	p.Close(readFile.ipt)
 
 	var pkt *core.Packet
 	var rec string

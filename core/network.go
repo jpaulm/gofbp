@@ -146,7 +146,7 @@ func (n *Network) NewInitializationConnection() *InitializationConnection {
 	conn := &InitializationConnection{
 		network: n,
 	}
-
+	conn.mtx = sync.Mutex{}
 	return conn
 }
 
@@ -154,7 +154,7 @@ func (n *Network) NewInArrayPort() *InArrayPort {
 	conn := &InArrayPort{
 		network: n,
 	}
-
+	conn.mtx = sync.Mutex{}
 	return conn
 }
 
@@ -295,7 +295,6 @@ func trace(s ...string) {
 		fmt.Print(strings.Trim(fmt.Sprint(s), "[]") + "\n")
 	}
 }
-
 
 func (n *Network) Run() {
 

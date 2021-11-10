@@ -6,11 +6,12 @@ type inputCommon interface {
 	IsEmpty() bool
 	IsClosed() bool
 	Close()
+	receive(*Process) *Packet
 }
 
 type InputConn interface {
 	inputCommon
-	receive(p *Process) *Packet
+	//receive(p *Process) *Packet
 }
 
 type InputArrayConn interface {

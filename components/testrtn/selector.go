@@ -36,6 +36,8 @@ func (selector *Selector) Execute(p *core.Process) {
 
 	p.Discard(icpkt)
 
+	p.Close(selector.iptIp)
+
 	for {
 		var pkt = p.Receive(selector.ipt)
 		if pkt == nil {

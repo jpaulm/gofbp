@@ -26,6 +26,7 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 	icpkt := p.Receive(writeFile.iptIp)
 	fname := icpkt.Contents.(string)
 	p.Discard(icpkt)
+	p.Close(writeFile.iptIp)
 
 	f, err := os.Create(fname)
 	if err != nil {
@@ -50,11 +51,7 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 		if !writeFile.opt.IsConnected() {
 			p.Discard(pkt)
 		} else {
-			//if writeFile.opt == nil {
-			//	panic("WriteFile - port not specified, but not optional")
-			//}
 			p.Send(writeFile.opt, pkt)
-			//}
 		}
 
 		//fmt.Println(p.GetName() + " ended")

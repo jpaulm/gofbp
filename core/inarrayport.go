@@ -1,11 +1,18 @@
 package core
 
+import (
+	//"fmt"
+	"sync"
+)
+
 type InArrayPort struct {
 	network GenNet
 
 	//portName string
 	//fullName string
-	array []*InPort
+	array  []*InPort
+	mtx    sync.Mutex
+	closed bool
 }
 
 func (c *InArrayPort) IsDrained() bool {
@@ -26,9 +33,9 @@ func (c *InArrayPort) IsEmpty() bool {
 	return true
 }
 
-//func (c *InArrayPort) receive(p *Process) *Packet {
-//	panic("receive from an array port")
-//}
+func (c *InArrayPort) receive(p *Process) *Packet {
+	panic("receive from an array port")
+}
 
 func (c *InArrayPort) IsClosed() bool {
 	for _, v := range c.array {
@@ -65,4 +72,12 @@ func (c *InArrayPort) ArrayLength() int {
 	return len(c.array)
 }
 
-func (c *InArrayPort) Close() {}
+func (c *InArrayPort) Close() {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+	c.closed = true
+	for _, w := range c.array {
+		w.closed = true
+		BdcastTr(w.condNE, "bdcast in array NE", w.downStrProc)
+	}
+}

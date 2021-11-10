@@ -155,6 +155,10 @@ func (p *Process) Receive(c InputConn) *Packet {
 	return c.receive(p)
 }
 
+func (p *Process) Close(c InputConn) {
+	c.Close()
+}
+
 func (p *Process) activate() {
 
 	//
@@ -206,8 +210,8 @@ func (p *Process) inputState() (bool, bool, bool) {
 				for _, w := range v.(*InArrayPort).array {
 					allDrained = allDrained && w.IsDrained()
 					hasData = hasData || !w.IsEmpty()
+					selfStarting = false
 				}
-				selfStarting = false
 			} else {
 				w, b := v.(*InPort)
 				if b {
