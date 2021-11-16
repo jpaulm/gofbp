@@ -19,7 +19,7 @@ func (writeToConsole *WriteToConsole) Setup(p *core.Process) {
 func (WriteToConsole) MustRun() {}
 
 func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
-	//fmt.Println(p.GetName() + " started")
+	
 
 	for {
 		var pkt = p.Receive(writeToConsole.ipt)
@@ -27,7 +27,7 @@ func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
 			break
 		}
 		fmt.Println(pkt.Contents)
-		//if writeToConsole.out.GetType() == "OutPort" {
+		
 		if writeToConsole.out.IsConnected() {
 			p.Send(writeToConsole.out, pkt)
 		} else {
@@ -35,5 +35,5 @@ func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
 		}
 	}
 
-	//fmt.Println(p.GetName() + " ended")
+	
 }

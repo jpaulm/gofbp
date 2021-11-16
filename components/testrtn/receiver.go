@@ -17,7 +17,7 @@ func (receiver *Receiver) Setup(p *core.Process) {
 func (Receiver) MustRun() {}
 
 func (receiver *Receiver) Execute(p *core.Process) {
-	//fmt.Println(p.GetName() + " started")
+	
 
 	for {
 		var pkt = p.Receive(receiver.ipt)
@@ -28,5 +28,5 @@ func (receiver *Receiver) Execute(p *core.Process) {
 		p.Discard(pkt)
 	}
 
-	//fmt.Println(p.GetName() + " ended")
+	
 }

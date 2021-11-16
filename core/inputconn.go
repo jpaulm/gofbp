@@ -7,6 +7,8 @@ type inputCommon interface {
 	IsClosed() bool
 	Close()
 	receive(*Process) *Packet
+	//Name() string
+	//SetName(string)
 }
 
 type InputConn interface {

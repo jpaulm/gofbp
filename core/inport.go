@@ -7,7 +7,7 @@ import (
 )
 
 type InPort struct {
-	network   GenNet
+	network   *Network
 	pktArray  []*Packet
 	is, ir    int // send index and receive index
 	mtx       sync.Mutex
@@ -15,8 +15,8 @@ type InPort struct {
 	condNF    *sync.Cond
 	closed    bool
 	upStrmCnt int
-	//portName  string
-	name string
+	portName  string
+	//fullName  string
 	//array       []*InPort
 	downStrProc *Process
 }
@@ -24,23 +24,30 @@ type InPort struct {
 func (c *InPort) receive(p *Process) *Packet {
 	LockTr(c.condNE, "recv L", p)
 	defer UnlockTr(c.condNE, "recv U", p)
-
-	trace(p.name, "Receiving from "+c.name+":")
+	if c.isDrained() {
+		return nil
+	}
+	trace(p, " Receiving from "+c.portName)
 	for c.isEmpty() { // InPort is empty
 		if c.closed {
 			//c.condNF.Broadcast()
 			BdcastTr(c.condNF, "bdcast in NF cl", p)
+			trace(p, " Received end of stream from "+c.portName)
 			return nil
 		}
 		atomic.StoreInt32(&p.status, SuspRecv)
 		//c.condNE.Wait()
 		WaitTr(c.condNE, "wait in recv", p)
 		atomic.StoreInt32(&p.status, Active)
-
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
-	trace(p.name, "Received from "+c.name+":", pkt.Contents.(string))
+	if pkt.pktType != Normal {
+		trace(p, " Received from "+c.portName+" <", pkt.Contents.(string),
+			[...]string{"", "Open", "Close"}[pkt.pktType])
+	} else {
+		trace(p, " Received from "+c.portName+" <", pkt.Contents.(string))
+	}
 	c.ir = (c.ir + 1) % len(c.pktArray)
 	pkt.owner = p
 	p.ownedPkts++
@@ -51,10 +58,16 @@ func (c *InPort) receive(p *Process) *Packet {
 }
 
 func (c *InPort) incUpstream() {
-	LockTr(c.condNE, "IUS L", c.downStrProc)
-	defer UnlockTr(c.condNE, "IUS U", c.downStrProc)
+	LockTr(c.condNE, "IUS L", nil)
+	defer UnlockTr(c.condNE, "IUS U", nil)
 
 	c.upStrmCnt++
+}
+
+func (c *InPort) decUpstream() {
+	//LockTr(c.condNE, "DUS L", nil) // sender is one of senders
+	//defer UnlockTr(c.condNE, "DUS U", nil)
+	c.upStrmCnt--
 }
 
 func (c *InPort) Close() {
@@ -100,4 +113,9 @@ func (c *InPort) isFull() bool {
 	return c.ir == c.is && c.pktArray[c.is] != nil
 }
 
-func (c *InPort) resetForNextExecution() {}
+func (c *InPort) resetForNextExecution() {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	c.closed = false
+}

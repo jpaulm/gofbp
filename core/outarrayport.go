@@ -3,11 +3,11 @@ package core
 //var _ Conn = (*InArrayPort)(nil)
 
 type OutArrayPort struct {
-	network GenNet
+	network *Network
 
-	//portName  string
-	name  string // full name
-	array []*OutPort
+	portName string
+	fullName string
+	array    []*OutPort
 	//closed    bool
 	connected bool
 	sender    *Process
@@ -44,12 +44,4 @@ func (o *OutArrayPort) Close() {
 func (o *OutArrayPort) IsConnected() bool {
 	//return o.connected
 	return true
-}
-
-func (o *OutArrayPort) GetSender() *Process {
-	return o.sender
-}
-
-func (o *OutArrayPort) SetSender(p *Process) {
-	o.sender = p
 }

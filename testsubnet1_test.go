@@ -8,8 +8,8 @@ import (
 	"github.com/jpaulm/gofbp/core"
 )
 
-func TestSubnet(t *testing.T) {
-	net := core.NewNetwork("TestSubnet")
+func TestSubnet1(t *testing.T) {
+	net := core.NewNetwork("TestSubnet1")
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 

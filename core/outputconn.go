@@ -3,8 +3,6 @@ package core
 type outputCommon interface {
 	Close()
 	IsConnected() bool
-	GetSender() *Process
-	SetSender(*Process)
 }
 
 type OutputConn interface {

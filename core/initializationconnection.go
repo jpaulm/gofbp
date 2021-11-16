@@ -6,12 +6,12 @@ import (
 )
 
 type InitializationConnection struct {
-	network GenNet
-	//portName string
-	fullName string
-	closed   bool
-	value    interface{}
-	mtx      sync.Mutex
+	network  *Network
+	portName string
+	//fullName string
+	closed bool
+	value  interface{}
+	mtx    sync.Mutex
 }
 
 func (c *InitializationConnection) IsDrained() bool {
@@ -33,13 +33,13 @@ func (c *InitializationConnection) receive(p *Process) *Packet {
 	if c.closed {
 		return nil
 	}
-	trace(p.name, "Receiving IIP")
+	trace(p, " Receiving IIP")
 	var pkt *Packet = new(Packet)
 	pkt.Contents = c.value
 	pkt.owner = p
 	p.ownedPkts++
 	c.Close()
-	trace(p.name, "Received IIP: ", pkt.Contents.(string))
+	trace(p, " Received IIP: ", pkt.Contents.(string))
 	return pkt
 }
 

@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 )
 
 type SubIn struct {
@@ -9,6 +10,10 @@ type SubIn struct {
 	iptIp InputConn
 	out   OutputConn
 	eipt  InputConn
+}
+
+type SubInSS struct {
+	SubIn
 }
 
 func (subIn *SubIn) Setup(p *Process) {
@@ -20,18 +25,18 @@ func (subIn *SubIn) Setup(p *Process) {
 	subIn.iptIp = p.OpenInPort("NAME")
 }
 
-//func (SubIn) MustRun() {}
-
 func (subIn *SubIn) Execute(p *Process) {
-	//fmt.Println(p.GetName() + " started")
 
 	icpkt := p.Receive(subIn.iptIp)
 	param := icpkt.Contents.(string)
 
 	p.Discard(icpkt)
-	netx, _ := p.network.(*Subnet)
-	mother := netx.Mother
+
+	mother := p.network.mother
 	subIn.eipt = mother.OpenInPort(param)
+	if strings.Index(subIn.eipt.(*InPort).portName, ".") == -1 {
+		subIn.eipt.(*InPort).portName = mother.Name + ":" + subIn.eipt.(*InPort).portName
+	}
 
 	for {
 		//var pkt = mother.Receive(subIn.eipt)
@@ -39,15 +44,48 @@ func (subIn *SubIn) Execute(p *Process) {
 		if pkt == nil {
 			break
 		}
+
 		pkt.owner = p
-
 		fmt.Println(pkt.Contents)
-
 		p.Send(subIn.out, pkt)
 
 	}
 
-	//fmt.Println(p.GetName() + " ended")
+}
+
+func (subIn *SubInSS) Execute(p *Process) {
+
+	icpkt := p.Receive(subIn.iptIp)
+	param := icpkt.Contents.(string)
+
+	p.Discard(icpkt)
+	mother := p.network.mother
+	subIn.eipt = mother.OpenInPort(param)
+	if !strings.Contains(subIn.eipt.(*InPort).portName, ":") {
+		subIn.eipt.(*InPort).portName = mother.Name + ":" + subIn.eipt.(*InPort).portName
+	}
+
+	for {
+		//var pkt = mother.Receive(subIn.eipt)
+		var pkt = subIn.eipt.receive(p)
+		if pkt == nil {
+			break
+		}
+
+		if pkt.pktType == OpenBracket {
+			p.Discard(pkt)
+		} else {
+			if pkt.pktType == CloseBracket {
+				p.Discard(pkt)
+				return
+			}
+
+			pkt.owner = p
+			fmt.Println(pkt.Contents)
+			p.Send(subIn.out, pkt)
+		}
+	}
+
 }
 
 type SubOut struct {
@@ -66,18 +104,19 @@ func (subOut *SubOut) Setup(p *Process) {
 //func (SubOut) MustRun() {}
 
 func (subOut *SubOut) Execute(p *Process) {
-	//fmt.Println(p.GetName() + " started")
 
 	icpkt := p.Receive(subOut.iptIp)
 	param := icpkt.Contents.(string)
 
 	p.Discard(icpkt)
-	netx, _ := p.network.(*Subnet)
-	mother := netx.Mother
+	mother := p.network.mother
 	subOut.eopt = mother.OpenOutPort(param)
+	if !strings.Contains(subOut.eopt.(*OutPort).portName, ":") {
+		subOut.eopt.(*OutPort).portName = mother.Name + ":" + subOut.eopt.(*OutPort).portName
+	}
 
 	for {
-		//var pkt = mother.Receive(subIn.eipt)
+
 		var pkt = subOut.ipt.receive(p)
 		if pkt == nil {
 			break
@@ -85,12 +124,9 @@ func (subOut *SubOut) Execute(p *Process) {
 		pkt.owner = p
 
 		fmt.Println(pkt.Contents)
-		//pkt.owner = mother
 
-		//p.Send(subOut.out, pkt)
 		subOut.eopt.send(p, pkt)
 
 	}
 
-	//fmt.Println(p.GetName() + " ended")
 }

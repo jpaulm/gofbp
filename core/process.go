@@ -14,8 +14,8 @@ import (
 //)
 
 type Process struct {
-	name    string
-	network GenNet
+	Name    string
+	network *Network
 
 	inPorts  map[string]inputCommon
 	outPorts map[string]outputCommon
@@ -45,22 +45,20 @@ const (
 	Terminated
 )
 
-func (p *Process) GetName() string {
-	return p.name
-}
+//func (p *Process) SetName(s string) {
+//	p.Name = s
+//}
 
 func (p *Process) OpenInPort(s string) InputConn {
 	var in InputConn
 	var b bool
 	if len(p.inPorts) == 0 {
-		panic(p.name + ": No input ports specified")
+		panic(p.Name + ": No input ports specified")
 	}
 	in, b = p.inPorts[s].(InputConn)
-	//if in == nil {
-	//	panic(p.name + ": Port name not found (" + s + ")")
-	//}
+
 	if !b {
-		panic(p.name + " " + s + " InPort not connected, or found other type")
+		panic(p.Name + " " + s + " InPort not connected, or found other type")
 	}
 	return in
 }
@@ -69,14 +67,14 @@ func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 	var in *InArrayPort
 	var b bool
 	if len(p.inPorts) == 0 {
-		panic(p.name + ": No input ports specified")
+		panic(p.Name + ": No input ports specified")
 	}
 	in, b = p.inPorts[s].(*InArrayPort)
 	//if in == nil {
-	//	panic(p.name + ": Port name not found (" + s + ")")
+	//	panic(p.Name + ": Port Name not found (" + s + ")")
 	//}
 	if !b {
-		panic(p.name + " " + s + " InArrayPort not connected, or found other type")
+		panic(p.Name + " " + s + " InArrayPort not connected, or found other type")
 	}
 	return in
 }
@@ -85,12 +83,14 @@ func (p *Process) OpenOutPort(s string) OutputConn {
 	var out OutputConn
 	var b bool
 	if len(p.outPorts) == 0 {
-		panic(p.name + " " + s + " OutPort not connected")
+		panic(p.Name + " " + s + " OutPort not connected")
 	} else {
 		out, b = p.outPorts[s].(*OutPort)
 		if !b {
-			panic(p.name + " " + s + " OutPort not connected, or found other type")
+			panic(p.Name + " " + s + " OutPort not connected, or found other type")
 		}
+		out.(*OutPort).portName = s
+		//out.(*OutPort).fullName = p.Name + "." + s
 	}
 
 	return out
@@ -103,19 +103,14 @@ func (p *Process) OpenOutPortOptional(s string) OutputConn {
 	if len(p.outPorts) == 0 {
 		out = new(NullOutPort)
 		p.outPorts[s] = out
-		//out.name = s
-		//out.connected = false
 	} else {
 		out, b = p.outPorts[s].(*OutPort)
-		//if !b {
-		//	panic(p.name + " " + s + " OutPort not connected, or found other type")
-		//}
-
-		if !b {
+		if b {
+			out.(*OutPort).portName = s
+			//out.(*OutPort).fullName = p.Name + "." + s
+		} else {
 			out := new(NullOutPort)
 			p.outPorts[s] = out
-			//out.name = s
-			//out.connected = false
 		}
 	}
 
@@ -130,12 +125,13 @@ func (p *Process) OpenOutArrayPort(s string) *OutArrayPort {
 	if len(p.outPorts) == 0 {
 		out = new(OutArrayPort)
 		p.outPorts[s] = out
-		out.name = s
+		out.portName = s
+		out.fullName = p.Name + "." + s
 		out.connected = false
 	} else {
 		out, b = p.outPorts[s].(*OutArrayPort)
 		if !b {
-			panic(p.name + " " + s + " OutArrayPort not connected, or found other type")
+			panic(p.Name + " " + s + " OutArrayPort not connected, or found other type")
 		}
 	}
 
@@ -177,19 +173,9 @@ func (p *Process) activate() {
 		return
 	}
 
-	netx, b := p.network.(*Network)
-
-	var wg *sync.WaitGroup
-	if b {
-		wg = &netx.wg
-	} else {
-		nets, _ := p.network.(*Subnet)
-		wg = &nets.wg
-	}
-
 	go func() { // Process goroutine
-		defer wg.Done()
-		fmt.Println("Starting goroutine", p.GetName())
+		defer p.network.wg.Done()
+		fmt.Println("Starting goroutine", p.Name)
 		p.Run() //   <-------
 	}()
 }
@@ -230,7 +216,6 @@ func (p *Process) inputState() (bool, bool, bool) {
 		//p.canGo.Wait()
 		WaitTr(p.canGo, "wait in IS", p)
 	}
-
 }
 
 func (p *Process) Run() {
@@ -239,10 +224,10 @@ func (p *Process) Run() {
 
 	//defer UnlockTr(p.canGo, "act L", p)
 	defer atomic.StoreInt32(&p.status, Terminated)
-	defer trace(p.GetName(), " terminated")
-	trace(p.GetName(), " started")
+	defer trace(p, " terminated")
+	trace(p, " started")
 
-	fmt.Println("Goroutine", p.GetName()+":", "no.", getGID())
+	fmt.Println("Goroutine", p.Name+":", "no.", getGID())
 
 	p.component.Setup(p)
 
@@ -257,20 +242,16 @@ func (p *Process) Run() {
 
 		// multiple activations, if necessary!
 
-		//if p.repeat {
-		//	LockTr(p.canGo, "act L", p)
-		//}
-
-		trace(p.GetName(), " activated")
+		trace(p, " activated")
 		atomic.StoreInt32(&p.status, Active)
 
 		p.component.Execute(p) // single "activation"
 
 		atomic.StoreInt32(&p.status, Dormant)
-		trace(p.GetName(), " deactivated")
+		trace(p, " deactivated")
 
 		if p.ownedPkts > 0 {
-			panic(p.name + " deactivated without disposing of all owned packets")
+			panic(p.Name + " deactivated without disposing of all owned packets")
 		}
 
 		if selfStarting {
@@ -287,12 +268,12 @@ func (p *Process) Run() {
 		}
 
 		for _, v := range p.inPorts {
-			v.resetForNextExecution() // resets IIPs
-		}
-		//}
 
-		//UnlockTr(p.canGo, "act L", p)
-		//p.repeat = true
+			_, b := v.(*InitializationConnection)
+			if b {
+				v.resetForNextExecution()
+			}
+		}
 	}
 
 	for _, v := range p.outPorts {

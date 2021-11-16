@@ -6,9 +6,9 @@ import (
 )
 
 type InArrayPort struct {
-	network GenNet
+	network *Network
 
-	//portName string
+	portName string
 	//fullName string
 	array  []*InPort
 	mtx    sync.Mutex
@@ -47,10 +47,6 @@ func (c *InArrayPort) IsClosed() bool {
 }
 
 func (c *InArrayPort) resetForNextExecution() {}
-
-//func (c *InArrayPort) GetType() string {
-//	return "InArrayPort"
-//}
 
 func (c *InArrayPort) GetArrayItem(i int) *InPort {
 	if i >= len(c.array) {

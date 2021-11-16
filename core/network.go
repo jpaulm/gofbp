@@ -8,41 +8,26 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 )
 
 var pStack []*Process
 
 var stkLevel int
+
 var tracing bool
 var tracelocks bool
 
-type GenNet interface {
-	id() string
-	NewConnection(int) *InPort
-	NewInitializationConnection() *InitializationConnection
-	NewInArrayPort() *InArrayPort
-	NewOutArrayPort() *OutArrayPort
-	Connect(*Process, string, *Process, string, int)
-	Initialize(interface{}, *Process, string)
-	Exit()
-	GetProc(string) *Process
-	SetProc(*Process, string)
-	Run()
-}
-
 type Network struct {
-	name  string
-	procs map[string]*Process
-	wg    sync.WaitGroup
+	Name   string
+	procs  map[string]*Process
+	wg     sync.WaitGroup
+	mother *Process
 }
-
-//func (n *Network) GetNetwork() *Network {
-//	return n
-//}
 
 func NewNetwork(name string) *Network {
 	net := &Network{
-		name:  name,
+		Name:  name,
 		procs: make(map[string]*Process),
 		wg:    sync.WaitGroup{},
 	}
@@ -55,16 +40,14 @@ func NewNetwork(name string) *Network {
 	return net
 }
 
-func NewSubnet(name string, p *Process) *Subnet {
-	net := &Subnet{}
-	//stkLevel++
-	//if stkLevel >= len(pStack) {
-	//	pStack = append(pStack, nil)
-	//}
-	net.name = name
-	net.procs = make(map[string]*Process)
-	net.wg = sync.WaitGroup{}
-	net.SetMother(p)
+func NewSubnet(Name string, p *Process) *Network {
+	net := &Network{
+		Name:  Name,
+		procs: make(map[string]*Process),
+		wg:    sync.WaitGroup{},
+	}
+
+	net.mother = p
 	pStack[stkLevel] = p
 	stkLevel++
 	if stkLevel >= len(pStack) {
@@ -72,36 +55,6 @@ func NewSubnet(name string, p *Process) *Subnet {
 	}
 	return net
 }
-
-func LockTr(sc *sync.Cond, s string, p *Process) {
-	sc.L.Lock()
-	if tracelocks {
-		fmt.Println(p.GetName(), s)
-	}
-}
-
-func UnlockTr(sc *sync.Cond, s string, p *Process) {
-	sc.L.Unlock()
-	if tracelocks {
-		fmt.Println(p.GetName(), s)
-	}
-}
-
-func BdcastTr(sc *sync.Cond, s string, p *Process) {
-	sc.Broadcast()
-	if tracelocks {
-		fmt.Println(p.GetName(), s)
-	}
-}
-
-func WaitTr(sc *sync.Cond, s string, p *Process) {
-	sc.Wait()
-	if tracelocks {
-		fmt.Println(p.GetName(), s)
-	}
-}
-
-func (n *Network) id() string { return fmt.Sprintf("%p", n) }
 
 func (n *Network) GetProc(nm string) *Process {
 	return n.procs[nm]
@@ -111,22 +64,54 @@ func (n *Network) SetProc(p *Process, nm string) {
 	n.procs[nm] = p
 }
 
+func LockTr(sc *sync.Cond, s string, p *Process) {
+	sc.L.Lock()
+	if tracelocks && p != nil {
+		fmt.Println(p.Name, s)
+	}
+}
+
+func UnlockTr(sc *sync.Cond, s string, p *Process) {
+	sc.L.Unlock()
+	if tracelocks && p != nil {
+		fmt.Println(p.Name, s)
+	}
+}
+
+func BdcastTr(sc *sync.Cond, s string, p *Process) {
+	sc.Broadcast()
+	if tracelocks && p != nil {
+		fmt.Println(p.Name, s)
+	}
+}
+
+func WaitTr(sc *sync.Cond, s string, p *Process) {
+	sc.Wait()
+	if tracelocks && p != nil {
+		fmt.Println(p.Name, s)
+	}
+}
+
+//func (n *Network) id() string { return fmt.Sprintf("%p", n) }
+
 func (n *Network) NewProc(nm string, comp Component) *Process {
 
 	proc := &Process{
-		name:      nm,
+		Name:      nm,
 		logFile:   "",
 		component: comp,
 		status:    Notstarted,
 		network:   n,
 	}
 
-	//proc.network = n
 	n.SetProc(proc, nm)
 	proc.inPorts = make(map[string]inputCommon)
 	proc.outPorts = make(map[string]outputCommon)
 	proc.mtx = sync.Mutex{}
 	proc.canGo = sync.NewCond(&proc.mtx)
+	if stkLevel > 0 {
+		n.mother = pStack[stkLevel-1]
+	}
 
 	return proc
 }
@@ -181,13 +166,12 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 			p2.inPorts[inPort.name] = anyInConn
 		}
 
-		//anyInConn = anyInConn.(InputArrayConn)
 		connxn = anyInConn.(InputArrayConn).GetArrayItem(inPort.index)
 
 		if connxn == nil {
 			connxn = n.NewConnection(cap)
-			//connxn.portName = inPort.name
-			connxn.name = p2.name + "." + inPort.name + "[" + strconv.Itoa(inPort.index) + "]"
+			connxn.portName = inPort.name + "[" + strconv.Itoa(inPort.index) + "]"
+			//connxn.fullName = p2.Name + "." + inPort.name + "[" + strconv.Itoa(inPort.index) + "]"
 			connxn.downStrProc = p2
 			connxn.network = n
 			if anyInConn == nil {
@@ -199,8 +183,8 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	} else {
 		if p2.inPorts[inPort.name] == nil {
 			connxn = n.NewConnection(cap)
-			//connxn.portName = inPort.name
-			connxn.name = p2.name + "." + inPort.name
+			connxn.portName = inPort.name
+			//connxn.fullName = p2.Name + "." + inPort.name
 			connxn.downStrProc = p2
 			connxn.network = n
 			p2.inPorts[inPort.name] = connxn
@@ -209,7 +193,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		}
 	}
 
-	if inPort.name == "*" {
+	if in == "*" {
 		p2.autoInput = connxn
 	}
 
@@ -229,24 +213,27 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		//opt := new(OutArrayPort)
 		outConn := anyOutConn.(*OutArrayPort)
 		//p1.outPorts[out] = anyOutConn
-		//opt.name = out
+		//opt.Name = out
 		opt = new(OutPort)
 		outConn.SetArrayItem(opt, outPort.index)
-		opt.name = p1.name + "." + out
+		opt.portName = out
+		//opt.fullName = p1.Name + "." + out
 	} else {
 		//var opt OutputConn
 		opt = new(OutPort)
 		p1.outPorts[out] = opt
-		opt.name = p1.name + "." + out
+		opt.network = n
+		opt.portName = out
+		//opt.fullName = p1.Name + "." + out
 
 	}
 
-	opt.SetSender(p1)
+	opt.sender = p1
 	opt.Conn = connxn
 	opt.connected = true
 
 	connxn.incUpstream()
-	if outPort.name == "*" {
+	if out == "*" {
 		p1.autoOutput = connxn
 	}
 }
@@ -278,28 +265,30 @@ func (n *Network) Initialize(initValue interface{}, p2 *Process, in string) {
 
 	conn := n.NewInitializationConnection()
 	p2.inPorts[in] = conn
-	//conn.portName = in
-	conn.fullName = p2.name + "." + in
+	conn.portName = in
+	//conn.fullName = p2.Name + "." + in
 
 	conn.value = initValue
-
 }
+
 func (n *Network) Exit() {
-	if stkLevel != 0 {
-		panic("Exit - stack level incorrect: " + strconv.Itoa(stkLevel))
+	if n.mother == nil {
+		if stkLevel != 0 {
+			panic("Exit - stack level incorrect: " + strconv.Itoa(stkLevel))
+		}
+	} else {
+		stkLevel--
 	}
 }
 
-func trace(s ...string) {
+func trace(p *Process, s ...string) {
 	if tracing {
-		fmt.Print(strings.Trim(fmt.Sprint(s), "[]") + "\n")
+		fmt.Print(p.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
 	}
 }
 
-func (n *Network) Run() {
-
+func setOptions() {
 	var rec string
-
 	f, err := os.Open("params.xml")
 	if err == nil {
 		defer f.Close()
@@ -329,42 +318,118 @@ func (n *Network) Run() {
 			tracelocks = true
 		}
 	}
+}
 
+func (n *Network) Run() {
 	defer n.Exit()
-	defer fmt.Println(n.name + " Done")
-	fmt.Println(n.name + " Starting network")
+	if n.mother == nil {
+		setOptions()
+	}
+	defer fmt.Println(n.Name + " Done")
 
-	// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
-	// reactivated many times during the process "run"
+	for {
+		if n.mother != nil {
+			fmt.Println(n.Name + " Starting subnet activation")
+		} else {
+			fmt.Println(n.Name + " Starting network")
+		}
 
-	n.wg.Add(len(n.procs))
+		// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
+		// reactivated many times during the process "run"
 
-	defer n.wg.Wait()
-	var someProcsCanRun bool = false
-	//time.Sleep(1 * time.Millisecond)
-	for _, proc := range n.procs {
+		n.wg = sync.WaitGroup{}
+		n.wg.Add(len(n.procs))
 
-		selfStarting := true
-		if proc.inPorts != nil {
-			for _, conn := range proc.inPorts {
-				//if conn.GetType() != "InitializationPort" {
-				_, b := conn.(*InitializationConnection)
-				if !b {
-					selfStarting = false
+		//defer n.wg.Wait()
+		var someProcsCanRun bool = false
+		//time.Sleep(1 * time.Millisecond)
+		for _, proc := range n.procs {
+			//proc.status = Notstarted
+			atomic.StoreInt32(&proc.status, Notstarted)
+			selfStarting := true
+			if proc.inPorts != nil {
+				for _, conn := range proc.inPorts {
+
+					_, b := conn.(*InitializationConnection)
+					if !b {
+						selfStarting = false
+					}
+				}
+			}
+
+			if !selfStarting {
+				continue
+			}
+
+			proc.activate()
+			someProcsCanRun = true
+		}
+		if !someProcsCanRun {
+			n.wg.Add(0 - len(n.procs))
+			panic("No process can start")
+		}
+		n.wg.Wait()
+
+		if n.mother == nil {
+			return
+		}
+		fmt.Println(n.Name + " Subnet deactivated")
+
+		for _, p := range n.procs {
+			for _, v := range p.inPorts {
+				_, b := v.(*InArrayPort)
+				if b {
+					for _, w := range v.(*InArrayPort).array {
+						w.resetForNextExecution()
+					}
+				} else {
+					v.resetForNextExecution()
 				}
 			}
 		}
-		if !selfStarting {
-			continue
-		}
+		//stkLevel--
 
-		proc.activate()
-		someProcsCanRun = true
+		p := pStack[stkLevel-1]
+
+		allDrained, _, _ := p.inputState()
+		if allDrained {
+			break
+		}
+		fmt.Println("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
+		fmt.Println(n.Name)
+		for _, p := range n.procs {
+			fmt.Println(p.Name)
+			for _, v := range p.inPorts {
+				_, b := v.(*InArrayPort)
+				if b {
+					for _, w := range v.(*InArrayPort).array {
+						//w.resetForNextExecution()
+						w.upStrmCnt = 0
+					}
+				} else {
+					w, b := v.(*InPort)
+					if b {
+						//w.resetForNextExecution()
+						w.upStrmCnt = 0
+					}
+				}
+			}
+
+			for _, v := range p.outPorts {
+				_, b := v.(*OutArrayPort)
+				if b {
+					for _, w := range v.(*OutArrayPort).array {
+						w.Conn.incUpstream()
+					}
+				} else {
+					w, b := v.(*OutPort)
+					if b {
+						w.Conn.incUpstream()
+					}
+				}
+			}
+		}
 	}
-	if !someProcsCanRun {
-		n.wg.Add(0 - len(n.procs))
-		panic("No process can start")
-	}
-	//}()
-	//n.wg.Wait()
+
+	//stkLevel++
 }

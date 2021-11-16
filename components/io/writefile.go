@@ -22,7 +22,7 @@ func (writeFile *WriteFile) Setup(p *core.Process) {
 func (WriteFile) MustRun() {}
 
 func (writeFile *WriteFile) Execute(p *core.Process) {
-	//fmt.Println(p.GetName() + " started")
+
 	icpkt := p.Receive(writeFile.iptIp)
 	fname := icpkt.Contents.(string)
 	p.Discard(icpkt)
@@ -54,7 +54,6 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 			p.Send(writeFile.opt, pkt)
 		}
 
-		//fmt.Println(p.GetName() + " ended")
 	}
-	fmt.Println(p.GetName()+": File", fname, "written")
+	fmt.Println(p.Name+": File", fname, "written")
 }

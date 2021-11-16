@@ -21,7 +21,7 @@ func (writeToConsole *WriteToConsNL) Setup(p *core.Process) {
 //func (WriteToConsNL) MustRun() {}
 
 func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
-	//fmt.Println(p.GetName() + " activated")
+	
 
 	//for {
 	var pkt = p.Receive(writeToConsole.ipt)
@@ -30,7 +30,7 @@ func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
 		return
 	}
 	fmt.Println(pkt.Contents)
-	//if writeToConsole.opt.GetType() == "OutPort" {
+	
 	if writeToConsole.opt.IsConnected() {
 		p.Send(writeToConsole.opt, pkt)
 	} else {
@@ -38,5 +38,5 @@ func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
 	}
 	//}
 
-	//fmt.Println(p.GetName() + " deactivated")
+	
 }

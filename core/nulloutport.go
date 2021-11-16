@@ -1,7 +1,9 @@
 package core
 
 type NullOutPort struct {
-	sender *Process
+	sender   *Process
+	portName string
+	fullName string
 }
 
 // NullOutPort by default discards the packet.
@@ -15,11 +17,3 @@ func (o *NullOutPort) IsConnected() bool {
 }
 
 func (o *NullOutPort) Close() {}
-
-func (o *NullOutPort) GetSender() *Process {
-	return o.sender
-}
-
-func (o *NullOutPort) SetSender(p *Process) {
-	o.sender = p
-}
