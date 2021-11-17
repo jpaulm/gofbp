@@ -34,7 +34,7 @@ func (subIn *SubIn) Execute(p *Process) {
 
 	mother := p.network.mother
 	subIn.eipt = mother.OpenInPort(param)
-	if strings.Index(subIn.eipt.(*InPort).portName, ".") == -1 {
+	if !strings.Contains(subIn.eipt.(*InPort).portName, ".") {
 		subIn.eipt.(*InPort).portName = mother.Name + ":" + subIn.eipt.(*InPort).portName
 	}
 
@@ -42,6 +42,7 @@ func (subIn *SubIn) Execute(p *Process) {
 		//var pkt = mother.Receive(subIn.eipt)
 		var pkt = subIn.eipt.receive(p)
 		if pkt == nil {
+			trace(p, " Received end of stream")
 			break
 		}
 
@@ -69,17 +70,13 @@ func (subIn *SubInSS) Execute(p *Process) {
 		//var pkt = mother.Receive(subIn.eipt)
 		var pkt = subIn.eipt.receive(p)
 		if pkt == nil {
+			trace(p, " Received end of stream")
 			break
 		}
 
-		if pkt.pktType == OpenBracket {
+		if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
 			p.Discard(pkt)
 		} else {
-			if pkt.pktType == CloseBracket {
-				p.Discard(pkt)
-				return
-			}
-
 			pkt.owner = p
 			fmt.Println(pkt.Contents)
 			p.Send(subIn.out, pkt)
@@ -117,8 +114,9 @@ func (subOut *SubOut) Execute(p *Process) {
 
 	for {
 
-		var pkt = subOut.ipt.receive(p)
+		pkt := subOut.ipt.receive(p)
 		if pkt == nil {
+			trace(p, " Received end of stream")
 			break
 		}
 		pkt.owner = p

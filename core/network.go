@@ -11,9 +11,9 @@ import (
 	"sync/atomic"
 )
 
-var pStack []*Process
+//var pStack []*Process
 
-var stkLevel int
+//var stkLevel int
 
 var tracing bool
 var tracelocks bool
@@ -34,7 +34,7 @@ func NewNetwork(name string) *Network {
 
 	//stkLevel++
 	//if stkLevel >= len(pStack) {
-	pStack = append(pStack, nil)
+	//pStack = append(pStack, nil)
 	//}
 
 	return net
@@ -48,11 +48,12 @@ func NewSubnet(Name string, p *Process) *Network {
 	}
 
 	net.mother = p
-	pStack[stkLevel] = p
-	stkLevel++
-	if stkLevel >= len(pStack) {
-		pStack = append(pStack, nil)
-	}
+	//n.mother = pStack[stkLevel-1]
+	//pStack[stkLevel] = p
+	//stkLevel++
+	//if stkLevel >= len(pStack) {
+	//	pStack = append(pStack, nil)
+	//}
 	return net
 }
 
@@ -109,10 +110,10 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 	proc.outPorts = make(map[string]outputCommon)
 	proc.mtx = sync.Mutex{}
 	proc.canGo = sync.NewCond(&proc.mtx)
-	if stkLevel > 0 {
-		n.mother = pStack[stkLevel-1]
-	}
-
+	//if stkLevel > 0 {
+	//	n.mother = pStack[stkLevel-1]
+	//}
+	proc.gid = getGID()
 	return proc
 }
 
@@ -273,17 +274,21 @@ func (n *Network) Initialize(initValue interface{}, p2 *Process, in string) {
 
 func (n *Network) Exit() {
 	if n.mother == nil {
-		if stkLevel != 0 {
-			panic("Exit - stack level incorrect: " + strconv.Itoa(stkLevel))
-		}
+		traceNet(n, "Exit network")
 	} else {
-		stkLevel--
+		traceNet(n, "Exit subnet")
 	}
 }
 
 func trace(p *Process, s ...string) {
 	if tracing {
 		fmt.Print(p.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
+	}
+}
+
+func traceNet(n *Network, s ...string) {
+	if tracing {
+		fmt.Print(n.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
 	}
 }
 
@@ -342,7 +347,7 @@ func (n *Network) Run() {
 
 		//defer n.wg.Wait()
 		var someProcsCanRun bool = false
-		//time.Sleep(1 * time.Millisecond)
+
 		for _, proc := range n.procs {
 			//proc.status = Notstarted
 			atomic.StoreInt32(&proc.status, Notstarted)
@@ -373,7 +378,8 @@ func (n *Network) Run() {
 		if n.mother == nil {
 			return
 		}
-		fmt.Println(n.Name + " Subnet deactivated")
+
+		fmt.Println(n.Name + " subnet deactivated")
 
 		for _, p := range n.procs {
 			for _, v := range p.inPorts {
@@ -389,7 +395,13 @@ func (n *Network) Run() {
 		}
 		//stkLevel--
 
-		p := pStack[stkLevel-1]
+		//p := pStack[stkLevel-1]
+		var p *Process
+		if n.mother != nil {
+			p = n.mother
+		} else {
+			break
+		}
 
 		allDrained, _, _ := p.inputState()
 		if allDrained {
@@ -398,7 +410,7 @@ func (n *Network) Run() {
 		fmt.Println("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
 		fmt.Println(n.Name)
 		for _, p := range n.procs {
-			fmt.Println(p.Name)
+			fmt.Println(" ", p.Name)
 			for _, v := range p.inPorts {
 				_, b := v.(*InArrayPort)
 				if b {

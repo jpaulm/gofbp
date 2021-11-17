@@ -14,26 +14,21 @@ import (
 //)
 
 type Process struct {
+	gid     uint64
 	Name    string
 	network *Network
 
 	inPorts  map[string]inputCommon
 	outPorts map[string]outputCommon
 
-	logFile   string
-	component Component
-	ownedPkts int
-	//done         bool
-	//selfStarting bool // process has no non-IIP input ports
-	//MustRun   bool
+	logFile    string
+	component  Component
+	ownedPkts  int
 	status     int32
 	mtx        sync.Mutex
 	canGo      *sync.Cond
 	autoInput  inputCommon
 	autoOutput inputCommon
-	//allDrained bool
-	//hasData    bool
-	//repeat     bool
 }
 
 const (
@@ -44,10 +39,6 @@ const (
 	SuspRecv
 	Terminated
 )
-
-//func (p *Process) SetName(s string) {
-//	p.Name = s
-//}
 
 func (p *Process) OpenInPort(s string) InputConn {
 	var in InputConn
@@ -303,7 +294,7 @@ func (p *Process) Create(x interface{}) *Packet {
 func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 	var pkt *Packet = new(Packet)
 	pkt.Contents = s
-	pkt.pktType = pktType
+	pkt.PktType = pktType
 	pkt.owner = p
 	p.ownedPkts++
 	return pkt

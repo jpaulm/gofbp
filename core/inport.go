@@ -42,9 +42,9 @@ func (c *InPort) receive(p *Process) *Packet {
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
-	if pkt.pktType != Normal {
+	if pkt.PktType != Normal {
 		trace(p, " Received from "+c.portName+" <", pkt.Contents.(string),
-			[...]string{"", "Open", "Close"}[pkt.pktType])
+			[...]string{"", "Open", "Close"}[pkt.PktType])
 	} else {
 		trace(p, " Received from "+c.portName+" <", pkt.Contents.(string))
 	}

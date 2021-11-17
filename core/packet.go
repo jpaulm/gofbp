@@ -8,6 +8,6 @@ const (
 
 type Packet struct {
 	Contents interface{}
-	pktType  int32
+	PktType  int32
 	owner    *Process
 }

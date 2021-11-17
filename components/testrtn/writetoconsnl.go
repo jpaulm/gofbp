@@ -6,7 +6,7 @@ import (
 	"github.com/jpaulm/gofbp/core"
 )
 
-// WriteToConsole modifieed to be a non-looper (NL)
+// WriteToConsole modified to be a non-looper (NL)
 
 type WriteToConsNL struct {
 	ipt core.InputConn
@@ -21,7 +21,6 @@ func (writeToConsole *WriteToConsNL) Setup(p *core.Process) {
 //func (WriteToConsNL) MustRun() {}
 
 func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
-	
 
 	//for {
 	var pkt = p.Receive(writeToConsole.ipt)
@@ -29,8 +28,16 @@ func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
 		//break
 		return
 	}
-	fmt.Println(pkt.Contents)
-	
+	if pkt.PktType == core.OpenBracket {
+		fmt.Println("Open", pkt.Contents)
+	} else {
+		if pkt.PktType == core.CloseBracket {
+			fmt.Println("Close", pkt.Contents)
+		} else {
+			fmt.Println(pkt.Contents)
+		}
+	}
+
 	if writeToConsole.opt.IsConnected() {
 		p.Send(writeToConsole.opt, pkt)
 	} else {
@@ -38,5 +45,4 @@ func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
 	}
 	//}
 
-	
 }

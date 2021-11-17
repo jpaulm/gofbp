@@ -28,9 +28,9 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	LockTr(o.Conn.condNF, "send L", p)
 	defer UnlockTr(o.Conn.condNF, "send U", p)
 
-	if pkt.pktType != Normal {
+	if pkt.PktType != Normal {
 		trace(p, " Sending to "+o.portName+" >", pkt.Contents.(string),
-			[...]string{"", "Open", "Close"}[pkt.pktType])
+			[...]string{"", "Open", "Close"}[pkt.PktType])
 	} else {
 		trace(p, " Sending to "+o.portName+" >", pkt.Contents.(string))
 	}
@@ -77,7 +77,7 @@ func (o *OutPort) ArrayLength() int {
 func (o *OutPort) Close() {
 	LockTr(o.Conn.condNF, "close L", o.sender)
 	defer UnlockTr(o.Conn.condNF, "close U", o.sender)
-
+	trace(o.sender, " Close "+o.portName)
 	//o.Conn.upStrmCnt--
 	o.Conn.decUpstream()
 	if o.Conn.upStrmCnt == 0 {
