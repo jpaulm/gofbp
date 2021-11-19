@@ -35,8 +35,11 @@ An XML file has been provided in the root, called `params.xml`.  So far there is
 &lt;tracelocks&gt;true|false&lt;/tracelocks&gt;
 </pre>
 
+## Subnets
+These are described in Chap. 7 in "Flow-Based Programming": Composite Components - https://jpaulmorrison.com/fbp/compos.shtml , although we haven't implemented dynamic subnets (yet)!
+
 ## Test Cases
-The following test cases are now working - thanks to Egon Elbre for all his help!
+The following test cases are now working - thanks to Egon Elbre and Emil Valeev for all their help!
 
 - 2 Senders, one Receiver - merging first come, first served
 
@@ -66,7 +69,9 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 - `go test -run ForceDeadlock -count=1`
 - `go test -run InfQueueAsMain -count=1` (note the "automatic" ports between WriteFile and ReadFile)
-- `go test -run Subnet -count=1` 
+- `go test -run Subnet1 -count=1` 
+- `go test -run Subnet2 -count=1` 
+- `go test -run Subnet3 -count=1` 
 
 
 **Note**: ForceDeadlock is constructed differently so that it can "crash" without disrupting the flow of tests: the network definition has to be compiled "on the fly", so it is actually in `testdata`, while the test itself contains the code to compile and run the test.
@@ -118,6 +123,8 @@ The following components are available:
 
 "subnets" folder:
 - subnet1.go   (this is a subnet, i.e. a "network" with "sticky" connections - this can be treated as a component)
+- sssubnet1.go   (this is similar to subnet1.go, but with a substream-sensitive front-end, and a substream delimiter generating back-end)
+- sssubnet2.go   (this is the same as sssubnet1, but with a counter generating its output)
 
 "io" folder:
 - readfile.go
