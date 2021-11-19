@@ -134,7 +134,7 @@ The following components are available:
 
 - More and better documentation
 - Convert `panic`s to more standard Go error handling
-- Way too much logging - have to make that optional - issue raised for this... - *done!*
+- Way too much logging - have to make that optional - put remaining logging under switch control
 - Add subnet handling - *done!*
 - Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp
 - Add Load Balancing component
