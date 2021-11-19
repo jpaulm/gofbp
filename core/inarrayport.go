@@ -9,7 +9,7 @@ type InArrayPort struct {
 	network *Network
 
 	portName string
-	//fullName string
+	fullName string
 	array  []*InPort
 	mtx    sync.Mutex
 	closed bool

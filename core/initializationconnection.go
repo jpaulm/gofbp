@@ -8,7 +8,7 @@ import (
 type InitializationConnection struct {
 	network  *Network
 	portName string
-	//fullName string
+	fullName string
 	closed bool
 	value  interface{}
 	mtx    sync.Mutex

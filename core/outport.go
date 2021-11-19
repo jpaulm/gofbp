@@ -6,7 +6,7 @@ import (
 
 type OutPort struct {
 	portName string
-	//fullName  string
+	fullName  string
 	Conn      *InPort
 	connected bool
 	sender    *Process
@@ -38,14 +38,11 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	o.Conn.downStrProc.activate()
 	//o.Conn.downStrProc.canGo.Broadcast()
 
-	for o.Conn.isFull() { // InPort is full
+	for o.Conn.isFull() { // while connection is full
 		atomic.StoreInt32(&p.status, SuspSend)
-		//o.Conn.condNF.Wait()
 		WaitTr(o.Conn.condNF, "wait in send", p)
 		atomic.StoreInt32(&p.status, Active)
 	}
-
-	BdcastTr(o.Conn.condNE, "bdcast out", p)
 
 	trace(p, " Sent to "+o.portName)
 
@@ -54,6 +51,7 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	//pkt.owner = nil
 	p.ownedPkts--
 	pkt = nil
+	BdcastTr(o.Conn.condNE, "bdcast sent", p)
 	return true
 }
 
@@ -78,14 +76,11 @@ func (o *OutPort) Close() {
 	LockTr(o.Conn.condNF, "close L", o.sender)
 	defer UnlockTr(o.Conn.condNF, "close U", o.sender)
 	trace(o.sender, " Close "+o.portName)
-	//o.Conn.upStrmCnt--
+
 	o.Conn.decUpstream()
 	if o.Conn.upStrmCnt == 0 {
 		o.Conn.closed = true
-		//o.Conn.condNE.Broadcast()
 		BdcastTr(o.Conn.condNE, "bdcast out", o.sender)
 		o.Conn.downStrProc.activate()
-		//o.Conn.downStrProc.canGo.Signal()
-
 	}
 }

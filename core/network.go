@@ -21,6 +21,7 @@ var tracelocks bool
 type Network struct {
 	Name   string
 	procs  map[string]*Process
+	conns  map[string]inputCommon
 	wg     sync.WaitGroup
 	mother *Process
 }
@@ -29,6 +30,7 @@ func NewNetwork(name string) *Network {
 	net := &Network{
 		Name:  name,
 		procs: make(map[string]*Process),
+		conns: make(map[string]inputCommon),
 		wg:    sync.WaitGroup{},
 	}
 
@@ -44,16 +46,11 @@ func NewSubnet(Name string, p *Process) *Network {
 	net := &Network{
 		Name:  Name,
 		procs: make(map[string]*Process),
+		conns: make(map[string]inputCommon),
 		wg:    sync.WaitGroup{},
 	}
 
 	net.mother = p
-	//n.mother = pStack[stkLevel-1]
-	//pStack[stkLevel] = p
-	//stkLevel++
-	//if stkLevel >= len(pStack) {
-	//	pStack = append(pStack, nil)
-	//}
 	return net
 }
 
@@ -66,10 +63,10 @@ func (n *Network) SetProc(p *Process, nm string) {
 }
 
 func LockTr(sc *sync.Cond, s string, p *Process) {
-	sc.L.Lock()
 	if tracelocks && p != nil {
 		fmt.Println(p.Name, s)
 	}
+	sc.L.Lock()
 }
 
 func UnlockTr(sc *sync.Cond, s string, p *Process) {
@@ -87,9 +84,21 @@ func BdcastTr(sc *sync.Cond, s string, p *Process) {
 }
 
 func WaitTr(sc *sync.Cond, s string, p *Process) {
-	sc.Wait()
 	if tracelocks && p != nil {
 		fmt.Println(p.Name, s)
+	}
+	sc.Wait()
+}
+
+func trace(p *Process, s ...string) {
+	if tracing {
+		fmt.Print(p.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
+	}
+}
+
+func traceNet(n *Network, s ...string) {
+	if tracing {
+		fmt.Print(n.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
 	}
 }
 
@@ -172,7 +181,8 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		if connxn == nil {
 			connxn = n.NewConnection(cap)
 			connxn.portName = inPort.name + "[" + strconv.Itoa(inPort.index) + "]"
-			//connxn.fullName = p2.Name + "." + inPort.name + "[" + strconv.Itoa(inPort.index) + "]"
+			connxn.fullName = p2.Name + "." + connxn.portName
+			n.conns[connxn.fullName] = connxn
 			connxn.downStrProc = p2
 			connxn.network = n
 			if anyInConn == nil {
@@ -185,7 +195,8 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		if p2.inPorts[inPort.name] == nil {
 			connxn = n.NewConnection(cap)
 			connxn.portName = inPort.name
-			//connxn.fullName = p2.Name + "." + inPort.name
+			connxn.fullName = p2.Name + "." + inPort.name
+			n.conns[connxn.fullName] = connxn
 			connxn.downStrProc = p2
 			connxn.network = n
 			p2.inPorts[inPort.name] = connxn
@@ -218,14 +229,16 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		opt = new(OutPort)
 		outConn.SetArrayItem(opt, outPort.index)
 		opt.portName = out
-		//opt.fullName = p1.Name + "." + out
+		opt.fullName = p1.Name + "." + out
+		n.conns[opt.fullName] = opt.Conn
 	} else {
 		//var opt OutputConn
 		opt = new(OutPort)
 		p1.outPorts[out] = opt
 		opt.network = n
 		opt.portName = out
-		//opt.fullName = p1.Name + "." + out
+		opt.fullName = p1.Name + "." + out
+		n.conns[opt.fullName] = opt.Conn
 
 	}
 
@@ -267,7 +280,8 @@ func (n *Network) Initialize(initValue interface{}, p2 *Process, in string) {
 	conn := n.NewInitializationConnection()
 	p2.inPorts[in] = conn
 	conn.portName = in
-	//conn.fullName = p2.Name + "." + in
+	conn.fullName = p2.Name + "." + in
+	n.conns[conn.fullName] = conn
 
 	conn.value = initValue
 }
@@ -277,18 +291,6 @@ func (n *Network) Exit() {
 		traceNet(n, "Exit network")
 	} else {
 		traceNet(n, "Exit subnet")
-	}
-}
-
-func trace(p *Process, s ...string) {
-	if tracing {
-		fmt.Print(p.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
-	}
-}
-
-func traceNet(n *Network, s ...string) {
-	if tracing {
-		fmt.Print(n.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
 	}
 }
 
@@ -393,9 +395,7 @@ func (n *Network) Run() {
 				}
 			}
 		}
-		//stkLevel--
 
-		//p := pStack[stkLevel-1]
 		var p *Process
 		if n.mother != nil {
 			p = n.mother
@@ -407,26 +407,18 @@ func (n *Network) Run() {
 		if allDrained {
 			break
 		}
-		fmt.Println("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
-		fmt.Println(n.Name)
-		for _, p := range n.procs {
-			fmt.Println(" ", p.Name)
-			for _, v := range p.inPorts {
-				_, b := v.(*InArrayPort)
-				if b {
-					for _, w := range v.(*InArrayPort).array {
-						//w.resetForNextExecution()
-						w.upStrmCnt = 0
-					}
-				} else {
-					w, b := v.(*InPort)
-					if b {
-						//w.resetForNextExecution()
-						w.upStrmCnt = 0
-					}
-				}
-			}
 
+		for _, c := range n.conns {
+			ci, b := c.(*InPort)
+			if b {
+				ci.mtx.Lock()
+				ci.upStrmCnt = 0
+				//c.resetForNextExecution()
+				ci.mtx.Unlock()
+			}
+		}
+
+		for _, p := range n.procs {
 			for _, v := range p.outPorts {
 				_, b := v.(*OutArrayPort)
 				if b {
@@ -442,6 +434,4 @@ func (n *Network) Run() {
 			}
 		}
 	}
-
-	//stkLevel++
 }

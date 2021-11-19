@@ -81,7 +81,8 @@ func (p *Process) OpenOutPort(s string) OutputConn {
 			panic(p.Name + " " + s + " OutPort not connected, or found other type")
 		}
 		out.(*OutPort).portName = s
-		//out.(*OutPort).fullName = p.Name + "." + s
+		out.(*OutPort).fullName = p.Name + "." + s
+		p.network.conns[out.(*OutPort).fullName] = out.(*OutPort).Conn
 	}
 
 	return out
@@ -98,7 +99,8 @@ func (p *Process) OpenOutPortOptional(s string) OutputConn {
 		out, b = p.outPorts[s].(*OutPort)
 		if b {
 			out.(*OutPort).portName = s
-			//out.(*OutPort).fullName = p.Name + "." + s
+			out.(*OutPort).fullName = p.Name + "." + s
+			p.network.conns[out.(*OutPort).fullName] = out.(*OutPort).Conn
 		} else {
 			out := new(NullOutPort)
 			p.outPorts[s] = out
@@ -156,11 +158,12 @@ func (p *Process) activate() {
 	//defer UnlockTr(p.canGo, "act L", p)
 
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
+		if atomic.CompareAndSwapInt32(&p.status, Dormant, Active) {
 
-		//LockTr(p.canGo, "act L", p)
-		BdcastTr(p.canGo, "bdcast IS", p)
-		//UnlockTr(p.canGo, "act U", p)
-
+			//LockTr(p.canGo, "act L", p)
+			BdcastTr(p.canGo, "bdcast act", p)
+			//UnlockTr(p.canGo, "act U", p)
+		}
 		return
 	}
 

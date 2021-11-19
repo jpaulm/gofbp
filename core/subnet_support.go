@@ -1,7 +1,7 @@
 package core
 
 import (
-	"fmt"
+	//"fmt"
 	"strings"
 )
 
@@ -42,12 +42,12 @@ func (subIn *SubIn) Execute(p *Process) {
 		//var pkt = mother.Receive(subIn.eipt)
 		var pkt = subIn.eipt.receive(p)
 		if pkt == nil {
-			trace(p, " Received end of stream")
+			//trace(p, " Received end of stream")
 			break
 		}
 
 		pkt.owner = p
-		fmt.Println(pkt.Contents)
+		//fmt.Println(pkt.Contents)
 		p.Send(subIn.out, pkt)
 
 	}
@@ -70,25 +70,34 @@ func (subIn *SubInSS) Execute(p *Process) {
 		//var pkt = mother.Receive(subIn.eipt)
 		var pkt = subIn.eipt.receive(p)
 		if pkt == nil {
-			trace(p, " Received end of stream")
+			//trace(p, " Received end of stream")
 			break
 		}
 
-		if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
+		if pkt.PktType == OpenBracket {
 			p.Discard(pkt)
 		} else {
-			pkt.owner = p
-			fmt.Println(pkt.Contents)
-			p.Send(subIn.out, pkt)
+			if pkt.PktType != CloseBracket {
+				pkt.owner = p
+				//fmt.Println(pkt.Contents)
+				p.Send(subIn.out, pkt)
+			} else {
+				p.Discard(pkt)
+				//subIn.out.Close()
+				return
+			}
 		}
 	}
-
 }
 
 type SubOut struct {
 	ipt   InputConn
 	iptIp InputConn
 	eopt  OutputConn
+}
+
+type SubOutSS struct {
+	SubOut
 }
 
 func (subOut *SubOut) Setup(p *Process) {
@@ -116,15 +125,44 @@ func (subOut *SubOut) Execute(p *Process) {
 
 		pkt := subOut.ipt.receive(p)
 		if pkt == nil {
-			trace(p, " Received end of stream")
+			//trace(p, " Received end of stream")
 			break
 		}
 		pkt.owner = p
 
-		fmt.Println(pkt.Contents)
+		//fmt.Println(pkt.Contents)
+
+		subOut.eopt.send(p, pkt)
+	}
+}
+func (subOut *SubOutSS) Execute(p *Process) {
+
+	icpkt := p.Receive(subOut.iptIp)
+	param := icpkt.Contents.(string)
+
+	p.Discard(icpkt)
+	mother := p.network.mother
+	subOut.eopt = mother.OpenOutPort(param)
+	if !strings.Contains(subOut.eopt.(*OutPort).portName, ":") {
+		subOut.eopt.(*OutPort).portName = mother.Name + ":" + subOut.eopt.(*OutPort).portName
+	}
+
+	pkt := p.CreateBracket(OpenBracket, "")
+	subOut.eopt.send(p, pkt)
+
+	for {
+		pkt = subOut.ipt.receive(p)
+		if pkt == nil {
+			//trace(p, " Received end of stream")
+			break
+		}
+		pkt.owner = p
+
+		//fmt.Println(pkt.Contents)
 
 		subOut.eopt.send(p, pkt)
 
 	}
-
+	pkt = p.CreateBracket(CloseBracket, "")
+	subOut.eopt.send(p, pkt)
 }

@@ -18,7 +18,7 @@ func (sender *SubstreamSender) Setup(p *core.Process) {
 }
 
 func (sender *SubstreamSender) Execute(p *core.Process) {
-	
+
 	icpkt := p.Receive(sender.ipt)
 	j, _ := strconv.Atoi(icpkt.Contents.(string))
 	p.Discard(icpkt)
@@ -29,14 +29,8 @@ func (sender *SubstreamSender) Execute(p *core.Process) {
 	p.Send(sender.opt, pkt)
 
 	for i := 0; i < j; i++ {
-		k := i % 9
-		if k == 2 {
-			pkt = p.CreateBracket(core.CloseBracket, "")
-			p.Send(sender.opt, pkt)
-			pkt = p.CreateBracket(core.OpenBracket, "")
-			p.Send(sender.opt, pkt)
-		}
-		if k == 7 {
+		k := i % 10
+		if k == 2 || k == 7 || k == 0 {
 			pkt = p.CreateBracket(core.CloseBracket, "")
 			p.Send(sender.opt, pkt)
 			pkt = p.CreateBracket(core.OpenBracket, "")
@@ -49,5 +43,4 @@ func (sender *SubstreamSender) Execute(p *core.Process) {
 	pkt = p.CreateBracket(core.CloseBracket, "")
 	p.Send(sender.opt, pkt)
 
-	
 }

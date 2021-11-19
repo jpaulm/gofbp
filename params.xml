@@ -1,5 +1,5 @@
 <?xml version="1.0"?> 
 <runparams>
-<tracing>true</tracing>
+<tracing>false</tracing>
 <tracelocks>false</tracelocks>
 </runparams>

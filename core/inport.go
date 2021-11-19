@@ -16,27 +16,20 @@ type InPort struct {
 	closed    bool
 	upStrmCnt int
 	portName  string
-	//fullName  string
-	//array       []*InPort
+	fullName  string
 	downStrProc *Process
 }
 
 func (c *InPort) receive(p *Process) *Packet {
 	LockTr(c.condNE, "recv L", p)
 	defer UnlockTr(c.condNE, "recv U", p)
-	if c.isDrained() {
-		return nil
-	}
 	trace(p, " Receiving from "+c.portName)
 	for c.isEmpty() { // InPort is empty
 		if c.closed {
-			//c.condNF.Broadcast()
-			BdcastTr(c.condNF, "bdcast in NF cl", p)
 			trace(p, " Received end of stream from "+c.portName)
 			return nil
 		}
 		atomic.StoreInt32(&p.status, SuspRecv)
-		//c.condNE.Wait()
 		WaitTr(c.condNE, "wait in recv", p)
 		atomic.StoreInt32(&p.status, Active)
 	}
@@ -52,7 +45,7 @@ func (c *InPort) receive(p *Process) *Packet {
 	pkt.owner = p
 	p.ownedPkts++
 	//c.condNF.Broadcast()
-	BdcastTr(c.condNF, "bdcast in NF", p)
+	BdcastTr(c.condNF, "bdcast recv'd", p)
 
 	return pkt
 }
@@ -65,7 +58,7 @@ func (c *InPort) incUpstream() {
 }
 
 func (c *InPort) decUpstream() {
-	//LockTr(c.condNE, "DUS L", nil) // sender is one of senders
+	//LockTr(c.condNE, "DUS L", nil)
 	//defer UnlockTr(c.condNE, "DUS U", nil)
 	c.upStrmCnt--
 }
