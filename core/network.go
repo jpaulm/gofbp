@@ -17,6 +17,7 @@ import (
 
 var tracing bool
 var tracelocks bool
+var generate_gids bool
 
 type Network struct {
 	Name   string
@@ -315,14 +316,21 @@ func setOptions() {
 			}
 		}
 
-		i := strings.Index(rec, "<tracing>")
-		if i > -1 && rec[i+9:i+13] == "true" {
+		s := "<tracing>"
+		i := strings.Index(rec, s)
+		if i > -1 && rec[i+len(s):i+len(s)+4] == "true" {
 			tracing = true
 		}
-
-		i = strings.Index(rec, "<tracelocks>")
-		if i > -1 && rec[i+12:i+16] == "true" {
+		s = "<tracelocks>"
+		i = strings.Index(rec, s)
+		if i > -1 && rec[i+len(s):i+len(s)+4] == "true" {
 			tracelocks = true
+		}
+
+		s = "<generate-gIds>"
+		i = strings.Index(rec, s)
+		if i > -1 && rec[i+len(s):i+len(s)+4] == "true" {
+			generate_gids = true
 		}
 	}
 }
@@ -332,13 +340,13 @@ func (n *Network) Run() {
 	if n.mother == nil {
 		setOptions()
 	}
-	defer fmt.Println(n.Name + " Done")
+	traceNet(n, " Done")
 
 	for {
 		if n.mother != nil {
-			fmt.Println(n.Name + " Starting subnet activation")
+			traceNet(n, " Starting subnet activation")
 		} else {
-			fmt.Println(n.Name + " Starting network")
+			traceNet(n, " Starting network")
 		}
 
 		// FBP distinguishes between execution of the process as a whole and activating the code - the code may be deactivated and then
@@ -381,7 +389,7 @@ func (n *Network) Run() {
 			return
 		}
 
-		fmt.Println(n.Name + " subnet deactivated")
+		traceNet(n, " subnet deactivated")
 
 		for _, p := range n.procs {
 			for _, v := range p.inPorts {
@@ -434,4 +442,22 @@ func (n *Network) Run() {
 			}
 		}
 	}
+
+	if n.mother != nil {
+		p := n.mother
+		for _, v := range p.outPorts {
+			_, b := v.(*OutArrayPort)
+			if b {
+				for _, w := range v.(*OutArrayPort).array {
+					w.Close()
+				}
+			} else {
+				w, b := v.(*OutPort)
+				if b {
+					w.Close()
+				}
+			}
+		}
+	}
+
 }

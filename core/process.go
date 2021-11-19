@@ -154,30 +154,27 @@ func (p *Process) activate() {
 	// This function starts a goroutine if it is not started, and signal if not
 	//
 
-	//LockTr(p.canGo, "act L", p)
-	//defer UnlockTr(p.canGo, "act L", p)
-
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		if atomic.CompareAndSwapInt32(&p.status, Dormant, Active) {
 
-			//LockTr(p.canGo, "act L", p)
 			BdcastTr(p.canGo, "bdcast act", p)
-			//UnlockTr(p.canGo, "act U", p)
 		}
 		return
 	}
 
 	go func() { // Process goroutine
 		defer p.network.wg.Done()
-		fmt.Println("Starting goroutine", p.Name)
+		if tracing {
+			fmt.Println("Starting goroutine", p.Name)
+		}
 		p.Run() //   <-------
 	}()
 }
 
 func (p *Process) inputState() (bool, bool, bool) {
 
-	//LockTr(p.canGo, "IS L", p)
-	//defer UnlockTr(p.canGo, "IS U", p)
+	LockTr(p.canGo, "IS L", p)
+	defer UnlockTr(p.canGo, "IS U", p)
 
 	allDrained := true
 	hasData := false
@@ -205,23 +202,20 @@ func (p *Process) inputState() (bool, bool, bool) {
 		if allDrained || hasData || selfStarting {
 			return allDrained, hasData, selfStarting
 		}
-
-		//fmt.Println("waiting for more data on canGo")
-		//p.canGo.Wait()
+		atomic.StoreInt32(&p.status, Dormant)
 		WaitTr(p.canGo, "wait in IS", p)
+		atomic.StoreInt32(&p.status, Active)
 	}
 }
 
 func (p *Process) Run() {
 
-	//var autoStarting bool
-
-	//defer UnlockTr(p.canGo, "act L", p)
 	defer atomic.StoreInt32(&p.status, Terminated)
 	defer trace(p, " terminated")
 	trace(p, " started")
-
-	fmt.Println("Goroutine", p.Name+":", "no.", getGID())
+	if generate_gids {
+		fmt.Println("Goroutine", p.Name+":", "no.", getGID())
+	}
 
 	p.component.Setup(p)
 
