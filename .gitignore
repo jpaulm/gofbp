@@ -1,5 +1,3 @@
 *.tmp
 qs_*.*
 bak
-/bin
-!/bin/analyze_deadlock.exe

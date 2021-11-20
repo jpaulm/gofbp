@@ -316,10 +316,10 @@ func setOptions() {
 			}
 		}
 
-		s := "<tracelocks>"
+		s := "<tracing>"
 		i := strings.Index(rec, s)
 		if i > -1 && rec[i+len(s):i+len(s)+4] == "true" {
-			tracelocks = true
+			tracing = true
 		}
 
 		s = "<tracelocks>"
@@ -341,6 +341,7 @@ func (n *Network) Run() {
 	if n.mother == nil {
 		setOptions()
 	}
+
 	defer traceNet(n, " Done")
 
 	for {
@@ -460,6 +461,7 @@ func (n *Network) Run() {
 			}
 		}
 	}
+
 	if n.mother != nil {
 		p := n.mother
 		for _, v := range p.outPorts {

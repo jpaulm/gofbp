@@ -16,7 +16,7 @@ func (subnet *SSSubnet1) Execute(p *core.Process) {
 
 	proc2 := net.NewProc("WriteToConsole1", &testrtn.WriteToConsole{})
 
-	proc3 := net.NewProc("SubOut", &core.SubOutSS{}) // Substream-Generating SubOut
+	proc3 := net.NewProc("SubOutSS", &core.SubOutSS{}) // Substream-delimiter-Generating SubOut
 
 	net.Initialize("IN", proc1, "NAME")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)

@@ -150,15 +150,10 @@ func (p *Process) activate() {
 	// This function starts a goroutine if it is not started, and signal if not
 	//
 
-	//LockTr(p.canGo, "act L", p)
-	//defer UnlockTr(p.canGo, "act L", p)
-
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		if atomic.CompareAndSwapInt32(&p.status, Dormant, Active) {
 
-			//LockTr(p.canGo, "act L", p)
 			BdcastTr(p.canGo, "bdcast act", p)
-			//UnlockTr(p.canGo, "act U", p)
 		}
 		return
 	}
@@ -212,9 +207,6 @@ func (p *Process) inputState() (bool, bool, bool) {
 
 func (p *Process) Run() {
 
-	//var autoStarting bool
-
-	//defer UnlockTr(p.canGo, "act L", p)
 	defer atomic.StoreInt32(&p.status, Terminated)
 	defer trace(p, " terminated")
 	trace(p, " started")
