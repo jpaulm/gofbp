@@ -78,7 +78,7 @@ func (p *Process) OpenOutPort(s string) OutputConn {
 		}
 		out.(*OutPort).portName = s
 		out.(*OutPort).fullName = p.Name + "." + s
-		p.network.conns[out.(*OutPort).fullName] = out.(*OutPort).Conn
+		//p.network.conns[out.(*OutPort).fullName] = out.(*OutPort).Conn
 	}
 
 	return out
@@ -96,7 +96,7 @@ func (p *Process) OpenOutPortOptional(s string) OutputConn {
 		if b {
 			out.(*OutPort).portName = s
 			out.(*OutPort).fullName = p.Name + "." + s
-			p.network.conns[out.(*OutPort).fullName] = out.(*OutPort).Conn
+			//p.network.conns[out.(*OutPort).fullName] = out.(*OutPort).Conn
 		} else {
 			out := new(NullOutPort)
 			p.outPorts[s] = out

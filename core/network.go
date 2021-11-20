@@ -20,9 +20,9 @@ var tracelocks bool
 var generate_gids bool
 
 type Network struct {
-	Name   string
-	procs  map[string]*Process
-	conns  map[string]inputCommon
+	Name  string
+	procs map[string]*Process
+	//conns  map[string]inputCommon
 	wg     sync.WaitGroup
 	mother *Process
 }
@@ -31,8 +31,8 @@ func NewNetwork(name string) *Network {
 	net := &Network{
 		Name:  name,
 		procs: make(map[string]*Process),
-		conns: make(map[string]inputCommon),
-		wg:    sync.WaitGroup{},
+		//conns: make(map[string]inputCommon),
+		wg: sync.WaitGroup{},
 	}
 
 	//stkLevel++
@@ -47,8 +47,8 @@ func NewSubnet(Name string, p *Process) *Network {
 	net := &Network{
 		Name:  Name,
 		procs: make(map[string]*Process),
-		conns: make(map[string]inputCommon),
-		wg:    sync.WaitGroup{},
+		//conns: make(map[string]inputCommon),
+		wg: sync.WaitGroup{},
 	}
 
 	net.mother = p
@@ -183,7 +183,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 			connxn = n.NewConnection(cap)
 			connxn.portName = inPort.name + "[" + strconv.Itoa(inPort.index) + "]"
 			connxn.fullName = p2.Name + "." + connxn.portName
-			n.conns[connxn.fullName] = connxn
+			//n.conns[connxn.fullName] = connxn
 			connxn.downStrProc = p2
 			connxn.network = n
 			if anyInConn == nil {
@@ -197,7 +197,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 			connxn = n.NewConnection(cap)
 			connxn.portName = inPort.name
 			connxn.fullName = p2.Name + "." + inPort.name
-			n.conns[connxn.fullName] = connxn
+			//n.conns[connxn.fullName] = connxn
 			connxn.downStrProc = p2
 			connxn.network = n
 			p2.inPorts[inPort.name] = connxn
@@ -231,7 +231,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		outConn.SetArrayItem(opt, outPort.index)
 		opt.portName = out
 		opt.fullName = p1.Name + "." + out
-		n.conns[opt.fullName] = opt.Conn
+		//n.conns[opt.fullName] = opt.Conn
 	} else {
 		//var opt OutputConn
 		opt = new(OutPort)
@@ -239,7 +239,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		opt.network = n
 		opt.portName = out
 		opt.fullName = p1.Name + "." + out
-		n.conns[opt.fullName] = opt.Conn
+		//n.conns[opt.fullName] = opt.Conn
 
 	}
 
@@ -282,7 +282,7 @@ func (n *Network) Initialize(initValue interface{}, p2 *Process, in string) {
 	p2.inPorts[in] = conn
 	conn.portName = in
 	conn.fullName = p2.Name + "." + in
-	n.conns[conn.fullName] = conn
+	//n.conns[conn.fullName] = conn
 
 	conn.value = initValue
 }
