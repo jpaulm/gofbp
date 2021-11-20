@@ -9,10 +9,6 @@ import (
 	"sync/atomic"
 )
 
-//import (
-//	"github.com/gofbp/core"
-//)
-
 type Process struct {
 	gid     uint64
 	Name    string
@@ -169,15 +165,17 @@ func (p *Process) activate() {
 
 	go func() { // Process goroutine
 		defer p.network.wg.Done()
-		fmt.Println("Starting goroutine", p.Name)
+		if tracing {
+			fmt.Println("Starting goroutine", p.Name)
+		}
 		p.Run() //   <-------
 	}()
 }
 
 func (p *Process) inputState() (bool, bool, bool) {
 
-	//LockTr(p.canGo, "IS L", p)
-	//defer UnlockTr(p.canGo, "IS U", p)
+	LockTr(p.canGo, "IS L", p)
+	defer UnlockTr(p.canGo, "IS U", p)
 
 	allDrained := true
 	hasData := false
@@ -206,9 +204,9 @@ func (p *Process) inputState() (bool, bool, bool) {
 			return allDrained, hasData, selfStarting
 		}
 
-		//fmt.Println("waiting for more data on canGo")
-		//p.canGo.Wait()
+		atomic.StoreInt32(&p.status, Dormant)
 		WaitTr(p.canGo, "wait in IS", p)
+
 	}
 }
 
@@ -221,7 +219,9 @@ func (p *Process) Run() {
 	defer trace(p, " terminated")
 	trace(p, " started")
 
-	fmt.Println("Goroutine", p.Name+":", "no.", getGID())
+	if generate_gids {
+		fmt.Println("Goroutine", p.Name+":", "no.", getGID())
+	}
 
 	p.component.Setup(p)
 
