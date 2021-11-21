@@ -5,7 +5,7 @@ import (
 )
 
 type OutPort struct {
-	portName string
+	portName  string
 	fullName  string
 	Conn      *InPort
 	connected bool
@@ -35,9 +35,6 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 		trace(p, " Sending to "+o.portName+" >", pkt.Contents.(string))
 	}
 
-	o.Conn.downStrProc.activate()
-	//o.Conn.downStrProc.canGo.Broadcast()
-
 	for o.Conn.isFull() { // while connection is full
 		atomic.StoreInt32(&p.status, SuspSend)
 		WaitTr(o.Conn.condNF, "wait in send", p)
@@ -45,6 +42,11 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	}
 
 	trace(p, " Sent to "+o.portName)
+
+	trace(o.Conn.downStrProc, "act from send")
+	//LockTr(o.Conn.downStrProc.canGo, "start test L", o.Conn.downStrProc)
+	o.Conn.downStrProc.activate()
+	//UnlockTr(o.Conn.downStrProc.canGo, "start test U", o.Conn.downStrProc)
 
 	o.Conn.pktArray[o.Conn.is] = pkt
 	o.Conn.is = (o.Conn.is + 1) % len(o.Conn.pktArray)
@@ -81,6 +83,9 @@ func (o *OutPort) Close() {
 	if o.Conn.upStrmCnt == 0 {
 		o.Conn.closed = true
 		BdcastTr(o.Conn.condNE, "bdcast out", o.sender)
+		trace(o.Conn.downStrProc, "act from close")
+		//LockTr(o.Conn.downStrProc.canGo, "start test L", o.Conn.downStrProc)
 		o.Conn.downStrProc.activate()
+		//UnlockTr(o.Conn.downStrProc.canGo, "start test U", o.Conn.downStrProc)
 	}
 }

@@ -19,7 +19,7 @@ func TestSubnet2(t *testing.T) {
 
 	proc3 := net.NewProc("WriteToConsole2", &testrtn.WriteToConsole{})
 
-	net.Initialize("40", proc1, "COUNT")
+	net.Initialize("20", proc1, "COUNT")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
 	net.Connect(proc2, "OUT", proc3, "IN", 6)
 

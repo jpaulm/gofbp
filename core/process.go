@@ -147,24 +147,27 @@ func (p *Process) Close(c InputConn) {
 func (p *Process) activate() {
 
 	//
-	// This function starts a goroutine if it is not started, and signal if not
+	// This function starts a goroutine if it is not started, and signal if it has been
 	//
 
+	//LockTr(p.canGo, "start test L", p)
+	//trace(p, "test if notstarted - status: "+strconv.FormatInt(int64(p.status), 10))
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		if atomic.CompareAndSwapInt32(&p.status, Dormant, Active) {
 
 			BdcastTr(p.canGo, "bdcast act", p)
 		}
+		//UnlockTr(p.canGo, "start test U", p)
 		return
 	}
+	//UnlockTr(p.canGo, "start test U", p)
 
 	go func() { // Process goroutine
 		defer p.network.wg.Done()
-		if tracing {
-			fmt.Println("Starting goroutine", p.Name)
-		}
+		trace(p, "Starting goroutine "+strconv.FormatUint(getGID(), 10))
 		p.Run() //   <-------
 	}()
+
 }
 
 func (p *Process) inputState() (bool, bool, bool) {

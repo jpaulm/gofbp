@@ -114,7 +114,7 @@ func (n *Network) NewProc(nm string, comp Component) *Process {
 		status:    Notstarted,
 		network:   n,
 	}
-
+	//atomic.StoreInt32(&proc.status, Notstarted)
 	n.SetProc(proc, nm)
 	proc.inPorts = make(map[string]inputCommon)
 	proc.outPorts = make(map[string]outputCommon)
@@ -361,8 +361,10 @@ func (n *Network) Run() {
 		var someProcsCanRun bool = false
 
 		for _, proc := range n.procs {
-			//proc.status = Notstarted
-			atomic.StoreInt32(&proc.status, Notstarted)
+
+			//LockTr(proc.canGo, "test if not started L", proc)
+			//atomic.StoreInt32(&proc.status, Notstarted)
+
 			selfStarting := true
 			if proc.inPorts != nil {
 				for _, conn := range proc.inPorts {
@@ -377,9 +379,11 @@ func (n *Network) Run() {
 			if !selfStarting {
 				continue
 			}
-
+			//atomic.StoreInt32(&proc.status, Notstarted)
+			trace(proc, "act from start")
 			proc.activate()
 			someProcsCanRun = true
+			//UnlockTr(proc.canGo, "test if not started U", proc)
 		}
 		if !someProcsCanRun {
 			n.wg.Add(0 - len(n.procs))
@@ -407,29 +411,19 @@ func (n *Network) Run() {
 		}
 
 		var p *Process
-		if n.mother != nil {
-			p = n.mother
-		} else {
-			break
-		}
+		//if n.mother != nil {
+		p = n.mother
+		//} else {
+		//	return
+		//}
 
 		allDrained, _, _ := p.inputState()
 		if allDrained {
 			break
 		}
-		/*
-			for _, c := range n.conns {
-				ci, b := c.(*InPort)
-				if b {
-					ci.mtx.Lock()
-					ci.upStrmCnt = 0
-					//c.resetForNextExecution()
-					ci.mtx.Unlock()
-				}
-			}
-		*/
 
 		for _, p := range n.procs {
+			atomic.StoreInt32(&p.status, Notstarted)
 			for _, v := range p.outPorts {
 				_, b := v.(*OutArrayPort)
 				if b {
@@ -462,20 +456,21 @@ func (n *Network) Run() {
 		}
 	}
 
-	if n.mother != nil {
-		p := n.mother
-		for _, v := range p.outPorts {
-			_, b := v.(*OutArrayPort)
+	//if n.mother != nil {
+	p := n.mother
+	for _, v := range p.outPorts {
+		_, b := v.(*OutArrayPort)
+		if b {
+			for _, w := range v.(*OutArrayPort).array {
+				w.Close()
+			}
+		} else {
+			w, b := v.(*OutPort)
 			if b {
-				for _, w := range v.(*OutArrayPort).array {
-					w.Close()
-				}
-			} else {
-				w, b := v.(*OutPort)
-				if b {
-					w.Close()
-				}
+				w.Close()
 			}
 		}
 	}
 }
+
+//}
