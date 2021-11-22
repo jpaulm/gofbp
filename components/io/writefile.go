@@ -24,7 +24,10 @@ func (WriteFile) MustRun() {}
 func (writeFile *WriteFile) Execute(p *core.Process) {
 
 	icpkt := p.Receive(writeFile.iptIp)
-	fname := icpkt.Contents.(string)
+	fname, ok := icpkt.Contents.(string)
+	if !ok {
+		panic("Parameter (file name) not a string")
+	}
 	p.Discard(icpkt)
 	p.Close(writeFile.iptIp)
 

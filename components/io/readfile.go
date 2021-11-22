@@ -21,9 +21,12 @@ func (readFile *ReadFile) Setup(p *core.Process) {
 }
 
 func (readFile *ReadFile) Execute(p *core.Process) {
-	
+
 	icpkt := p.Receive(readFile.ipt)
-	fname := icpkt.Contents.(string)
+	fname, ok := icpkt.Contents.(string)
+	if !ok {
+		panic("Parameter (file name) not a string")
+	}
 	f, err := os.Open(fname)
 	if err != nil {
 		panic("Unable to read file: " + fname)
@@ -60,5 +63,5 @@ func (readFile *ReadFile) Execute(p *core.Process) {
 		p.Send(readFile.opt, pkt)
 		rec = rec[i+1:]
 	}
-	
+
 }
