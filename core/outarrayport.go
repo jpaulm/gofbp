@@ -1,6 +1,8 @@
 package core
 
-//var _ Conn = (*InArrayPort)(nil)
+import (
+	"math"
+)
 
 type OutArrayPort struct {
 	network *Network
@@ -44,4 +46,16 @@ func (o *OutArrayPort) Close() {
 func (o *OutArrayPort) IsConnected() bool {
 	//return o.connected
 	return true
+}
+
+func (o *OutArrayPort) GetItemWithFewestIPs() int {
+	backlog := math.MaxInt32
+	var fewestIPsIndex int
+	for i, v := range o.array {
+		j := v.Conn.PktCount()
+		if j <= backlog {
+			fewestIPsIndex = i
+		}
+	}
+	return fewestIPsIndex
 }

@@ -1,7 +1,6 @@
 package testrtn
 
 import (
-	//"fmt"
 	"strconv"
 
 	"github.com/jpaulm/gofbp/core"
@@ -30,7 +29,17 @@ func (sender *SubstreamSender) Execute(p *core.Process) {
 
 	for i := 0; i < j; i++ {
 		k := i % 10
-		if k == 2 || k == 7 || k == 0 {
+
+		if k == 2 {
+			pkt = p.CreateBracket(core.CloseBracket, "")
+			p.Send(sender.opt, pkt)
+		}
+		if k == 3 {
+			pkt = p.CreateBracket(core.OpenBracket, "")
+			p.Send(sender.opt, pkt)
+		}
+
+		if k == 7 || k == 0 {
 			pkt = p.CreateBracket(core.CloseBracket, "")
 			p.Send(sender.opt, pkt)
 			pkt = p.CreateBracket(core.OpenBracket, "")

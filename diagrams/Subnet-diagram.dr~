@@ -1,0 +1,28 @@
+<?xml version="1.0"?> 
+ <drawfbp_file xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:noNamespaceSchemaLocation="https://github.com/jpaulm/drawfbp/blob/master/lib/drawfbp_file.xsd">
+<net>
+<desc> </desc>
+ <blocks><block> <x> 116 </x> <y> 192 </y> <id> 1 </id> <type>B</type> <width>92</width> <height>64</height> <description>Substream
+  Sender</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 375 </x> <y> 192 </y> <id> 2 </id> <type>B</type> <width>92</width> <height>64</height> <description>Run 
+ Subnet</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 645 </x> <y> 192 </y> <id> 3 </id> <type>B</type> <width>92</width> <height>64</height> <description>Write
+  To
+Console</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 179 </x> <y> 368 </y> <id> 4 </id> <type>B</type> <width>92</width> <height>64</height> <description>SubInSS</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 375 </x> <y> 368 </y> <id> 5 </id> <type>B</type> <width>92</width> <height>64</height> <description>Write To
+Console</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 578 </x> <y> 368 </y> <id> 6 </id> <type>B</type> <width>92</width> <height>64</height> <description>SubOutSS</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+</blocks> <connections>
+<connection> <fromx>162</fromx> <fromy>190</fromy> <tox>329</tox> <toy>190</toy> <fromid>1</fromid> <toid>2</toid> <id>1</id> <endsatline>false</endsatline><upstreamport>OUT</upstreamport><downstreamport>IN</downstreamport><segno>0</segno></connection> 
+<connection> <fromx>421</fromx> <fromy>191</fromy> <tox>599</tox> <toy>191</toy> <fromid>2</fromid> <toid>3</toid> <id>2</id> <endsatline>false</endsatline><upstreamport>OUT</upstreamport><downstreamport>IN</downstreamport><segno>0</segno></connection> 
+<connection> <fromx>225</fromx> <fromy>365</fromy> <tox>329</tox> <toy>365</toy> <fromid>4</fromid> <toid>5</toid> <id>3</id> <endsatline>false</endsatline><upstreamport>OUT</upstreamport><downstreamport>IN</downstreamport><segno>0</segno></connection> 
+<connection> <fromx>421</fromx> <fromy>366</fromy> <tox>532</tox> <toy>366</toy> <fromid>5</fromid> <toid>6</toid> <id>4</id> <endsatline>false</endsatline><upstreamport>OUT</upstreamport><downstreamport>IN</downstreamport><segno>0</segno></connection> 
+</connections> </net> </drawfbp_file>

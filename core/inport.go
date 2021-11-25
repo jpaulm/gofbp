@@ -7,16 +7,16 @@ import (
 )
 
 type InPort struct {
-	network   *Network
-	pktArray  []*Packet
-	is, ir    int // send index and receive index
-	mtx       sync.Mutex
-	condNE    *sync.Cond
-	condNF    *sync.Cond
-	closed    bool
-	upStrmCnt int
-	portName  string
-	fullName  string
+	network     *Network
+	pktArray    []*Packet
+	is, ir      int // send index and receive index
+	mtx         sync.Mutex
+	condNE      *sync.Cond
+	condNF      *sync.Cond
+	closed      bool
+	upStrmCnt   int
+	portName    string
+	fullName    string
 	downStrProc *Process
 }
 
@@ -111,4 +111,14 @@ func (c *InPort) resetForNextExecution() {
 	defer c.mtx.Unlock()
 
 	c.closed = false
+}
+
+func (c *InPort) PktCount() int {
+	var i int
+	for _, p := range c.pktArray {
+		if p != nil {
+			i++
+		}
+	}
+	return i
 }

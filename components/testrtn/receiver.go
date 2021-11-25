@@ -17,16 +17,15 @@ func (receiver *Receiver) Setup(p *core.Process) {
 func (Receiver) MustRun() {}
 
 func (receiver *Receiver) Execute(p *core.Process) {
-	
 
 	for {
 		var pkt = p.Receive(receiver.ipt)
 		if pkt == nil {
 			break
 		}
-		fmt.Println("Input to Receiver: ", pkt.Contents)
+
+		fmt.Println("Input to Receiver:", p.Name, ">", pkt.Contents)
 		p.Discard(pkt)
 	}
 
-	
 }

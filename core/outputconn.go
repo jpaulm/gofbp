@@ -16,4 +16,5 @@ type OutputArrayConn interface {
 	GetArrayItem(i int) *OutPort
 	SetArrayItem(c *OutPort, i int)
 	ArrayLength() int
+	GetItemWithFewestIPs() int
 }
