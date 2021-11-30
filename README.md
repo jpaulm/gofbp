@@ -84,7 +84,7 @@ You will occasionally see a message like `TempDir RemoveAll cleanup: remove ...\
 
 FBP deadlocks are well understood, and are handled well by other FBP implementations on https://github.com/jpaulm .  They also seem to be well detected by the Go scheduler - unfortunately, they are not so easy to troubleshoot, as Go deadlock detection is not "FBP-aware", and occurs before the GoFBP scheduler can analyze the process states to determine where the problem is occurring.  This has been raised as an issue - #28 .
 
-As of release v2.2.1, a stand-alone program has been added, `analyze_deadlock.go`, which can be used to analyze the Go stack trace. Its `.exe` file can be found in the project `bin` directory.  To analyze the deadlock, send the `go test` output to `logfile`, i.e. `go test -run ForceDeadlock -timeout 0ms > logfile`, then execute `bin\analyze_deadlock.exe`.  The output should be something like the following (based on running `go test -run ForceDeadlock -count=1`):
+As of release v2.2.1, a stand-alone program has been added, `analyze_deadlock.go`, which can be used to analyze the Go stack trace. Its `.exe` file can be found in the assets of the latest release.  To analyze the deadlock, change the `generate-gIds` parameter in `params.xml` to `true`, then send the `go test` output to `logfile`, i.e. `go test -run ForceDeadlock -timeout 0ms > logfile`.  Now download `analyze_deadlock.exe` to some convenient folder, then execute it.  The output should be something like the following (based on running `go test -run ForceDeadlock -count=1`):
 
 <pre>
 Sender Goroutine no.: 19
@@ -95,7 +95,7 @@ Process: Counter, Status: Send
 Process: Concat, Status: Receive
 </pre>
 
-Now look at the list of goroutines involved, and add the component names to your diagram, together with the "state".  Typically the deadlock will be "between" the goroutines waiting to Send and those waiting to Receive.
+Now look at the list of goroutines involved, and add the component names to your diagram, together with the displayed "status".  Typically the deadlock will be "between" some goroutines waiting to Send and some waiting to Receive.
 
 
 In MS-DOS, you can do the above all on one line, as follows:
