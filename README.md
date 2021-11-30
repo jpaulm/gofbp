@@ -101,7 +101,7 @@ Now look at the list of goroutines involved, and add the component names to your
 In MS-DOS, you can do the above all on one line, as follows:
 
 <pre>
-go test -run ForceDeadlock -count=1 > logfile & bin\analyze_deadlock.exe
+go test -run ForceDeadlock -count=1 > logfile & analyze_deadlock.exe
 </pre>
 
 (Not sure if you can do this with PowerShell...?)
@@ -111,24 +111,24 @@ go test -run ForceDeadlock -count=1 > logfile & bin\analyze_deadlock.exe
 The following components are available:
 
 "testrtn" folder:
-- concatstr.go
-- discard.go
-- kick.go
-- receiver.go
-- roundrobinsender.go
-- selector.go
-- sender.go
-- writetoconsole.go 
-- writetoconsNL.go   (same, but written as a non-looper)
+- `concatstr.go`
+- `discard.go`
+- `kick.go`        
+- `receiver.go`
+- `roundrobinsender.go`
+- `selector.go`
+- `sender.go`
+- `writetoconsole.go` 
+- `writetoconsNL.go`   (same, but written as a non-looper)
 
 "subnets" folder:
-- subnet1.go   (this is a subnet, i.e. a "network" with "sticky" connections - this can be treated as a component)
-- sssubnet1.go   (this is similar to subnet1.go, but with a substream-sensitive front-end, and a substream delimiter generating back-end)
-- sssubnet2.go   (this is the same as sssubnet1, but with a counter generating its output)
+- `subnet1.go`   (this is a subnet, i.e. a "network" with "sticky" connections - this can be treated as a component)
+- `sssubnet1.go`   (this is similar to subnet1.go, but with a substream-sensitive front-end, and a substream delimiter generating back-end)
+- `sssubnet2.go`   (this is the same as sssubnet1, but with a counter emitting the size of each incoming substream)
 
 "io" folder:
-- readfile.go
-- writefile.go
+- `readfile.go`
+- `writefile.go`
 
 **To dos**
 
