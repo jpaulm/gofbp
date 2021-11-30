@@ -1,4 +1,4 @@
-# gofbp 
+# GoFBP 
 
 This repo holds the beginning of an FBP implementation in Go
 
