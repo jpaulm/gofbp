@@ -115,6 +115,8 @@ func (c *InPort) resetForNextExecution() {
 
 func (c *InPort) PktCount() int {
 	var i int
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
 	for _, p := range c.pktArray {
 		if p != nil {
 			i++
