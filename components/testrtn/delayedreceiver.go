@@ -24,7 +24,7 @@ func (receiver *DelayedReceiver) Execute(p *core.Process) {
 		if pkt == nil {
 			break
 		}
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		fmt.Println("Input to DelayedReceiver:", p.Name, ">", pkt.Contents)
 		p.Discard(pkt)
 	}

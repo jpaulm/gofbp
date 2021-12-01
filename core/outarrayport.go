@@ -1,6 +1,7 @@
 package core
 
 import (
+	//"fmt"
 	"math"
 )
 
@@ -12,7 +13,7 @@ type OutArrayPort struct {
 	array    []*OutPort
 	//closed    bool
 	connected bool
-	sender    *Process
+	//sender    *Process
 }
 
 func (o *OutArrayPort) send(p *Process, pkt *Packet) bool { panic("send on array port") }
@@ -53,8 +54,10 @@ func (o *OutArrayPort) GetItemWithFewestIPs() int {
 	var fewestIPsIndex int
 	for i, v := range o.array {
 		j := v.Conn.PktCount()
+		//fmt.Println(i, j)
 		if j <= backlog {
 			fewestIPsIndex = i
+			backlog = j
 		}
 	}
 	return fewestIPsIndex
