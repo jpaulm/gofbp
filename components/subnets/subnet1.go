@@ -25,3 +25,5 @@ func (subnet *Subnet1) Execute(p *core.Process) {
 
 	net.Run()
 }
+
+//  NAME->0(proc1 SubIn)1.OUT -> IN.0(Proc2 WriteToConsole1)1.OUT -> NAME.0(proc3 SubOut);

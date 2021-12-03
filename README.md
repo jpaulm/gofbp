@@ -27,13 +27,15 @@ GoFBP Network Definition Syntax and Component API:
 
 ## Tracing
 
-An XML file has been provided in the root, called `params.xml`.  So far there is only one parameter:
-
-<pre>
-&lt;?xml version="1.0"?&gt;
-&lt;tracing&gt;true|false&lt;/tracing&gt;
-&lt;tracelocks&gt;true|false&lt;/tracelocks&gt;
-</pre>
+An XML file has been provided in the root, called `params.xml`:
+```
+<?xml version="1.0"?> 
+<runparams>
+<tracing>false</tracing>
+<tracelocks>false</tracelocks>
+<generate-gIds>false</generate-gIds> 
+</runparams>
+```
 
 ## Subnets
 These are described in Chap. 7 in "Flow-Based Programming": Composite Components - https://jpaulmorrison.com/fbp/compos.shtml , although we haven't implemented dynamic subnets (yet)!
@@ -140,4 +142,5 @@ The following components are available:
 - Add Load Balancing component
 - Add sample code showing use of substreams
 - "Automatic" ports - *done!*
-- Add Lua interface - see https://jpaulm.github.io/fbp/thlua.html
+- Add Lua interface - see https://jpaulm.github.io/fbp/thlua.html 
+

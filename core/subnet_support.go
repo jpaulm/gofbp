@@ -7,7 +7,7 @@ import (
 
 type SubIn struct {
 	//ipt   InputConn
-	iptIp InputConn
+	iptIP InputConn
 	out   OutputConn
 	eipt  InputConn
 }
@@ -22,12 +22,12 @@ func (subIn *SubIn) Setup(p *Process) {
 
 	subIn.out = p.OpenOutPort("OUT")
 
-	subIn.iptIp = p.OpenInPort("NAME")
+	subIn.iptIP = p.OpenInPort("NAME")
 }
 
 func (subIn *SubIn) Execute(p *Process) {
 
-	icpkt := p.Receive(subIn.iptIp)
+	icpkt := p.Receive(subIn.iptIP)
 	param := icpkt.Contents.(string)
 
 	p.Discard(icpkt)
@@ -56,7 +56,7 @@ func (subIn *SubIn) Execute(p *Process) {
 
 func (subIn *SubInSS) Execute(p *Process) {
 
-	icpkt := p.Receive(subIn.iptIp)
+	icpkt := p.Receive(subIn.iptIP)
 	param := icpkt.Contents.(string)
 
 	p.Discard(icpkt)
@@ -92,7 +92,7 @@ func (subIn *SubInSS) Execute(p *Process) {
 
 type SubOut struct {
 	ipt   InputConn
-	iptIp InputConn
+	iptIP InputConn
 	eopt  OutputConn
 }
 
@@ -104,14 +104,14 @@ func (subOut *SubOut) Setup(p *Process) {
 
 	subOut.ipt = p.OpenInPort("IN")
 
-	subOut.iptIp = p.OpenInPort("NAME")
+	subOut.iptIP = p.OpenInPort("NAME")
 }
 
 //func (SubOut) MustRun() {}
 
 func (subOut *SubOut) Execute(p *Process) {
 
-	icpkt := p.Receive(subOut.iptIp)
+	icpkt := p.Receive(subOut.iptIP)
 	param := icpkt.Contents.(string)
 
 	p.Discard(icpkt)
@@ -137,7 +137,7 @@ func (subOut *SubOut) Execute(p *Process) {
 }
 func (subOut *SubOutSS) Execute(p *Process) {
 
-	icpkt := p.Receive(subOut.iptIp)
+	icpkt := p.Receive(subOut.iptIP)
 	param := icpkt.Contents.(string)
 
 	p.Discard(icpkt)

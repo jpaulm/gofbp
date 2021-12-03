@@ -1,3 +1,4 @@
+/*Package subnets implements FBP subnet processing*/
 package subnets
 
 import (
