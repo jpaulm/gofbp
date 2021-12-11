@@ -9,7 +9,7 @@ import (
 
 type Selector struct {
 	ipt   core.InputConn
-	iptIp core.InputConn
+	iptIP core.InputConn
 	out1  core.OutputConn
 	out2  core.OutputConn
 }
@@ -22,20 +22,20 @@ func (selector *Selector) Setup(p *core.Process) {
 
 	selector.out2 = p.OpenOutPortOptional("REJ")
 
-	selector.iptIp = p.OpenInPort("PARAM")
+	selector.iptIP = p.OpenInPort("PARAM")
 }
 
 func (Selector) MustRun() {}
 
 func (selector *Selector) Execute(p *core.Process) {
 
-	icpkt := p.Receive(selector.iptIp)
+	icpkt := p.Receive(selector.iptIP)
 	param := icpkt.Contents.(string)
 	i := len(param)
 
 	p.Discard(icpkt)
 
-	p.Close(selector.iptIp)
+	p.Close(selector.iptIP)
 
 	for {
 		var pkt = p.Receive(selector.ipt)

@@ -1,3 +1,4 @@
+/*Package io implements gofbp I/O*/
 package io
 
 import (

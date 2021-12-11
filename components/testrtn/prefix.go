@@ -8,7 +8,7 @@ import (
 
 type Prefix struct {
 	ipt   core.InputConn
-	iptIp core.InputConn
+	iptIP core.InputConn
 	out   core.OutputConn
 }
 
@@ -18,17 +18,17 @@ func (prefix *Prefix) Setup(p *core.Process) {
 
 	prefix.out = p.OpenOutPort("OUT")
 
-	prefix.iptIp = p.OpenInPort("PARAM")
+	prefix.iptIP = p.OpenInPort("PARAM")
 }
 
 func (prefix *Prefix) Execute(p *core.Process) {
 
-	icpkt := p.Receive(prefix.iptIp)
+	icpkt := p.Receive(prefix.iptIP)
 	param := icpkt.Contents.(string)
 
 	p.Discard(icpkt)
 
-	p.Close(prefix.iptIp)
+	p.Close(prefix.iptIP)
 
 	for {
 		var pkt = p.Receive(prefix.ipt)
