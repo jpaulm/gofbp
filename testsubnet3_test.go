@@ -1,4 +1,4 @@
-package main
+package testing
 
 // Thiis differs from TestSubnet1 because it uses SSSubnet1 (SubstreamSenstive) instead of simple Subnet1...
 

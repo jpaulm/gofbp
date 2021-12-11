@@ -21,8 +21,6 @@ Console</description> <compname>writetoconsole.go</compname> <blockclassname>C:/
  </bends> </connection> 
 <connection> <fromx>126</fromx> <fromy>234</fromy> <tox>231</tox> <toy>233</toy> <fromid>5</fromid> <toid>4</toid> <id>7</id> <endsatline>false</endsatline><downstreamport>IN</downstreamport><segno>0</segno></connection> 
 <connection> <fromx>128</fromx> <fromy>403</fromy> <tox>231</tox> <toy>402</toy> <fromid>6</fromid> <toid>2</toid> <id>8</id> <endsatline>false</endsatline><downstreamport>IN</downstreamport><segno>0</segno></connection> 
-<connection> <fromx>323</fromx> <fromy>414</fromy> <tox>366</tox> <toy>231</toy> <fromid>2</fromid> <toid>4</toid> <id>11</id> <endsatline>true</endsatline><upstreamport>OUT</upstreamport><segno>0</segno><bends> <bend> <x>717</x> <y> 414</y> </bend>
- <bend> <x>717</x> <y> 142</y> </bend>
- <bend> <x>364</x> <y> 142</y> </bend>
+<connection> <fromx>323</fromx> <fromy>409</fromy> <tox>431</tox> <toy>314</toy> <fromid>2</fromid> <toid>4</toid> <id>12</id> <endsatline>true</endsatline><upstreamport>OUT</upstreamport><segno>2</segno><bends> <bend> <x>430</x> <y> 409</y> </bend>
  </bends> </connection> 
 </connections> </net> </drawfbp_file>
