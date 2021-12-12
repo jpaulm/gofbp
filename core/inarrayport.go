@@ -10,9 +10,9 @@ type InArrayPort struct {
 
 	portName string
 	fullName string
-	array  []*InPort
-	mtx    sync.Mutex
-	closed bool
+	array    []*InPort
+	mtx      sync.Mutex
+	closed   bool
 }
 
 func (c *InArrayPort) IsDrained() bool {

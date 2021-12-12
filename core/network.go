@@ -17,7 +17,7 @@ import (
 
 var tracing bool
 var tracelocks bool
-var generate_gids bool
+var generateGids bool
 
 type Network struct {
 	Name  string
@@ -331,7 +331,7 @@ func setOptions() {
 		s = "<generate-gIds>"
 		i = strings.Index(rec, s)
 		if i > -1 && rec[i+len(s):i+len(s)+4] == "true" {
-			generate_gids = true
+			generateGids = true
 		}
 	}
 }

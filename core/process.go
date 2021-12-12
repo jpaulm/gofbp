@@ -9,6 +9,7 @@ import (
 	"sync/atomic"
 )
 
+/** type Process defines a gofbp process */
 type Process struct {
 	gid     uint64
 	Name    string
@@ -214,7 +215,7 @@ func (p *Process) Run() {
 	defer trace(p, " terminated")
 	trace(p, " started")
 
-	if generate_gids {
+	if generateGids {
 		fmt.Println("Goroutine", p.Name+":", "no.", getGID())
 	}
 
