@@ -17,7 +17,7 @@ import (
 
 var tracing bool
 var tracelocks bool
-var generate_gids bool
+var generateGids bool
 
 type Network struct {
 	Name  string
@@ -310,11 +310,12 @@ func setOptions() {
 	err = xml.Unmarshal(xmldata, &params)
 	if err != nil {
 		return
+
 	}
 
 	tracing = params.Tracing
 	tracelocks = params.TraceLocks
-	generate_gids = params.GenerateGIDs
+	generateGids = params.GenerateGIDs
 }
 
 func (n *Network) Run() {
