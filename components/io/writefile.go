@@ -7,20 +7,24 @@ import (
 	"github.com/jpaulm/gofbp/core"
 )
 
+// WriteFile type defines iptIP, ipt, and opt
 type WriteFile struct {
 	iptIP core.InputConn
 	ipt   core.InputConn
 	opt   core.OutputConn
 }
 
+//Setup method initializes Process
 func (writeFile *WriteFile) Setup(p *core.Process) {
 	writeFile.iptIP = p.OpenInPort("FILENAME")
 	writeFile.ipt = p.OpenInPort("IN")
 	writeFile.opt = p.OpenOutPortOptional("OUT")
 }
 
+//MustRun method 
 func (WriteFile) MustRun() {}
 
+//Execute method strts Process
 func (writeFile *WriteFile) Execute(p *core.Process) {
 
 	icpkt := p.Receive(writeFile.iptIP)
