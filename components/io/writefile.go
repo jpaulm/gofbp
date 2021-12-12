@@ -7,29 +7,33 @@ import (
 	"github.com/jpaulm/gofbp/core"
 )
 
+// WriteFile type defines iptIP, ipt, and opt
 type WriteFile struct {
-	iptIp core.InputConn
+	iptIP core.InputConn
 	ipt   core.InputConn
 	opt   core.OutputConn
 }
 
+//Setup method initializes Process
 func (writeFile *WriteFile) Setup(p *core.Process) {
-	writeFile.iptIp = p.OpenInPort("FILENAME")
+	writeFile.iptIP = p.OpenInPort("FILENAME")
 	writeFile.ipt = p.OpenInPort("IN")
 	writeFile.opt = p.OpenOutPortOptional("OUT")
 }
 
+//MustRun method 
 func (WriteFile) MustRun() {}
 
+//Execute method strts Process
 func (writeFile *WriteFile) Execute(p *core.Process) {
 
-	icpkt := p.Receive(writeFile.iptIp)
+	icpkt := p.Receive(writeFile.iptIP)
 	fname, ok := icpkt.Contents.(string)
 	if !ok {
 		panic("Parameter (file name) not a string")
 	}
 	p.Discard(icpkt)
-	p.Close(writeFile.iptIp)
+	p.Close(writeFile.iptIP)
 
 	f, err := os.Create(fname)
 	if err != nil {

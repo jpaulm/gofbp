@@ -10,16 +10,19 @@ import (
 	"github.com/jpaulm/gofbp/core"
 )
 
+//ReadFile type defines ipt and opt
 type ReadFile struct {
 	ipt core.InputConn
 	opt core.OutputConn
 }
 
+//Setup method opens readFile 
 func (readFile *ReadFile) Setup(p *core.Process) {
 	readFile.ipt = p.OpenInPort("FILENAME")
 	readFile.opt = p.OpenOutPort("OUT")
 }
 
+//Execute method starts Process 
 func (readFile *ReadFile) Execute(p *core.Process) {
 
 	icpkt := p.Receive(readFile.ipt)

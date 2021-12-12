@@ -22,7 +22,6 @@ func (counter *Counter) Setup(p *core.Process) {
 func (Counter) MustRun() {}
 
 func (counter *Counter) Execute(p *core.Process) {
-	
 
 	count := 0
 
@@ -43,5 +42,4 @@ func (counter *Counter) Execute(p *core.Process) {
 	pkt := p.Create(strconv.Itoa(count))
 	p.Send(counter.cnt, pkt)
 
-	
 }
