@@ -9,6 +9,7 @@ import (
 	"sync/atomic"
 )
 
+//Process type defines a gofbp process.
 type Process struct {
 	gid     uint64
 	Name    string
@@ -27,6 +28,7 @@ type Process struct {
 	autoOutput inputCommon
 }
 
+//Nostarted const reflects current process status
 const (
 	Notstarted int32 = iota
 	Active
@@ -36,6 +38,7 @@ const (
 	Terminated
 )
 
+//OpenInPort function opens and returns InputConn 
 func (p *Process) OpenInPort(s string) InputConn {
 	var in InputConn
 	var b bool
@@ -50,6 +53,7 @@ func (p *Process) OpenInPort(s string) InputConn {
 	return in
 }
 
+//OpenInArrayPort method opens and returns InArrayPort  
 func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 	var in *InArrayPort
 	var b bool
@@ -66,6 +70,7 @@ func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 	return in
 }
 
+//OpenOutPort method opens and returns OutputConn 
 func (p *Process) OpenOutPort(s string) OutputConn {
 	var out OutputConn
 	var b bool
@@ -85,6 +90,7 @@ func (p *Process) OpenOutPort(s string) OutputConn {
 
 }
 
+//OpenOutPortOptional function opens and returns OutputConn 
 func (p *Process) OpenOutPortOptional(s string) OutputConn {
 	var out OutputConn
 	var b bool
@@ -108,6 +114,7 @@ func (p *Process) OpenOutPortOptional(s string) OutputConn {
 
 // not sure it makes sense to allow optional for array ports!
 
+//OpenOutArrayPort method opens and returns OutArrayPort
 func (p *Process) OpenOutArrayPort(s string) *OutArrayPort {
 	var out *OutArrayPort
 	var b bool
@@ -128,18 +135,22 @@ func (p *Process) OpenOutArrayPort(s string) *OutArrayPort {
 }
 
 // Send sends a packet to the output connection.
-// Returns false when fails to send.
+ 
+//Send method emits Packet,  returning false when fails to send.
 func (p *Process) Send(o OutputConn, pkt *Packet) bool {
 	//o.SetSender(p)
 	return o.send(p, pkt)
 }
 
+
+//Receive method accepts InputConn and returns Packet
 // Receive receives from the connection.
 // Returns nil, when there's no more data.
 func (p *Process) Receive(c InputConn) *Packet {
 	return c.receive(p)
 }
 
+//Close method closes InputConn 
 func (p *Process) Close(c InputConn) {
 	c.Close()
 }
@@ -208,13 +219,14 @@ func (p *Process) inputState() (bool, bool, bool) {
 	}
 }
 
+//Run method initializes and Executes Process
 func (p *Process) Run() {
 
 	defer atomic.StoreInt32(&p.status, Terminated)
 	defer trace(p, " terminated")
 	trace(p, " started")
 
-	if generate_gids {
+	if generateGids {
 		fmt.Println("Goroutine", p.Name+":", "no.", getGID())
 	}
 
@@ -279,6 +291,7 @@ func (p *Process) isMustRun() bool {
 	return hasMustRun
 }
 
+//Create method  creates and interface and returns a Packet
 // create packet containing anything!
 func (p *Process) Create(x interface{}) *Packet {
 	var pkt *Packet = new(Packet)
@@ -288,6 +301,7 @@ func (p *Process) Create(x interface{}) *Packet {
 	return pkt
 }
 
+//CreateBracket method builds a new Packet and returns it
 // create bracket
 func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 	var pkt *Packet = new(Packet)
@@ -298,6 +312,7 @@ func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 	return pkt
 }
 
+//Discard method sets Packet to nil
 func (p *Process) Discard(pkt *Packet) {
 	if pkt == nil {
 		panic("Discarding nil packet")

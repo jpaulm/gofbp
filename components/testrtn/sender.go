@@ -22,7 +22,7 @@ func (sender *Sender) Setup(p *core.Process) {
 
 /*Execute function launches a source process.*/
 func (sender *Sender) Execute(p *core.Process) {
-	
+
 	icpkt := p.Receive(sender.ipt)
 	j, _ := strconv.Atoi(icpkt.Contents.(string))
 	p.Discard(icpkt)
@@ -33,5 +33,5 @@ func (sender *Sender) Execute(p *core.Process) {
 		pkt = p.Create("IP - # " + strconv.Itoa(i))
 		p.Send(sender.opt, pkt)
 	}
-	
+
 }

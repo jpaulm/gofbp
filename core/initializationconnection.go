@@ -9,9 +9,9 @@ type InitializationConnection struct {
 	network  *Network
 	portName string
 	fullName string
-	closed bool
-	value  interface{}
-	mtx    sync.Mutex
+	closed   bool
+	value    interface{}
+	mtx      sync.Mutex
 }
 
 func (c *InitializationConnection) IsDrained() bool {
