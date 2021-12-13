@@ -392,12 +392,7 @@ func (n *Network) Run() {
 			}
 		}
 
-		var p *Process
-		//if n.mother != nil {
-		p = n.mother
-		//} else {
-		//	return
-		//}
+		p := n.mother
 
 		allDrained, _, _ := p.inputState()
 		if allDrained {

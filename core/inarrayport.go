@@ -8,11 +8,11 @@ import (
 type InArrayPort struct {
 	network *Network
 
-	portName string
-	fullName string
-	array    []*InPort
-	mtx      sync.Mutex
-	closed   bool
+	//portName string
+	//fullName string
+	array  []*InPort
+	mtx    sync.Mutex
+	closed bool
 }
 
 func (c *InArrayPort) IsDrained() bool {

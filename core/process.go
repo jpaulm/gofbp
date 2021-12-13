@@ -38,7 +38,7 @@ const (
 	Terminated
 )
 
-//OpenInPort function opens and returns InputConn 
+//OpenInPort function opens and returns InputConn
 func (p *Process) OpenInPort(s string) InputConn {
 	var in InputConn
 	var b bool
@@ -53,7 +53,7 @@ func (p *Process) OpenInPort(s string) InputConn {
 	return in
 }
 
-//OpenInArrayPort method opens and returns InArrayPort  
+//OpenInArrayPort method opens and returns InArrayPort
 func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 	var in *InArrayPort
 	var b bool
@@ -70,7 +70,7 @@ func (p *Process) OpenInArrayPort(s string) *InArrayPort {
 	return in
 }
 
-//OpenOutPort method opens and returns OutputConn 
+//OpenOutPort method opens and returns OutputConn
 func (p *Process) OpenOutPort(s string) OutputConn {
 	var out OutputConn
 	var b bool
@@ -90,7 +90,7 @@ func (p *Process) OpenOutPort(s string) OutputConn {
 
 }
 
-//OpenOutPortOptional function opens and returns OutputConn 
+//OpenOutPortOptional function opens and returns OutputConn
 func (p *Process) OpenOutPortOptional(s string) OutputConn {
 	var out OutputConn
 	var b bool
@@ -135,13 +135,12 @@ func (p *Process) OpenOutArrayPort(s string) *OutArrayPort {
 }
 
 // Send sends a packet to the output connection.
- 
+
 //Send method emits Packet,  returning false when fails to send.
 func (p *Process) Send(o OutputConn, pkt *Packet) bool {
 	//o.SetSender(p)
 	return o.send(p, pkt)
 }
-
 
 //Receive method accepts InputConn and returns Packet
 // Receive receives from the connection.
@@ -150,7 +149,7 @@ func (p *Process) Receive(c InputConn) *Packet {
 	return c.receive(p)
 }
 
-//Close method closes InputConn 
+//Close method closes InputConn
 func (p *Process) Close(c InputConn) {
 	c.Close()
 }
@@ -318,7 +317,7 @@ func (p *Process) Discard(pkt *Packet) {
 		panic("Discarding nil packet")
 	}
 	p.ownedPkts--
-	pkt = nil
+	//pkt = nil
 }
 
 //https://blog.sgmansfield.com/2015/12/goroutine-ids/

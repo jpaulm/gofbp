@@ -1,9 +1,9 @@
 package core
 
 type NullOutPort struct {
-	sender   *Process
-	portName string
-	fullName string
+	//sender   *Process
+	//portName string
+	//fullName string
 }
 
 // NullOutPort by default discards the packet.
