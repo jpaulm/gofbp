@@ -1,9 +1,9 @@
 package core
 
 import (
+	"encoding/xml"
 	"fmt"
-	"io"
-	"os"
+	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
@@ -296,44 +296,25 @@ func (n *Network) Exit() {
 }
 
 func setOptions() {
-	var rec string
-	f, err := os.Open("params.xml")
-	if err == nil {
-		defer f.Close()
-		buf := make([]byte, 1024)
-		for {
-			n, err := f.Read(buf)
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			if n > 0 {
-				//fmt.Println(string(buf[:n]))
-				rec += string(buf[:n])
-			}
-		}
-
-		s := "<tracing>"
-		i := strings.Index(rec, s)
-		if i > -1 && rec[i+len(s):i+len(s)+4] == "true" {
-			tracing = true
-		}
-
-		s = "<tracelocks>"
-		i = strings.Index(rec, s)
-		if i > -1 && rec[i+len(s):i+len(s)+4] == "true" {
-			tracelocks = true
-		}
-
-		s = "<generate-gIds>"
-		i = strings.Index(rec, s)
-		if i > -1 && rec[i+len(s):i+len(s)+4] == "true" {
-			generate_gids = true
-		}
+	var params struct {
+		Tracing      bool `xml:"tracing"`
+		TraceLocks   bool `xml:"tracelocks"`
+		GenerateGIDs bool `xml:"generate-gIds"`
 	}
+
+	xmldata, err := ioutil.ReadFile("params.xml")
+	if err != nil {
+		return
+	}
+
+	err = xml.Unmarshal(xmldata, &params)
+	if err != nil {
+		return
+	}
+
+	tracing = params.Tracing
+	tracelocks = params.TraceLocks
+	generate_gids = params.GenerateGIDs
 }
 
 func (n *Network) Run() {
