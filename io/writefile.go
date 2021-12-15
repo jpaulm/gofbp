@@ -1,0 +1,66 @@
+package io
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/jpaulm/gofbp"
+)
+
+// WriteFile type defines iptIP, ipt, and opt
+type WriteFile struct {
+	iptIP gofbp.InputConn
+	ipt   gofbp.InputConn
+	opt   gofbp.OutputConn
+}
+
+//Setup method initializes Process
+func (writeFile *WriteFile) Setup(p *gofbp.Process) {
+	writeFile.iptIP = p.OpenInPort("FILENAME")
+	writeFile.ipt = p.OpenInPort("IN")
+	writeFile.opt = p.OpenOutPortOptional("OUT")
+}
+
+//MustRun method
+func (WriteFile) MustRun() {}
+
+//Execute method strts Process
+func (writeFile *WriteFile) Execute(p *gofbp.Process) {
+
+	icpkt := p.Receive(writeFile.iptIP)
+	fname, ok := icpkt.Contents.(string)
+	if !ok {
+		panic("Parameter (file name) not a string")
+	}
+	p.Discard(icpkt)
+	p.Close(writeFile.iptIP)
+
+	f, err := os.Create(fname)
+	if err != nil {
+		panic("Unable to open file: " + fname)
+	}
+	defer f.Close()
+
+	for {
+		var pkt = p.Receive(writeFile.ipt)
+		if pkt == nil {
+			break
+		}
+
+		data := []byte(pkt.Contents.(string) + "\n")
+
+		_, err2 := f.Write(data)
+
+		if err2 != nil {
+			panic("Unable to write file: " + fname)
+		}
+
+		if !writeFile.opt.IsConnected() {
+			p.Discard(pkt)
+		} else {
+			p.Send(writeFile.opt, pkt)
+		}
+
+	}
+	fmt.Println(p.Name+": File", fname, "written")
+}
