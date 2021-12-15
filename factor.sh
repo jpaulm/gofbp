@@ -8,5 +8,3 @@ for sdir in io subnets testrtn ./ utils internal ; do
     done
   popd
 done   
-
-done
