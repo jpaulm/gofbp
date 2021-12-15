@@ -3,9 +3,9 @@ package main
 import (
 	"testing"
 
-	"github.com/jpaulm/gofbp"
-	"github.com/jpaulm/gofbp/io"
-	"github.com/jpaulm/gofbp/testrtn"
+	"github.com/tyoung3/gofbp"
+	"github.com/tyoung3/gofbp/io"
+	"github.com/tyoung3/gofbp/testrtn"
 )
 
 func TestInfQueueAsMain(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jpaulm/gofbp"
+	"github.com/tyoung3/gofbp"
 )
 
 // WriteFile type defines iptIP, ipt, and opt

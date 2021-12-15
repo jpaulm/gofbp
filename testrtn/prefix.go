@@ -3,7 +3,7 @@ package testrtn
 import (
 	"fmt"
 
-	"github.com/jpaulm/gofbp"
+	"github.com/tyoung3/gofbp"
 )
 
 type Prefix struct {

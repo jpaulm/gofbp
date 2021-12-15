@@ -5,9 +5,9 @@ package main
 import (
 	"testing"
 
-	"github.com/jpaulm/gofbp"
-	"github.com/jpaulm/gofbp/subnets"
-	"github.com/jpaulm/gofbp/testrtn"
+	"github.com/tyoung3/gofbp"
+	"github.com/tyoung3/gofbp/subnets"
+	"github.com/tyoung3/gofbp/testrtn"
 )
 
 func TestSubnet3(t *testing.T) {

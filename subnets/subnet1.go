@@ -1,8 +1,8 @@
 package subnets
 
 import (
-	"github.com/jpaulm/gofbp"
-	"github.com/jpaulm/gofbp/testrtn"
+	"github.com/tyoung3/gofbp"
+	"github.com/tyoung3/gofbp/testrtn"
 )
 
 type Subnet1 struct{}

@@ -1,7 +1,7 @@
 package testrtn
 
 import (
-	"github.com/jpaulm/gofbp"
+	"github.com/tyoung3/gofbp"
 )
 
 type LoadBalance struct {

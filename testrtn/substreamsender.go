@@ -3,7 +3,7 @@ package testrtn
 import (
 	"strconv"
 
-	"github.com/jpaulm/gofbp"
+	"github.com/tyoung3/gofbp"
 )
 
 type SubstreamSender struct {

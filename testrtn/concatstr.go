@@ -1,6 +1,6 @@
 package testrtn
 
-import "github.com/jpaulm/gofbp"
+import "github.com/tyoung3/gofbp"
 
 type ConcatStr struct {
 	ipt gofbp.InputArrayConn
