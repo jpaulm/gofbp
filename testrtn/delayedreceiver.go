@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/tyoung3/gofbp"
+	"github.com/jpaulm/gofbp"
 )
 
 type DelayedReceiver struct {

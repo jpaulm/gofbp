@@ -3,7 +3,7 @@ package testrtn
 import (
 	"fmt"
 
-	"github.com/tyoung3/gofbp"
+	"github.com/jpaulm/gofbp"
 )
 
 type Receiver struct {

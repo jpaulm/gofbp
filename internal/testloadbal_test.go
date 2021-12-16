@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	"github.com/tyoung3/gofbp"
-	"github.com/tyoung3/gofbp/testrtn"
+	"github.com/jpaulm/gofbp"
+	"github.com/jpaulm/gofbp/testrtn"
 )
 
 func TestLoadBal(t *testing.T) {

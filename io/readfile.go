@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tyoung3/gofbp"
+	"github.com/jpaulm/gofbp"
 )
 
 //ReadFile type defines ipt and opt

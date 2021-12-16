@@ -58,7 +58,7 @@ func main() {
 			}
 			j = strings.Index(rec[i:], "[sync.Cond.Wait]:")
 			i += j
-			// github.com/tyoung3/gofbp/core.(*Process).Send(...)
+			// github.com/jpaulm/gofbp/core.(*Process).Send(...)
 			k = strings.Index(rec[i:], "(*Process).")
 			l := strings.Index(rec[i+k+11:], "(")
 			fmt.Println("Process:", gName+",", "Status:", rec[i+k+11:i+k+11+l])

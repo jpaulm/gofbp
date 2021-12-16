@@ -1,8 +1,8 @@
 package subnets
 
 import (
-	"github.com/tyoung3/gofbp"
-	"github.com/tyoung3/gofbp/testrtn"
+	"github.com/jpaulm/gofbp"
+	"github.com/jpaulm/gofbp/testrtn"
 )
 
 type SSSubnet2 struct{}

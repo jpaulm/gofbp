@@ -4,7 +4,7 @@ import (
 	//"fmt"
 	"strconv"
 
-	"github.com/tyoung3/gofbp"
+	"github.com/jpaulm/gofbp"
 )
 
 type Sender struct {
