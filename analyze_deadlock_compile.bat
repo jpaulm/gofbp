@@ -1,0 +1,1 @@
+go build -o analyze_deadlock.exe analyze_deadlock.go

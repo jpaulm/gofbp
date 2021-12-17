@@ -4,7 +4,7 @@ package testrtn
 import (
 	//"fmt"
 	"strconv"
-	
+
 	"github.com/jpaulm/gofbp/core"
 )
 

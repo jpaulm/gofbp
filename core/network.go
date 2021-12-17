@@ -11,10 +11,6 @@ import (
 	"sync/atomic"
 )
 
-//var pStack []*Process
-
-//var stkLevel int
-
 var tracing bool
 var tracelocks bool
 var generateGids bool
@@ -31,14 +27,8 @@ func NewNetwork(name string) *Network {
 	net := &Network{
 		Name:  name,
 		procs: make(map[string]*Process),
-		//conns: make(map[string]inputCommon),
-		wg: sync.WaitGroup{},
+		wg:    sync.WaitGroup{},
 	}
-
-	//stkLevel++
-	//if stkLevel >= len(pStack) {
-	//pStack = append(pStack, nil)
-	//}
 
 	return net
 }
@@ -47,8 +37,7 @@ func NewSubnet(Name string, p *Process) *Network {
 	net := &Network{
 		Name:  Name,
 		procs: make(map[string]*Process),
-		//conns: make(map[string]inputCommon),
-		wg: sync.WaitGroup{},
+		wg:    sync.WaitGroup{},
 	}
 
 	net.mother = p
