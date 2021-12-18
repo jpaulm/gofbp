@@ -25,6 +25,17 @@ GoFBP Network Definition Syntax and Component API:
 - "automatic" in- and out-ports - notation is port name = "*"
 - GoFBP (and the other FBP implementations on https://github.com/jpaulm distingish between "invocation" and "activation" of processes: a process is invoked once, but may be activated multiple times (if it does a return before all its input ports have been drained) 
 
+## Running your app with GoFBP
+
+In the `go.mod` file in your root, add the statement
+
+```
+require github.com/jpaulm/gofbp latest
+```
+and then run the command `go mod tidy`.
+
+You will also need a `params.xml` file, as shown below.
+
 ## Tracing
 
 An XML file has been provided in the root, called `params.xml`:
