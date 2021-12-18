@@ -47,6 +47,7 @@ An XML file has been provided in the root, called `params.xml`:
 <generate-gIds>false</generate-gIds> 
 </runparams>
 ```
+The `generate-gIds` parameter is used to assist in debugging deadlocks - see below.
 
 ## Subnets
 These are described in Chap. 7 in "Flow-Based Programming": Composite Components - https://jpaulmorrison.com/fbp/compos.shtml , although we haven't implemented dynamic subnets (yet)!
