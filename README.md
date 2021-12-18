@@ -36,6 +36,12 @@ and then run the command `go mod tidy`.
 
 You will also need a `params.xml` file, as shown below.
 
+Command to run your network, e.g.:
+
+```
+go run Merge.go
+```
+
 ## Tracing
 
 An XML file has been provided in the root, called `params.xml`:
