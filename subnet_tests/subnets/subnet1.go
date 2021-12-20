@@ -7,9 +7,11 @@ import (
 	"github.com/jpaulm/gofbp/core"
 )
 
-type Subnet1 struct{}
+type Subnet1 struct {
+}
 
-func (subnet *Subnet1) Setup(p *core.Process) {}
+func (subnet *Subnet1) Setup(p *core.Process) {
+}
 
 func (subnet *Subnet1) Execute(p *core.Process) {
 	net := core.NewSubnet("Subnet1", p)
