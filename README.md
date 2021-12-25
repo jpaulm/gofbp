@@ -60,6 +60,8 @@ The `generate-gIds` parameter is used to assist in debugging deadlocks - see bel
 ## Subnets
 These are described in Chap. 7 in "Flow-Based Programming": Composite Components - https://jpaulmorrison.com/fbp/compos.shtml , although we haven't implemented dynamic subnets (yet)!
 
+**Note:** If a subnet `.go` file is in the same folder as the network `.go` file invoking it, the `NewProc` call should be written without the folder - e.g. `net.NewProc("Run___Subnet", &Subnet1{})`, but currently DrawFBP cannot detect this situation, so, when using notation `GoFBP`, this call will not be generated correctly. 
+
 ## Test Cases
 The following test cases are now working - thanks to Egon Elbre and Emil Valeev for all their help!
 
