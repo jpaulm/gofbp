@@ -1,8 +1,10 @@
 # GoFBP 
 
-This repo holds the beginning of an FBP implementation in Go
+This repo contains an FBP implementation in Go.  It conforms pretty closely to the scheduling logic in JavaFBP, C#FBP and C++FBP (all on https://github.com/jpaulm ).
 
 There may well be further internal changes, but I am hoping that the "external" APIs (network and component definitions) are now firm. 
+
+Current tag: **v1.0.2** .
 
 ## General
  
