@@ -34,7 +34,7 @@ In the `go.mod` file in your root, add the statement
 ```
 require github.com/jpaulm/gofbp latest
 ```
-and then run the command `go mod tidy`.
+and then run the command `go mod tidy` - this will change the word `latest` to the latest version, and store it back in your `go.mod` file.
 
 You will also need a `params.xml` file, as shown below.
 
