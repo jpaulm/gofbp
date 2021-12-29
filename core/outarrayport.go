@@ -25,7 +25,7 @@ func (o *OutArrayPort) GetArrayItem(i int) *OutPort {
 	return o.array[i]
 }
 
-func (o *OutArrayPort) SetArrayItem(o2 *OutPort, i int) {
+func (o *OutArrayPort) setArrayItem(o2 *OutPort, i int) {
 	if i >= len(o.array) {
 		// add to .array to fit c2
 		increaseBy := make([]*OutPort, i-len(o.array)+1)
@@ -53,7 +53,7 @@ func (o *OutArrayPort) GetItemWithFewestIPs() int {
 	backlog := math.MaxInt32
 	var fewestIPsIndex int
 	for i, v := range o.array {
-		j := v.Conn.PktCount()
+		j := v.Conn.pktCount()
 		//fmt.Println(i, j)
 		if j <= backlog {
 			fewestIPsIndex = i

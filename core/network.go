@@ -178,7 +178,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 			if anyInConn == nil {
 				p2.inPorts[inPort.name] = connxn
 			} else {
-				anyInConn.(InputArrayConn).SetArrayItem(connxn, inPort.index)
+				anyInConn.(InputArrayConn).setArrayItem(connxn, inPort.index)
 			}
 		}
 	} else {
@@ -217,7 +217,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 		//p1.outPorts[out] = anyOutConn
 		//opt.Name = out
 		opt = new(OutPort)
-		outConn.SetArrayItem(opt, outPort.index)
+		outConn.setArrayItem(opt, outPort.index)
 		opt.portName = out
 		opt.fullName = p1.Name + "." + out
 		//n.conns[opt.fullName] = opt.Conn

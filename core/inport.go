@@ -117,7 +117,7 @@ func (c *InPort) resetForNextExecution() {
 	c.closed = false
 }
 
-func (c *InPort) PktCount() int {
+func (c *InPort) pktCount() int {
 	var i int
 	c.mtx.Lock()
 	defer c.mtx.Unlock()

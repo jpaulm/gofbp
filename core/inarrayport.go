@@ -10,10 +10,10 @@ type InArrayPort struct {
 
 	//portName string
 	//fullName string
-	array       []*InPort
-	mtx         sync.Mutex
-	closed      bool
-	downStrProc *Process
+	array  []*InPort
+	mtx    sync.Mutex
+	closed bool
+	//downStrProc *Process
 }
 
 func (c *InArrayPort) IsDrained() bool {
@@ -56,7 +56,7 @@ func (c *InArrayPort) GetArrayItem(i int) *InPort {
 	return c.array[i]
 }
 
-func (c *InArrayPort) SetArrayItem(c2 *InPort, i int) {
+func (c *InArrayPort) setArrayItem(c2 *InPort, i int) {
 	if i >= len(c.array) {
 		// add to .array to fit c2
 		increaseBy := make([]*InPort, i-len(c.array)+1)

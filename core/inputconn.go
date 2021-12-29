@@ -20,6 +20,6 @@ type InputArrayConn interface {
 	inputCommon
 
 	GetArrayItem(i int) *InPort
-	SetArrayItem(c *InPort, i int)
+	setArrayItem(c *InPort, i int)
 	ArrayLength() int
 }
