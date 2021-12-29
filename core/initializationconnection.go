@@ -6,12 +6,13 @@ import (
 )
 
 type InitializationConnection struct {
-	network  *Network
-	portName string
-	fullName string
-	closed   bool
-	value    interface{}
-	mtx      sync.Mutex
+	network     *Network
+	portName    string
+	fullName    string
+	closed      bool
+	value       interface{}
+	mtx         sync.Mutex
+	downStrProc *Process
 }
 
 func (c *InitializationConnection) IsDrained() bool {
@@ -26,6 +27,10 @@ func (c *InitializationConnection) IsEmpty() bool {
 	defer c.mtx.Unlock()
 
 	return !c.closed
+}
+
+func (c *InitializationConnection) Receive(p *Process) *Packet {
+	return c.receive(c.downStrProc)
 }
 
 func (c *InitializationConnection) receive(p *Process) *Packet {

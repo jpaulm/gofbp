@@ -20,6 +20,10 @@ type InPort struct {
 	downStrProc *Process
 }
 
+func (c *InPort) Receive(p *Process) *Packet {
+	return c.receive(c.downStrProc)
+}
+
 func (c *InPort) receive(p *Process) *Packet {
 	LockTr(c.condNE, "recv L", p)
 	defer UnlockTr(c.condNE, "recv U", p)
