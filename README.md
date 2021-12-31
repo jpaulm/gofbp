@@ -86,7 +86,7 @@ The following test cases are now working - thanks to Egon Elbre and Emil Valeev 
 - force deadlock (separate test file) - this is designed to crash, and in fact will give a message if it does *not* crash!
  
 
-To run them, position to your `GitHub\gofbp` directory, and do any of the following:
+To run them, position to your `GitHub\gofbp\testing` directory (note the additional folder, as of tag v1.0.3), and do any of the following:
 
 - `go test -run Merge -count=1`
 - `go test -run Concat -count=1`
@@ -97,6 +97,7 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 - `go test -run ForceDeadlock -count=1`
 - `go test -run InfQueueAsMain -count=1` (note the "automatic" ports between WriteFile and ReadFile)
+- `go test -run LoadBal -count=1` (this does load balancing, and uses two DelayedReceiver processes)
 - `go test -run Subnet1 -count=1` 
 - `go test -run Subnet2 -count=1` 
 - `go test -run Subnet3 -count=1` 
