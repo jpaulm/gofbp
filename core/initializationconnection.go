@@ -15,14 +15,14 @@ type InitializationConnection struct {
 	downStrProc *Process
 }
 
-func (c *InitializationConnection) IsDrained() bool {
+func (c *InitializationConnection) isDrained() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
 	return c.closed
 }
 
-func (c *InitializationConnection) IsEmpty() bool {
+func (c *InitializationConnection) isEmpty() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -56,7 +56,7 @@ func (c *InitializationConnection) Close() {
 
 }
 
-func (c *InitializationConnection) IsClosed() bool {
+func (c *InitializationConnection) isClosed() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 

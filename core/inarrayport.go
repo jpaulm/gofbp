@@ -16,18 +16,18 @@ type InArrayPort struct {
 	//downStrProc *Process
 }
 
-func (c *InArrayPort) IsDrained() bool {
+func (c *InArrayPort) isDrained() bool {
 	for _, v := range c.array {
-		if !v.IsDrained() {
+		if !v.isDrained() {
 			return false
 		}
 	}
 	return true
 }
 
-func (c *InArrayPort) IsEmpty() bool {
+func (c *InArrayPort) isEmpty() bool {
 	for _, v := range c.array {
-		if !v.IsEmpty() {
+		if !v.isEmpty() {
 			return false
 		}
 	}
@@ -38,9 +38,9 @@ func (c *InArrayPort) receive(p *Process) *Packet {
 	panic("receive from an array port")
 }
 
-func (c *InArrayPort) IsClosed() bool {
+func (c *InArrayPort) isClosed() bool {
 	for _, v := range c.array {
-		if !v.IsClosed() {
+		if !v.isClosed() {
 			return false
 		}
 	}

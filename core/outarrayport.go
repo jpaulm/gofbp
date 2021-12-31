@@ -53,7 +53,7 @@ func (o *OutArrayPort) GetItemWithFewestIPs() int {
 	backlog := math.MaxInt32
 	var fewestIPsIndex int
 	for i, v := range o.array {
-		j := v.Conn.pktCount()
+		j := v.conn.pktCount()
 		//fmt.Println(i, j)
 		if j <= backlog {
 			fewestIPsIndex = i

@@ -28,7 +28,7 @@ func (c *InPort) receive(p *Process) *Packet {
 	LockTr(c.condNE, "recv L", p)
 	defer UnlockTr(c.condNE, "recv U", p)
 	trace(p, " Receiving from "+c.portName)
-	for c.isEmpty() { // InPort is empty
+	for c.isEmptyNL() { // InPort is empty
 		if c.closed {
 			trace(p, " Received end of stream from "+c.portName)
 			return nil
@@ -77,29 +77,29 @@ func (c *InPort) Close() {
 	//c.downStrProc.activate()
 }
 
-func (c *InPort) IsDrained() bool {
+func (c *InPort) isDrained() bool {
 	LockTr(c.condNE, "IDr L", c.downStrProc)
 	defer UnlockTr(c.condNE, "IDr U", c.downStrProc)
 
-	return c.isDrained()
+	return c.isDrainedNL()
 }
 
-func (c *InPort) isDrained() bool {
-	return c.isEmpty() && c.closed
-}
-
-func (c *InPort) IsEmpty() bool {
-	LockTr(c.condNE, "IE L", c.downStrProc)
-	defer UnlockTr(c.condNE, "IE U", c.downStrProc)
-
-	return c.isEmpty()
+func (c *InPort) isDrainedNL() bool {
+	return c.isEmptyNL() && c.closed
 }
 
 func (c *InPort) isEmpty() bool {
+	LockTr(c.condNE, "IE L", c.downStrProc)
+	defer UnlockTr(c.condNE, "IE U", c.downStrProc)
+
+	return c.isEmptyNL()
+}
+
+func (c *InPort) isEmptyNL() bool {
 	return c.ir == c.is && c.pktArray[c.is] == nil
 }
 
-func (c *InPort) IsClosed() bool {
+func (c *InPort) isClosed() bool {
 	LockTr(c.condNE, "IC L", c.downStrProc)
 	defer UnlockTr(c.condNE, "IC U", c.downStrProc)
 

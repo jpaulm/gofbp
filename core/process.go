@@ -194,15 +194,15 @@ func (p *Process) inputState() (bool, bool, bool) {
 			_, b := v.(*InArrayPort)
 			if b {
 				for _, w := range v.(*InArrayPort).array {
-					allDrained = allDrained && w.IsDrained()
-					hasData = hasData || !w.IsEmpty()
+					allDrained = allDrained && w.isDrained()
+					hasData = hasData || !w.isEmpty()
 					selfStarting = false
 				}
 			} else {
 				w, b := v.(*InPort)
 				if b {
-					allDrained = allDrained && v.IsDrained()
-					hasData = hasData || !w.IsEmpty()
+					allDrained = allDrained && v.isDrained()
+					hasData = hasData || !w.isEmpty()
 					selfStarting = false
 				}
 			}

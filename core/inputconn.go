@@ -1,10 +1,10 @@
 package core
 
 type inputCommon interface {
-	IsDrained() bool
+	isDrained() bool
 	resetForNextExecution()
-	IsEmpty() bool
-	IsClosed() bool
+	isEmpty() bool
+	isClosed() bool
 	Close()
 	receive(*Process) *Packet
 	//Name() string

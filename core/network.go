@@ -233,7 +233,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	}
 
 	opt.sender = p1
-	opt.Conn = connxn
+	opt.conn = connxn
 	opt.connected = true
 
 	connxn.incUpstream()
@@ -394,12 +394,12 @@ func (n *Network) Run() {
 				_, b := v.(*OutArrayPort)
 				if b {
 					for _, w := range v.(*OutArrayPort).array {
-						w.Conn.upStrmCnt = 0
+						w.conn.upStrmCnt = 0
 					}
 				} else {
 					w, b := v.(*OutPort)
 					if b {
-						w.Conn.upStrmCnt = 0
+						w.conn.upStrmCnt = 0
 					}
 				}
 			}
@@ -410,12 +410,12 @@ func (n *Network) Run() {
 				_, b := v.(*OutArrayPort)
 				if b {
 					for _, w := range v.(*OutArrayPort).array {
-						w.Conn.incUpstream()
+						w.conn.incUpstream()
 					}
 				} else {
 					w, b := v.(*OutPort)
 					if b {
-						w.Conn.incUpstream()
+						w.conn.incUpstream()
 					}
 				}
 			}
