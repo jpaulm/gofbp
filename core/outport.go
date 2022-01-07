@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"sync/atomic"
 )
 
@@ -29,10 +30,16 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	defer UnlockTr(o.conn.condNF, "send U", p)
 
 	if pkt.PktType != Normal {
-		trace(p, " Sending to "+o.portName+" >", pkt.Contents.(string),
+		trace(p, " Sending to "+o.portName+" > "+
 			[...]string{"", "Open", "Close"}[pkt.PktType])
+		if tracing {
+			fmt.Print("  ", pkt.Contents, "\n")
+		}
 	} else {
-		trace(p, " Sending to "+o.portName+" >", pkt.Contents.(string))
+		trace(p, " Sending to "+o.portName+" > ")
+		if tracing {
+			fmt.Print("  ", pkt.Contents, "\n")
+		}
 	}
 
 	for o.conn.isFull() { // while connection is full

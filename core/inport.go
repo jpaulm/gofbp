@@ -1,7 +1,7 @@
 package core
 
 import (
-	//"fmt"
+	"fmt"
 	"sync"
 	"sync/atomic"
 )
@@ -40,10 +40,16 @@ func (c *InPort) receive(p *Process) *Packet {
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
 	if pkt.PktType != Normal {
-		trace(p, " Received from "+c.portName+" <", pkt.Contents.(string),
+		trace(p, " Received from "+c.portName+" < "+
 			[...]string{"", "Open", "Close"}[pkt.PktType])
+		if tracing {
+			fmt.Print("  ", pkt.Contents, "\n")
+		}
 	} else {
-		trace(p, " Received from "+c.portName+" <", pkt.Contents.(string))
+		trace(p, " Received from "+c.portName+" < ")
+		if tracing {
+			fmt.Print("  ", pkt.Contents, "\n")
+		}
 	}
 	c.ir = (c.ir + 1) % len(c.pktArray)
 	pkt.owner = p

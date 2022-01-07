@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"regexp"
 	"strconv"
-	"strings"
 	"sync"
 	"sync/atomic"
 )
@@ -80,15 +79,17 @@ func WaitTr(sc *sync.Cond, s string, p *Process) {
 	sc.Wait()
 }
 
-func trace(p *Process, s ...string) {
+func trace(p *Process, s string) {
 	if tracing {
-		fmt.Print(p.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
+		//fmt.Print(p.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
+		fmt.Print(p.Name, " "+s+"\n")
 	}
 }
 
-func traceNet(n *Network, s ...string) {
+func traceNet(n *Network, s string) {
 	if tracing {
-		fmt.Print(n.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
+		//fmt.Print(n.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
+		fmt.Print(n.Name, " "+s+"\n")
 	}
 }
 

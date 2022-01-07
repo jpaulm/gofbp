@@ -1,4 +1,4 @@
-package main
+package testing
 
 import (
 	"github.com/jpaulm/gofbp/components/testrtn"
