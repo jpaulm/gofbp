@@ -45,8 +45,11 @@ Command to run your network, e.g.:
 ```
 go run Merge.go
 ```
+### Notes:
 
-One comment about running with subnets: the subnet or subnets should be in a different folder from the code that invokes it.  If they are in the same folder, apparently both the invoking code and the subnet need to be named individually in a `go run` command... this is not required when running under VSCode, or from an `.exe` file.  
+- There seems to be a problem with test cases accessing the `params.xml` file, if it is in a different folder.  I have accordingly copied it into the `testing` folder, so that test cases can access it as well.
+
+- One comment about running with subnets: the subnet or subnets should be in a different folder from the code that invokes it.  If they are in the same folder, apparently both the invoking code and the subnet need to be named individually in a `go run` command... this is not required when running under VSCode, or from an `.exe` file.  
 
 ## Tracing
 
