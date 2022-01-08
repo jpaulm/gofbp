@@ -17,13 +17,13 @@ type ReadFile struct {
 	opt core.OutputConn
 }
 
-//Setup method opens readFile 
+//Setup method opens readFile
 func (readFile *ReadFile) Setup(p *core.Process) {
 	readFile.ipt = p.OpenInPort("FILENAME")
 	readFile.opt = p.OpenOutPort("OUT")
 }
 
-//Execute method starts Process 
+//Execute method starts Process
 func (readFile *ReadFile) Execute(p *core.Process) {
 
 	icpkt := p.Receive(readFile.ipt)

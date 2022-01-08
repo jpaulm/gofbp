@@ -21,7 +21,7 @@ func (writeFile *WriteFile) Setup(p *core.Process) {
 	writeFile.opt = p.OpenOutPortOptional("OUT")
 }
 
-//MustRun method 
+//MustRun method
 func (WriteFile) MustRun() {}
 
 //Execute method strts Process
@@ -39,6 +39,7 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 	if err != nil {
 		panic("Unable to open file: " + fname)
 	}
+	defer fmt.Println(p.Name+": File", fname, "written")
 	defer f.Close()
 
 	for {
@@ -47,14 +48,14 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 			break
 		}
 
-		data := []byte(pkt.Contents.(string) + "\n")
-
-		_, err2 := f.Write(data)
+		data := fmt.Sprint(pkt.Contents)
+		_, err2 := fmt.Fprintln(f, data)
 
 		if err2 != nil {
 			panic("Unable to write file: " + fname)
 		}
 
+		f.Sync()
 		if !writeFile.opt.IsConnected() {
 			p.Discard(pkt)
 		} else {
@@ -62,5 +63,4 @@ func (writeFile *WriteFile) Execute(p *core.Process) {
 		}
 
 	}
-	fmt.Println(p.Name+": File", fname, "written")
 }
