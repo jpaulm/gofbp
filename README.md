@@ -53,7 +53,12 @@ go run Merge.go
 
 ## Tracing
 
-An XML file has been provided in the root, called `params.xml`:
+An XML file has been provided in the root, called `params.xml`.  
+
+If you need values other than `false`, you will need a copy of this in the same folder as your network definition.  
+
+Format of the tracing definitions file:
+
 ```
 <?xml version="1.0"?> 
 <runparams>
