@@ -7,7 +7,7 @@ xsi:noNamespaceSchemaLocation="https://github.com/jpaulm/drawfbp/blob/master/lib
   Sender</description> <compname>sender.go</compname> <blockclassname>C:/Users/Paul/Documents/GitHub/gofbp/components/testrtn/sender.go</blockclassname> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
 </block> 
 <block> <x> 375 </x> <y> 192 </y> <id> 2 </id> <type>B</type> <width>92</width> <height>64</height> <description>Run 
- Subnet</description> <diagramfilename>C:/Users/Paul/Documents/GitHub/gofbp/diagrams/Subnet1.drw</diagramfilename> <compname>Subnet1.go</compname> <blockclassname>C:/Users/Paul/Documents/GitHub/gofbp/subnet_tests/Subnet1.go</blockclassname> <multiplex>false</multiplex><invisible>false</invisible><issubnet>true</issubnet> 
+ Subnet</description> <diagramfilename>C:/Users/Paul/Documents/GitHub/gofbp/diagrams/Subnet1.drw</diagramfilename> <compname>subnet1.go</compname> <blockclassname>C:/Users/Paul/Documents/GitHub/gofbp/subnet_tests/subnets/subnet1.go</blockclassname> <multiplex>false</multiplex><invisible>false</invisible><issubnet>true</issubnet> 
 </block> 
 <block> <x> 645 </x> <y> 192 </y> <id> 3 </id> <type>B</type> <width>92</width> <height>64</height> <description>Write
   To

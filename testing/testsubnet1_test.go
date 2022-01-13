@@ -9,7 +9,7 @@ import (
 )
 
 func TestSubnet1(t *testing.T) {
-	net := core.NewNetwork("TestSubnet1")
+	net := core.NewNetwork("TestSubnet1", nil)
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 

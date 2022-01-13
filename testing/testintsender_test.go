@@ -9,7 +9,7 @@ import (
 )
 
 func TestIntSender(t *testing.T) {
-	net := core.NewNetwork("TestIntSender")
+	net := core.NewNetwork("TestIntSender", nil)
 
 	proc1 := net.NewProc("IntSender", &testrtn.IntSender{})
 	proc2 := net.NewProc("WriteToFile", &io.WriteFile{})

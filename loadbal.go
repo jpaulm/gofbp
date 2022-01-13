@@ -1,4 +1,4 @@
-package testing
+package main
 
 import (
 	"github.com/jpaulm/gofbp/components/testrtn"
@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	net := core.NewNetwork("loadbal")
+	net := core.NewNetwork("loadbal", nil)
 
 	receiver2 := net.NewProc("Receiver2", &testrtn.Receiver{})
 	receiver1 := net.NewProc("Receiver1", &testrtn.Receiver{})

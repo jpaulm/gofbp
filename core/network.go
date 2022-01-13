@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"regexp"
@@ -20,13 +21,15 @@ type Network struct {
 	//conns  map[string]inputCommon
 	wg     sync.WaitGroup
 	mother *Process
+	params *Params
 }
 
-func NewNetwork(name string) *Network {
+func NewNetwork(name string, pms *Params) *Network {
 	net := &Network{
-		Name:  name,
-		procs: make(map[string]*Process),
-		wg:    sync.WaitGroup{},
+		Name:   name,
+		procs:  make(map[string]*Process),
+		wg:     sync.WaitGroup{},
+		params: pms,
 	}
 
 	return net
@@ -285,33 +288,43 @@ func (n *Network) Exit() {
 	}
 }
 
-func setOptions() {
-	var params struct {
-		Tracing      bool `xml:"tracing"`
-		TraceLocks   bool `xml:"tracelocks"`
-		GenerateGIDs bool `xml:"generate-gIds"`
-	}
+type Params struct {
+	Tracing      bool `xml:"tracing"`
+	TraceLocks   bool `xml:"tracelocks"`
+	GenerateGIDs bool `xml:"generate-gIds"`
+}
 
-	xmldata, err := ioutil.ReadFile("params.xml")
+func LoadXMLParams(s string) (*Params, error) {
+
+	params := &Params{}
+
+	xmldata, err := ioutil.ReadFile(s)
 	if err != nil {
-		return
+		return nil, errors.New("couldn't read: " + s)
 	}
-
 	err = xml.Unmarshal(xmldata, &params)
 	if err != nil {
-		return
-
+		return nil, errors.New("couldn't unmarshal: " + s)
 	}
 
-	tracing = params.Tracing
-	tracelocks = params.TraceLocks
-	generateGids = params.GenerateGIDs
+	//tracing = params.Tracing
+	//tracelocks = params.TraceLocks
+	//generateGids = params.GenerateGIDs
+	return params, nil
+}
+
+func (n *Network) setOptions() {
+	if n.params != nil {
+		tracing = n.params.Tracing
+		tracelocks = n.params.TraceLocks
+		generateGids = n.params.GenerateGIDs
+	}
 }
 
 func (n *Network) Run() {
 	defer n.Exit()
 	if n.mother == nil {
-		setOptions()
+		n.setOptions()
 	}
 
 	defer traceNet(n, " Done")

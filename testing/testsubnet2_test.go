@@ -11,7 +11,7 @@ import (
 )
 
 func TestSubnet2(t *testing.T) {
-	net := core.NewNetwork("TestSubnet2")
+	net := core.NewNetwork("TestSubnet2", nil)
 
 	proc1 := net.NewProc("SubstreamSender", &testrtn.SubstreamSender{}) // sends multiple substreams of varying lengths
 
