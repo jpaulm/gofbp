@@ -8,7 +8,7 @@ import (
 )
 
 func TestLoadBal(t *testing.T) {
-	net := core.NewNetwork("TestLoadBal", nil)
+	net := core.NewNetwork("TestLoadBal")
 
 	sender := net.NewProc("Sender", &testrtn.Sender{})
 

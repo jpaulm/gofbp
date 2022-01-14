@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	net := core.NewNetwork("ForceDeadlock", nil)
+	net := core.NewNetwork("ForceDeadlock")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 	proc2 := net.NewProc("Counter", &testrtn.Counter{})

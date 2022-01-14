@@ -11,7 +11,7 @@ import (
 )
 
 func TestMerge(t *testing.T) {
-	net := core.NewNetwork("Merge", nil)
+	net := core.NewNetwork("Merge")
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 	proc2 := net.NewProc("Sender2", &testrtn.Sender{})
@@ -27,7 +27,7 @@ func TestMerge(t *testing.T) {
 }
 
 func TestConcat(t *testing.T) {
-	net := core.NewNetwork("Concat", nil)
+	net := core.NewNetwork("Concat")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
@@ -47,7 +47,7 @@ func TestConcat(t *testing.T) {
 }
 
 func TestRRDist(t *testing.T) {
-	net := core.NewNetwork("RRDist", nil)
+	net := core.NewNetwork("RRDist")
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
@@ -67,7 +67,7 @@ func TestRRDist(t *testing.T) {
 }
 
 func TestCopyFile(t *testing.T) {
-	net := core.NewNetwork("CopyFile", nil)
+	net := core.NewNetwork("CopyFile")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 
@@ -84,7 +84,7 @@ func TestDoSelect1(t *testing.T) {
 
 	// port REJ from proc2 is connected
 
-	net := core.NewNetwork("DoSelect1", nil)
+	net := core.NewNetwork("DoSelect1")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 	proc2 := net.NewProc("Select", &testrtn.Selector{})
@@ -105,7 +105,7 @@ func TestDoSelect2(t *testing.T) {
 
 	// port REJ from proc2 is NOT connected
 
-	net := core.NewNetwork("DoSelect2", nil)
+	net := core.NewNetwork("DoSelect2")
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 	proc2 := net.NewProc("Select", &testrtn.Selector{})
@@ -123,7 +123,7 @@ func TestDoSelect2(t *testing.T) {
 }
 func TestWriteToConsUsingNL(t *testing.T) {
 
-	net := core.NewNetwork("TestWriteToConsUsingNL", nil)
+	net := core.NewNetwork("TestWriteToConsUsingNL")
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 	proc2 := net.NewProc("Sender2", &testrtn.Sender{})

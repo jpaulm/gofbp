@@ -21,15 +21,15 @@ type Network struct {
 	//conns  map[string]inputCommon
 	wg     sync.WaitGroup
 	mother *Process
-	params *Params
+	//params *Params
 }
 
-func NewNetwork(name string, pms *Params) *Network {
+func NewNetwork(name string) *Network {
 	net := &Network{
-		Name:   name,
-		procs:  make(map[string]*Process),
-		wg:     sync.WaitGroup{},
-		params: pms,
+		Name:  name,
+		procs: make(map[string]*Process),
+		wg:    sync.WaitGroup{},
+		//params: pms,
 	}
 
 	return net
@@ -313,19 +313,19 @@ func LoadXMLParams(s string) (*Params, error) {
 	return params, nil
 }
 
-func (n *Network) setOptions() {
-	if n.params != nil {
-		tracing = n.params.Tracing
-		tracelocks = n.params.TraceLocks
-		generateGids = n.params.GenerateGIDs
-	}
+func (n *Network) SetParams(p *Params) {
+	//if p != nil {
+	tracing = p.Tracing
+	tracelocks = p.TraceLocks
+	generateGids = p.GenerateGIDs
+	//}
 }
 
 func (n *Network) Run() {
 	defer n.Exit()
-	if n.mother == nil {
-		n.setOptions()
-	}
+	//if n.mother == nil {
+	//	n.setOptions()
+	//}
 
 	defer traceNet(n, " Done")
 

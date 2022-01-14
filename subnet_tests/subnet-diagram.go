@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	net := core.NewNetwork("Subnet-diagram", nil)
+	net := core.NewNetwork("Subnet-diagram")
 	substream___sender := net.NewProc("Substream___Sender", &testrtn.Sender{})
 	run___subnet := net.NewProc("Run___Subnet", &subnets.Subnet1{})
 	write___to_console := net.NewProc("Write___To_Console", &testrtn.WriteToConsole{})
