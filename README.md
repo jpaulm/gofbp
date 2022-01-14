@@ -38,7 +38,7 @@ require github.com/jpaulm/gofbp latest
 ```
 and then run the command `go mod tidy` - this will change the word `latest` to the latest version, and store it back in your `go.mod` file.
 
-You will also need a `params.xml` file, as shown below.
+If you need parameter values other than `false`, you will have to provide a `params.xml` file, as shown below.
 
 Command to run your network, e.g.:
 
@@ -64,10 +64,10 @@ Format of the tracing definitions file:
 <runparams>
 <tracing>false</tracing>
 <tracelocks>false</tracelocks>
-<generate-gIds>false</generate-gIds> 
+<generate-gIds>true</generate-gIds> 
 </runparams>
 ```
-The `generate-gIds` parameter is used to assist in debugging deadlocks - see below.
+The `generate-gIds` parameter is only used to assist in debugging deadlocks, so can default most of the time - see below.
 
 ## Subnets
 These are described in Chap. 7 in "Flow-Based Programming": Composite Components - https://jpaulmorrison.com/fbp/compos.shtml , although we haven't implemented dynamic subnets (yet)!
