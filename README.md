@@ -47,15 +47,11 @@ go run Merge.go
 ```
 ### Notes:
 
-- There seems to be a problem with test cases accessing the `params.xml` file, if it is in a different folder.  I have accordingly copied it into the `testing` folder, so that test cases can access it as well.
-
 - One comment about running with subnets: the subnet or subnets should be in a different folder from the code that invokes it.  If they are in the same folder, apparently both the invoking code and the subnet need to be named individually in a `go run` command... this is not required when running under VSCode, or from an `.exe` file.  
 
 ## Tracing
 
-An XML file has been provided in the root, called `params.xml`.  
-
-If you need values other than `false`, you will need a copy of this in the same folder as your network definition.  
+An XML file has been provided in the root, called `params.xml`.  If you need values other than all `false`, you will need to reference this using the `LoadXMLParams` and `SetParams` methods - see https://jpaulm.github.io/fbp/gosyntax.htm .
 
 Format of the tracing definitions file:
 
