@@ -52,6 +52,12 @@ A number of test cases are in the `testing` folder, and can be run as follows:
 cd testing
 go test
 ```
+To run an individual network, e.g. `TestIntSender` in `testing\testintsender_test.go`,
+run
+```
+cd testing
+go test -run IntSender
+```
 
 ### Notes:
 
