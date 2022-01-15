@@ -38,13 +38,21 @@ require github.com/jpaulm/gofbp latest
 ```
 and then run the command `go mod tidy` - this will change the word `latest` to the latest version, and store it back in your `go.mod` file.
 
-If you need parameter values other than `false`, you will have to provide a `params.xml` file, as shown below.
+If you need parameter values other than `false`, you will have to access a `params.xml` file, as shown below.
 
 Command to run your network, e.g.:
 
 ```
 go run Merge.go
 ```
+
+A number of test cases are in the `testing` folder, and can be run as follows:
+
+```
+cd testing
+go test
+```
+
 ### Notes:
 
 - One comment about running with subnets: the subnet or subnets should be in a different folder from the code that invokes it.  If they are in the same folder, apparently both the invoking code and the subnet need to be named individually in a `go run` command... this is not required when running under VSCode, or from an `.exe` file.  
