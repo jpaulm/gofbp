@@ -84,19 +84,15 @@ func WaitTr(sc *sync.Cond, s string, p *Process) {
 
 func trace(p *Process, s string) {
 	if tracing {
-		//fmt.Print(p.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
 		fmt.Print(p.Name, " "+s+"\n")
 	}
 }
 
 func traceNet(n *Network, s string) {
 	if tracing {
-		//fmt.Print(n.Name, " "+strings.Trim(fmt.Sprint(s), "[]")+"\n")
 		fmt.Print(n.Name, " "+s+"\n")
 	}
 }
-
-//func (n *Network) id() string { return fmt.Sprintf("%p", n) }
 
 func (n *Network) NewProc(nm string, comp Component) *Process {
 
@@ -307,18 +303,16 @@ func LoadXMLParams(s string) (*Params, error) {
 		return nil, errors.New("couldn't unmarshal: " + s)
 	}
 
-	//tracing = params.Tracing
-	//tracelocks = params.TraceLocks
-	//generateGids = params.GenerateGIDs
 	return params, nil
 }
 
 func (n *Network) SetParams(p *Params) {
-	//if p != nil {
+	if p == nil {
+		panic("Calling SetParams with nil parameter")
+	}
 	tracing = p.Tracing
 	tracelocks = p.TraceLocks
 	generateGids = p.GenerateGIDs
-	//}
 }
 
 func (n *Network) Run() {

@@ -9,8 +9,12 @@ import (
 )
 
 func TestIntSender(t *testing.T) {
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("TestIntSender")
-
+	net.SetParams(params)
 	proc1 := net.NewProc("IntSender", &testrtn.IntSender{})
 	proc2 := net.NewProc("WriteToFile", &io.WriteFile{})
 	proc3 := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
