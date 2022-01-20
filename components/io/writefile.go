@@ -24,7 +24,7 @@ func (writeFile *WriteFile) Setup(p *core.Process) {
 //MustRun method
 func (WriteFile) MustRun() {}
 
-//Execute method strts Process
+//Execute method starts Process
 func (writeFile *WriteFile) Execute(p *core.Process) {
 
 	icpkt := p.Receive(writeFile.iptIP)
