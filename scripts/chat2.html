@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WebSocket Example - Chat2</title>
+<meta http-equiv="Content-Type" content="text/shtml; charset=UTF-8">
+//<link rel="shortcut icon" href="favicon.ico">
+<style>
+#container {
+	border: 1px #999999 solid;
+	padding: 10px;
+}
+
+p.client {
+	border-bottom: 1px aquamarine solid;
+}
+
+p.server {
+	border-bottom: 1px crimson solid;
+}
+
+input {
+	padding: 5px;
+	width: 250px;
+}
+
+button {
+	padding: 5px;
+}
+</style>
+<script>
+	//if ("WebSocket" in window)
+	if (window.WebSocket) {
+
+		//var portno = "9003";
+		//var portno = "8887";
+		var portno = "8080";
+		
+		//var chatClient = new WebSocket("ws://localhost:" + portno  + "/websocket/ws");  
+		var chatClient = new WebSocket("ws://localhost:" + portno  + "/ws");  
+		//alert(chatClient);
+
+	var message = document.getElementById("message");
+		//var jarfile = document.getElementById("jarfile");
+		console.log("ready state: " + chatClient.readyState);
+		console.log('starting client html');
+		
+		document.addEventListener("keyup", function(event) {
+         // Number 13 is the "Enter" key on the keyboard
+         if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click             
+            document.getElementById("send").click();
+         }
+     }); 
+		chatClient.onmessage = function(evt) {
+			var container = document.getElementById("container");
+			//alert(typeof evt.data);			
+
+			if (evt.data === "@{")  {
+				while(container.firstChild){                      // clear container
+					container.removeChild(container.firstChild);
+				}
+			} else if (evt.data === "@}") {
+				console.log('End of substream');
+			} else {
+				var p = document.createElement("li");
+				p.setAttribute("class", "server");
+				p.innerHTML = "Server: " + evt.data;
+
+				container.appendChild(p);
+			}
+		}
+	} else {
+		alert("WebSocket NOT supported by your Browser!");
+	}
+	
+
+
+	function send() {
+
+		var message = document.getElementById("message");
+		var jarfile = document.getElementById("jarfile");
+		//debugger;
+		if (!(message.value.trim() == "namelist")  && !(message.value.trim() == "complist")) {
+		 alert("Command must be 'namelist' or 'complist'");
+		  return;
+		}
+		
+		if (message.value.trim() == "complist"  && jarfile.value.trim() == "") {
+		  alert("For 'complist' command, fill in jar file name");
+		  return;
+		}
+		
+		//alert("Sent");
+		
+		//alert("Sent1");
+		chatClient.send("@{");		
+		//alert("Sent2");
+
+		chatClient.send("{Client2: " + message.value + "}");
+
+                if (message.value.trim() == "complist")  {
+		  chatClient.send("{Client2: " + jarfile.value + "}");
+                }
+		
+		chatClient.send("@}");
+		//alert("Sent3");
+	}
+
+    chatClient.onopen = function(event) {
+		console.log('Connection opened ', event);
+	}
+	
+	// Listen for socket closes
+	chatClient.onclose = function(event) {
+		console.log('Client notified socket has closed', event);
+	}
+
+	window.onbeforeunload = function() {
+		chatClient.onclose = function() {
+		}; // disable onclose handler first
+		chatClient.close();
+	}
+
+	function closeme() {
+		//chatClient.close(1000);
+		chatClient.send("@close");
+	}
+
+	function stopws() {
+
+		chatClient.send("@kill");
+
+console.log('Server being closed down', event);
+		var status = document.getElementById("status");
+		status.innerHTML = "<b>End of dialog</b>";
+	}
+</script>
+</head>
+<body>
+	<h1>WebSockets Example - Chat2</h1>
+	
+	<p>
+		Command: <input type="text" id="message" name="message" />
+	</p>
+	<p>
+		Data: <input type="text" id="jarfile" name="jarfile" />
+	</p>
+<p>
+		Status: <output type="text" id="status" name="status" ></output>
+	</p>
+	<button type="button" id="send" onclick="send()">Send</button>
+	<button type="button" id="stopws" onclick="stopws()">Stop WS</button>
+	<ul id="container">
+	</ul>
+	</body>
+
+</html>
+
