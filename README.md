@@ -4,7 +4,7 @@ This repo contains an FBP implementation in Go.  It conforms pretty closely to t
 
 There may well be further internal changes, but I am hoping that the "external" APIs (network and component definitions) are now firm. 
 
-Current tag: **v1.0.5** .
+Current tag: **v1.0.6** .
 
 ## General
  
