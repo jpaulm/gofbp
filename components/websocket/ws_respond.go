@@ -13,6 +13,8 @@ type WSRespond struct {
 	ipt core.InputConn
 }
 
+func (WSRespond) MustRun() {}
+
 func (wsrespond *WSRespond) Setup(p *core.Process) {
 	wsrespond.ipt = p.OpenInPort("IN")
 }
@@ -28,11 +30,7 @@ func (wsrespond *WSRespond) Execute(p *core.Process) {
 	if pkt == nil {
 		return
 	}
-	conn, ok := pkt.Contents.(*websocket.Conn)
-	if !ok {
-		i := 1
-		i++
-	}
+	conn, _ := pkt.Contents.(*websocket.Conn)
 
 	p.Discard(pkt)
 

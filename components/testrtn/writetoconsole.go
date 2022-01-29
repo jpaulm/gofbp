@@ -26,10 +26,10 @@ func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
 			break
 		}
 		if pkt.PktType == core.OpenBracket {
-			fmt.Println("Open", pkt.Contents)
+			fmt.Println("Open Bracket", pkt.Contents)
 		} else {
 			if pkt.PktType == core.CloseBracket {
-				fmt.Println("Close", pkt.Contents)
+				fmt.Println("Close Bracket", pkt.Contents)
 			} else {
 				fmt.Print(pkt.Contents)
 			}

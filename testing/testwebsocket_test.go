@@ -5,7 +5,6 @@ import (
 
 	"github.com/jpaulm/gofbp/components/websocket"
 
-	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
 )
 
@@ -17,7 +16,7 @@ func TestWebSocket(t *testing.T) {
 	net := core.NewNetwork("TestWebSocket")
 	net.SetParams(params)
 	proc1 := net.NewProc("WSRequest", &websocket.WSRequest{})
-	proc2 := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
+	proc2 := net.NewProc("AnsReq", &websocket.WSAnsReq{})
 	proc3 := net.NewProc("WSRespond", &websocket.WSRespond{})
 	net.Initialize("localhost:8080", proc1, "ADDR")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
