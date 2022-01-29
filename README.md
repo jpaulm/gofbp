@@ -194,6 +194,7 @@ The following components are available:
 - open with Firefox or Chrome
 - enter `namelist` in the Command box, hit enter or Send
 - you should see `Server: Line1`, `Server: Line2`, `Server: Line3` show up in the box below "Send"
+- you can repeat this multiple times, and the 3 output lines will be appended each time to the current display
 - click on `Stop WS` - you will see `End of dialog` next to `Status`
 
 - you're done... except that, right now, it's not coming down cleanly, so you will have to close the DOS session manually.  Hopefully, this will be fixed soon!
