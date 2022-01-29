@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/jpaulm/gofbp/components/websocket"
-
 	"github.com/jpaulm/gofbp/core"
 )
 

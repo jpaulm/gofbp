@@ -1,4 +1,4 @@
-package components
+package websocket
 
 import (
 	"github.com/jpaulm/gofbp/core"
@@ -26,7 +26,7 @@ func (wsansreq *WSAnsReq) Execute(p *core.Process) {
 		p.Send(wsansreq.out, pkt)
 
 		pkt = p.Receive(wsansreq.ipt) // connection
-		p.Discard(pkt)
+		p.Send(wsansreq.out, pkt)
 
 		pkt = p.Receive(wsansreq.ipt) //"namelist"
 		p.Discard(pkt)

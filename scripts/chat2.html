@@ -55,7 +55,8 @@ button {
      }); 
 		chatClient.onmessage = function(evt) {
 			var container = document.getElementById("container");
-			//alert(typeof evt.data);			
+			//alert(typeof evt.data);	
+			//alert(evt.data)		
 
 			if (evt.data === "@{")  {
 				while(container.firstChild){                      // clear container

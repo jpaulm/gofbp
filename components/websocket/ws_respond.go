@@ -35,13 +35,17 @@ func (wsrespond *WSRespond) Execute(p *core.Process) {
 	p.Discard(pkt)
 
 	for {
-		pkt := p.Receive(wsrespond.ipt)
+		pkt = p.Receive(wsrespond.ipt)
 		if pkt.PktType == core.CloseBracket {
 			break
 		}
-		data, _ := pkt.Contents.([]byte)
+		data, ok := pkt.Contents.(string)
+		if !ok {
+			log.Println("write: data not string")
+			break
+		}
 
-		err := conn.WriteMessage(websocket.TextMessage, data)
+		err := conn.WriteMessage(websocket.TextMessage, []byte(data))
 		if err != nil {
 			log.Println("write:", err)
 			break
