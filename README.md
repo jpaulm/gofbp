@@ -102,9 +102,11 @@ The following test cases are now working - thanks to Egon Elbre and Emil Valeev 
 - test subnet (SubIn and SubOut)
 
 - force deadlock (separate test file) - this is designed to crash, and in fact will give a message if it does *not* crash!
+
+- simple web sockets test
  
 
-To run them, position to your `GitHub\gofbp\testing` directory (note the additional folder, as of tag v1.0.3), and do any of the following:
+To run them, position to your `GitHub\gofbp\testing` directory (note the additional folder, as of tag `v1.0.3` plus), and do any of the following:
 
 - `go test -run Merge -count=1`
 - `go test -run Concat -count=1`
@@ -119,6 +121,7 @@ To run them, position to your `GitHub\gofbp\testing` directory (note the additio
 - `go test -run Subnet1 -count=1` 
 - `go test -run Subnet2 -count=1` 
 - `go test -run Subnet3 -count=1` 
+- `go test -run TestWebSocket -count=1`  - for more instructions, see # Test WebSockets (below)
 
 
 **Note**: ForceDeadlock is constructed differently so that it can "crash" without disrupting the flow of tests: the network definition has to be compiled "on the fly", so it is actually in `testdata`, while the test itself contains the code to compile and run the test.
@@ -177,15 +180,33 @@ The following components are available:
 - `readfile.go`
 - `writefile.go`
 
+"websocket" folder (for instructions, see below):
+- `ws_request.go`
+- `ws_respond.go`
+- `ws_ans_req.go`  (sample component - properly belongs in test suite)
+
+**Test Websockets**
+
+- position to your `GitHub\gofbp\testing` directory in DOS
+- run `go test -run TestWebSocket -count=1`
+
+- in File Explorer, locate `GitHub\gofbp\scripts\chat2.html`
+- open with Firefox or Chrome
+- enter `namelist` in the Command box, hit enter or Send
+- you should see `Server: Line1`, `Server: Line2`, `Server: Line3` show up in the box below "Send"
+- click on `Stop WS` - you will see `End of dialog` next to `Status`
+
+- you're done... except that, right now, it's not coming down cleanly, so you will have to close the DOS session manually.  Hopefully, this will be fixed soon!
+
+
 **To dos**
 
-- More and better documentation
 - Convert `panic`s to more standard Go error handling
-- Way too much logging - have to make that optional - put remaining logging under switch control
+- Way too much logging - have to make that optional - put remaining logging under switch control - *done!*
 - Add subnet handling - *done!*
-- Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp
-- Add Load Balancing component
-- Add sample code showing use of substreams
+- Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp - *done!*
+- Add Load Balancing component - *done!*
+- Add sample code showing use of substreams - *done!*
 - "Automatic" ports - *done!*
-- Add Lua interface - see https://jpaulm.github.io/fbp/thlua.html 
+- Add Lua interface - similar to https://jpaulm.github.io/fbp/thlua.html 
 
