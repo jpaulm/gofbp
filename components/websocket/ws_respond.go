@@ -39,13 +39,13 @@ func (wsrespond *WSRespond) Execute(p *core.Process) {
 		if pkt.PktType == core.CloseBracket {
 			break
 		}
-		data, ok := pkt.Contents.(string)
-		if !ok {
-			log.Println("write: data not string")
-			break
-		}
+		//data, ok := pkt.Contents.(string)
+		//if !ok {
+		//	log.Println("write: data not string")
+		//	break
+		//}
 
-		err := conn.WriteMessage(websocket.TextMessage, []byte(data))
+		err := conn.WriteMessage(websocket.TextMessage, []byte(pkt.Contents.(string)))
 		if err != nil {
 			log.Println("write:", err)
 			break
