@@ -297,6 +297,10 @@ func (p *Process) Create(x interface{}) *Packet {
 	pkt.Contents = x
 	pkt.owner = p
 	p.ownedPkts++
+	if tracepkts {
+		fmt.Print(p.Name, "Packet created <\n")
+		fmt.Println("  ", pkt.Contents)
+	}
 	return pkt
 }
 
@@ -308,6 +312,10 @@ func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 	pkt.PktType = pktType
 	pkt.owner = p
 	p.ownedPkts++
+	if tracepkts {
+		fmt.Print(p.Name, "Bracket created: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
+		fmt.Println("  ", pkt.Contents)
+	}
 	return pkt
 }
 
@@ -317,7 +325,16 @@ func (p *Process) Discard(pkt *Packet) {
 		panic("Discarding nil packet")
 	}
 	p.ownedPkts--
-	//pkt = nil
+	if tracepkts {
+		if pkt.PktType != NormalPacket {
+			fmt.Print(p.Name, "Bracket discarded: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
+			fmt.Print("  contents: ", pkt.Contents, "\n")
+		} else {
+			fmt.Print(p.Name, "Packet discarded >")
+			fmt.Println("  ", pkt.Contents)
+		}
+	}
+	pkt = nil
 }
 
 //https://blog.sgmansfield.com/2015/12/goroutine-ids/

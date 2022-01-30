@@ -29,11 +29,11 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	LockTr(o.conn.condNF, "send L", p)
 	defer UnlockTr(o.conn.condNF, "send U", p)
 
-	if pkt.PktType != Normal {
+	if pkt.PktType != NormalPacket {
 		trace(p, " Sending to "+o.portName+" > "+
-			[...]string{"", "Open", "Close"}[pkt.PktType])
+			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
 		if tracing {
-			fmt.Print("  ", pkt.Contents, "\n")
+			fmt.Print("  contents: ", pkt.Contents, "\n")
 		}
 	} else {
 		trace(p, " Sending to "+o.portName+" > ")

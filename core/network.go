@@ -13,6 +13,7 @@ import (
 
 var tracing bool
 var tracelocks bool
+var tracepkts bool
 var generateGids bool
 
 type Network struct {
@@ -287,6 +288,7 @@ func (n *Network) Exit() {
 type Params struct {
 	Tracing      bool `xml:"tracing"`
 	TraceLocks   bool `xml:"tracelocks"`
+	TracePkts    bool `xml:"tracepkts"`
 	GenerateGIDs bool `xml:"generate-gIds"`
 }
 
@@ -312,6 +314,7 @@ func (n *Network) SetParams(p *Params) {
 	}
 	tracing = p.Tracing
 	tracelocks = p.TraceLocks
+	tracepkts = p.TracePkts
 	generateGids = p.GenerateGIDs
 }
 

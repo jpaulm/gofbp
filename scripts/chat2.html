@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 <title>WebSocket Example - Chat2</title>
@@ -116,6 +116,14 @@ button {
 	// Listen for socket closes
 	chatClient.onclose = function(event) {
 		console.log('Client notified socket has closed', event);
+        var status = document.getElementById("status");
+        status.innerHTML = "<b>End of dialog (1)</b>";
+	}
+	
+	chatClient.onerror = function(event) {
+		console.log('Client notified socket has closed', event);
+        var status = document.getElementById("status");
+        status.innerHTML = "<b>End of dialog (2)</b>";
 	}
 
 	window.onbeforeunload = function() {
@@ -133,9 +141,9 @@ button {
 
 		chatClient.send("@kill");
 
-console.log('Server being closed down', event);
-		var status = document.getElementById("status");
-		status.innerHTML = "<b>End of dialog</b>";
+		console.log('Server being closed down', event);
+		//var status = document.getElementById("status");
+		//status.innerHTML = "<b>End of dialog</b>";
 	}
 </script>
 </head>

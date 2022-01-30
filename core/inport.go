@@ -29,7 +29,7 @@ func (c *InPort) receive(p *Process) *Packet {
 	defer UnlockTr(c.condNE, "recv U", p)
 	trace(p, " Receiving from "+c.portName)
 	for c.isEmptyNL() { // InPort is empty
-		if c.closed {
+		if c.closed /* || c.upStrmCnt == 0  - check this! */ {
 			trace(p, " Received end of stream from "+c.portName)
 			return nil
 		}
@@ -39,11 +39,11 @@ func (c *InPort) receive(p *Process) *Packet {
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
-	if pkt.PktType != Normal {
+	if pkt.PktType != NormalPacket {
 		trace(p, " Received from "+c.portName+" < "+
-			[...]string{"", "Open", "Close"}[pkt.PktType])
+			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
 		if tracing {
-			fmt.Print("  ", pkt.Contents, "\n")
+			fmt.Print("  contents: ", pkt.Contents, "\n")
 		}
 	} else {
 		trace(p, " Received from "+c.portName+" < ")

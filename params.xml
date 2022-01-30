@@ -2,5 +2,6 @@
 <runparams>
     <tracing>true</tracing>
     <tracelocks>false</tracelocks>
+    <tracepkts>true</tracepkts>
     <generate-gIds>false</generate-gIds>
 </runparams>

@@ -1,7 +1,7 @@
 package core
 
 const (
-	Normal int32 = iota
+	NormalPacket int32 = iota
 	OpenBracket
 	CloseBracket
 )
