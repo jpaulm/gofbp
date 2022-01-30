@@ -74,6 +74,7 @@ Format of the tracing definitions file:
 <runparams>
 <tracing>false</tracing>
 <tracelocks>false</tracelocks>
+<tracepkts>false</tracepkts>     (traces packet creates, createbrackets and discards)
 <generate-gIds>true</generate-gIds> 
 </runparams>
 ```
