@@ -162,6 +162,8 @@ func (p *Process) activate() {
 
 	//LockTr(p.canGo, "start test L", p)
 	//trace(p, "test if notstarted - status: "+strconv.FormatInt(int64(p.status), 10))
+	trace(p, "Activating: status "+[...]string{"Not Started", "Active", "Dormant",
+		"SuspSend", "SuspRecv", "Terminated"}[p.status])
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		if atomic.CompareAndSwapInt32(&p.status, Dormant, Active) {
 

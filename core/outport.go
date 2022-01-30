@@ -88,7 +88,7 @@ func (o *OutPort) Close() {
 	if o.conn.upStrmCnt == 0 {
 		o.conn.closed = true
 		BdcastTr(o.conn.condNE, "bdcast out", o.sender)
-		trace(o.conn.downStrProc, "act from close")
+		trace(o.conn.downStrProc, "activated from close")
 		o.conn.downStrProc.activate()
 	}
 }
