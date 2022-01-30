@@ -109,6 +109,9 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	//}
 
 	var pkt_list []*core.Packet
+	var pkt *core.Packet
+
+	opt := proc.OpenOutPort("OUT")
 
 	for {
 		_, message, err := c.ReadMessage()
@@ -120,8 +123,6 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 
 		x := string(message)
 
-		opt := proc.OpenOutPort("OUT")
-
 		if x == "@{" {
 
 			pkt_list = make([]*core.Packet, 0)
@@ -131,11 +132,14 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 
 		if x == "@}" {
 
-			pkt := proc.CreateBracket(core.OpenBracket, "")
+			// send out "connection" IPs, then IPs stored in pkt_list ... surrounded by bracket IPs
+
+			pkt = proc.CreateBracket(core.OpenBracket, "")
 			proc.Send(opt, pkt)
 
-			pkt = proc.Create(c)
+			pkt = proc.Create(c) // connection
 			proc.Send(opt, pkt)
+
 			for _, pkt := range pkt_list {
 				proc.Send(opt, pkt)
 			}
@@ -147,12 +151,15 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if x == "@kill" {
-			time.Sleep(10 * time.Second)
+			//time.Sleep(10 * time.Second)
+			//pkt = proc.Create(x)
+			//proc.Send(opt, pkt)
 			c.Close()
 			//break
+			continue
 		}
 
-		pkt := proc.Create(x)
+		pkt = proc.Create(x)
 		pkt_list = append(pkt_list, pkt)
 		//data_map[c] = pkt_list
 	}
