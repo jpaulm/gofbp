@@ -37,8 +37,7 @@ func (wsrequest *WSRequest) Execute(p *core.Process) {
 	p.Discard(icpkt)
 	p.Close(wsrequest.ipt)
 	proc = p
-	//addr = flag.String("addr", path, "http service address")
-	//flag.Parse()
+
 	log.SetFlags(0)
 
 	log.Printf("main: starting HTTP server")
@@ -46,6 +45,7 @@ func (wsrequest *WSRequest) Execute(p *core.Process) {
 	httpServerExitDone := &sync.WaitGroup{}
 
 	httpServerExitDone.Add(1)
+
 	srv := startHttpServer(httpServerExitDone, path)
 
 	log.Printf("serving for 20 seconds")
@@ -65,15 +65,10 @@ func (wsrequest *WSRequest) Execute(p *core.Process) {
 	httpServerExitDone.Wait()
 
 	log.Printf("done. exiting")
-	//http.HandleFunc("/", serveHome)
-	//http.HandleFunc("/ws", serveWs)
 
-	//err := http.ListenAndServe(*addr, nil)
-	//log.Fatal(err)
 }
 
 func startHttpServer(wg *sync.WaitGroup, path string) *http.Server {
-	//srv := &http.Server{Addr: ":8080"}
 	srv := &http.Server{Addr: path}
 
 	//http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -104,10 +99,6 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	//conn = *c
 	defer c.Close()
 
-	//if data_map == nil {
-	//	data_map = make(map[*websocket.Conn][]*core.Packet)
-	//}
-
 	var pkt_list []*core.Packet
 	var pkt *core.Packet
 
@@ -126,13 +117,13 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		if x == "@{" {
 
 			pkt_list = make([]*core.Packet, 0)
-			//data_map[c] = pkt_list
+
 			continue
 		}
 
 		if x == "@}" {
 
-			// send out "connection" IPs, then IPs stored in pkt_list ... surrounded by bracket IPs
+			// send out "connection" IPs, then IPs stored in pkt_list ... all surrounded by bracket IPs
 
 			pkt = proc.CreateBracket(core.OpenBracket, "")
 			proc.Send(opt, pkt)
@@ -151,9 +142,7 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if x == "@kill" {
-			//time.Sleep(10 * time.Second)
-			//pkt = proc.Create(x)
-			//proc.Send(opt, pkt)
+
 			c.Close()
 			//break
 			continue
@@ -161,20 +150,6 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 
 		pkt = proc.Create(x)
 		pkt_list = append(pkt_list, pkt)
-		//data_map[c] = pkt_list
-	}
-}
 
-/*
-func serveHome(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.Error(w, "Not found", http.StatusNotFound)
-		return
 	}
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	http.ServeFile(w, r, "home.html")
 }
-*/
