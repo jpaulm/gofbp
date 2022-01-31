@@ -20,38 +20,36 @@ func (wsrespond *WSRespond) Setup(p *core.Process) {
 }
 
 func (wsrespond *WSRespond) Execute(p *core.Process) {
-	pkt := p.Receive(wsrespond.ipt) // open bracket
-	if pkt == nil {
-		return
-	}
-	p.Discard(pkt)
-
-	pkt = p.Receive(wsrespond.ipt) // connection
-	if pkt == nil {
-		return
-	}
-	conn, _ := pkt.Contents.(*websocket.Conn)
-
-	p.Discard(pkt)
-
 	for {
-		pkt = p.Receive(wsrespond.ipt)
-		if pkt.PktType == core.CloseBracket {
-			break
+		pkt := p.Receive(wsrespond.ipt) // should be open bracket
+		if pkt == nil {
+			return
 		}
-		//data, ok := pkt.Contents.(string)
-		//if !ok {
-		//	log.Println("write: data not string")
-		//	break
-		//}
+		p.Discard(pkt)
 
-		err := conn.WriteMessage(websocket.TextMessage, []byte(pkt.Contents.(string)))
-		if err != nil {
-			log.Println("write:", err)
-			break
-		} else {
-			p.Discard(pkt)
+		pkt = p.Receive(wsrespond.ipt) // connection
+		if pkt == nil {
+			return
 		}
+		conn, _ := pkt.Contents.(*websocket.Conn)
+
+		p.Discard(pkt)
+
+		for {
+			pkt = p.Receive(wsrespond.ipt)
+			if pkt.PktType == core.CloseBracket {
+				break
+			}
+
+			err := conn.WriteMessage(websocket.TextMessage, []byte(pkt.Contents.(string)))
+			if err != nil {
+				log.Println("write:", err)
+				break
+			} else {
+				p.Discard(pkt)
+			}
+		}
+		p.Discard(pkt)
 	}
-	p.Discard(pkt)
+
 }
