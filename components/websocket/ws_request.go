@@ -30,6 +30,7 @@ func (wsrequest *WSRequest) Setup(p *core.Process) {
 
 var upgrader = websocket.Upgrader{}
 var proc *core.Process
+var closed_down bool
 
 func (wsrequest *WSRequest) Execute(p *core.Process) {
 	icpkt := p.Receive(wsrequest.ipt)
@@ -48,9 +49,10 @@ func (wsrequest *WSRequest) Execute(p *core.Process) {
 
 	srv := startHttpServer(httpServerExitDone, path)
 
-	log.Printf("serving for 20 seconds")
-
-	time.Sleep(20 * time.Second)
+	for !closed_down {
+		log.Printf("serving for 10 seconds")
+		time.Sleep(10 * time.Second)
+	}
 
 	log.Printf("stopping HTTP server")
 
@@ -71,8 +73,7 @@ func (wsrequest *WSRequest) Execute(p *core.Process) {
 func startHttpServer(wg *sync.WaitGroup, path string) *http.Server {
 	srv := &http.Server{Addr: path}
 
-	//http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	http.HandleFunc("/", serveWs)
+	http.HandleFunc("/ws", serveWs)
 
 	go func() {
 		defer wg.Done() // let main know we are done cleaning up
@@ -144,7 +145,11 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		if x == "@kill" {
 
 			c.Close()
+			//if err := srv.Shutdown(context.TODO()); err != nil {
+			//	panic(err) // failure/timeout shutting down the server gracefully
+			//}
 			//break
+			closed_down = true
 			continue
 		}
 
