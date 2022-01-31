@@ -1,0 +1,9 @@
+{
+  "extends": [
+    "config:base", ":disableDependencyDashboard"
+  ] ,
+  "automerge": true,
+  "major": {
+    "automerge": false
+  } 
+}

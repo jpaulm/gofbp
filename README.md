@@ -1,8 +1,10 @@
 # GoFBP 
 
-This repo holds the beginning of an FBP implementation in Go
+This repo contains an FBP implementation in Go.  It conforms pretty closely to the scheduling logic in JavaFBP, C#FBP and C++FBP (all on https://github.com/jpaulm ).
 
 There may well be further internal changes, but I am hoping that the "external" APIs (network and component definitions) are now firm. 
+
+Current tag: **v1.0.6** .
 
 ## General
  
@@ -12,8 +14,10 @@ General web site for "classical" FBP:
 In computer programming, flow-based programming (FBP) is a programming paradigm that defines applications as networks of "black box" processes, which exchange data across predefined connections by message passing, where the connections are specified externally to the processes. These black box processes can be reconnected endlessly to form different applications without having to be changed internally. FBP is thus naturally component-oriented.
 
 FBP is a particular form of dataflow programming based on bounded buffers, information packets with defined lifetimes, named ports, and separate definition of connections.
+
+DrawFBP (https://github.com/jpaulm/drawfbp) can now generate working GoFBP network and subnet definitions from a network diagram (as well as JavaFBP, C#FBP, JSON and free-form notations).
  
-GoFBP Network Definition Syntax and Component API:
+## GoFBP Network Definition Syntax and Component API:
 * https://jpaulm.github.io/fbp/gosyntax.htm
 
 ## Features (these are common to all FBP implementations on GitHub/jpaulm):
@@ -25,18 +29,60 @@ GoFBP Network Definition Syntax and Component API:
 - "automatic" in- and out-ports - notation is port name = "*"
 - GoFBP (and the other FBP implementations on https://github.com/jpaulm distingish between "invocation" and "activation" of processes: a process is invoked once, but may be activated multiple times (if it does a return before all its input ports have been drained) 
 
+## Running your app with GoFBP
+
+In the `go.mod` file in your root, add the statement
+
+```
+require github.com/jpaulm/gofbp latest
+```
+and then run the command `go mod tidy` - this will change the word `latest` to the latest version, and store it back in your `go.mod` file.
+
+If you need parameter values other than `false`, you will have to access a `params.xml` file, as shown below.
+
+Command to run your network, e.g.:
+
+```
+go run Merge.go
+```
+
+A number of test cases are in the `testing` folder, and can be run as follows:
+
+```
+cd testing
+go test
+```
+To run an individual network, e.g. `TestIntSender` in `testing\testintsender_test.go`,
+run
+```
+cd testing
+go test -run IntSender
+```
+
+### Notes:
+
+- One comment about running with subnets: the subnet or subnets should be in a different folder from the code that invokes it.  If they are in the same folder, apparently both the invoking code and the subnet need to be named individually in a `go run` command... this is not required when running under VSCode, or from an `.exe` file.  
+
 ## Tracing
 
-An XML file has been provided in the root, called `params.xml`.  So far there is only one parameter:
+An XML file has been provided in the root, called `params.xml`.  If you need values other than all `false`, you will need to reference this using the `LoadXMLParams` and `SetParams` methods - see https://jpaulm.github.io/fbp/gosyntax.htm .
 
-<pre>
-&lt;?xml version="1.0"?&gt;
-&lt;tracing&gt;true|false&lt;/tracing&gt;
-&lt;tracelocks&gt;true|false&lt;/tracelocks&gt;
-</pre>
+Format of the tracing definitions file:
+
+```
+<?xml version="1.0"?> 
+<runparams>
+<tracing>false</tracing>
+<tracelocks>false</tracelocks>
+<generate-gIds>true</generate-gIds> 
+</runparams>
+```
+The `generate-gIds` parameter is only used to assist in debugging deadlocks, so can default most of the time - see below.
 
 ## Subnets
 These are described in Chap. 7 in "Flow-Based Programming": Composite Components - https://jpaulmorrison.com/fbp/compos.shtml , although we haven't implemented dynamic subnets (yet)!
+
+**Note:** If a subnet `.go` file is in the same folder as the network `.go` file invoking it, the `NewProc` call should be written without the folder - e.g. `net.NewProc("Run___Subnet", &Subnet1{})`, but currently DrawFBP cannot detect this situation, so, when using notation `GoFBP`, this call will not be generated correctly. 
 
 ## Test Cases
 The following test cases are now working - thanks to Egon Elbre and Emil Valeev for all their help!
@@ -56,9 +102,11 @@ The following test cases are now working - thanks to Egon Elbre and Emil Valeev 
 - test subnet (SubIn and SubOut)
 
 - force deadlock (separate test file) - this is designed to crash, and in fact will give a message if it does *not* crash!
+
+- simple web sockets test
  
 
-To run them, position to your `GitHub\gofbp` directory, and do any of the following:
+To run them, position to your `GitHub\gofbp\testing` directory (note the additional folder, as of tag `v1.0.3` plus), and do any of the following:
 
 - `go test -run Merge -count=1`
 - `go test -run Concat -count=1`
@@ -69,9 +117,11 @@ To run them, position to your `GitHub\gofbp` directory, and do any of the follow
 - `go test -run WriteToConsUsingNL -count=1`  (note the activated/deactivated messages)
 - `go test -run ForceDeadlock -count=1`
 - `go test -run InfQueueAsMain -count=1` (note the "automatic" ports between WriteFile and ReadFile)
+- `go test -run LoadBal -count=1` (this does load balancing, and uses two DelayedReceiver processes)
 - `go test -run Subnet1 -count=1` 
 - `go test -run Subnet2 -count=1` 
 - `go test -run Subnet3 -count=1` 
+- `go test -run TestWebSocket -count=1`  - for more instructions, see # Test WebSockets (below)
 
 
 **Note**: ForceDeadlock is constructed differently so that it can "crash" without disrupting the flow of tests: the network definition has to be compiled "on the fly", so it is actually in `testdata`, while the test itself contains the code to compile and run the test.
@@ -130,14 +180,34 @@ The following components are available:
 - `readfile.go`
 - `writefile.go`
 
+"websocket" folder (for instructions, see below):
+- `ws_request.go`
+- `ws_respond.go`
+- `ws_ans_req.go`  (sample component - properly belongs in test suite)
+
+**Test Websockets**
+
+- position to your `GitHub\gofbp\testing` directory in DOS
+- run `go test -run TestWebSocket -count=1`
+
+- in File Explorer, locate `GitHub\gofbp\scripts\chat2.html`
+- open with Firefox or Chrome
+- enter `namelist` in the Command box, hit enter or Send
+- you should see `Server: Line1`, `Server: Line2`, `Server: Line3` show up in the box below "Send"
+- you can repeat this multiple times, and the 3 output lines will be appended each time to the current display
+- click on `Stop WS` - you will see `End of dialog` next to `Status`
+
+- you're done... except that, right now, it's not coming down cleanly, so you will have to close the DOS session manually.  Hopefully, this will be fixed soon!
+
+
 **To dos**
 
-- More and better documentation
 - Convert `panic`s to more standard Go error handling
-- Way too much logging - have to make that optional - put remaining logging under switch control
+- Way too much logging - have to make that optional - put remaining logging under switch control - *done!*
 - Add subnet handling - *done!*
-- Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp
-- Add Load Balancing component
-- Add sample code showing use of substreams
+- Generate GoFBP networks from DrawFBP - https://github.com/jpaulm/drawfbp - *done!*
+- Add Load Balancing component - *done!*
+- Add sample code showing use of substreams - *done!*
 - "Automatic" ports - *done!*
-- Add Lua interface - see https://jpaulm.github.io/fbp/thlua.html
+- Add Lua interface - similar to https://jpaulm.github.io/fbp/thlua.html 
+
