@@ -1,0 +1,26 @@
+<?xml version="1.0"?> 
+ <drawfbp_file xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:noNamespaceSchemaLocation="https://github.com/jpaulm/drawfbp/blob/master/lib/drawfbp_file.xsd">
+<net>
+<desc> </desc>
+ <blocks><block> <x> 277 </x> <y> 411 </y> <id> 2 </id> <type>B</type> <width>92</width> <height>64</height> <description>Sender2</description> <compname>sender.go</compname> <blockclassname>C:/Users/Paul/Documents/GitHub/gofbp/components/testrtn/sender.go</blockclassname> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 555 </x> <y> 316 </y> <id> 3 </id> <type>B</type> <width>92</width> <height>64</height> <description>Write
+  To
+Console</description> <compname>writetoconsole.go</compname> <blockclassname>C:/Users/Paul/Documents/GitHub/gofbp/components/testrtn/writetoconsole.go</blockclassname> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 277 </x> <y> 235 </y> <id> 4 </id> <type>B</type> <width>92</width> <height>64</height> <description>Sender1</description> <compname>sender.go</compname> <blockclassname>C:/Users/Paul/Documents/GitHub/gofbp/components/testrtn/sender.go</blockclassname> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 100 </x> <y> 234 </y> <id> 5 </id> <type>I</type> <width>52</width> <height>30</height> <description>15</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 102 </x> <y> 406 </y> <id> 6 </id> <type>I</type> <width>52</width> <height>30</height> <description>10</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+</blocks> <connections>
+<connection> <fromx>323</fromx> <fromy>232</fromy> <tox>509</tox> <toy>312</toy> <fromid>4</fromid> <toid>3</toid> <id>4</id> <endsatline>false</endsatline><upstreamport>OUT</upstreamport><downstreamport>IN</downstreamport><segno>0</segno><bends> <bend> <x>424</x> <y> 232</y> </bend>
+ <bend> <x>424</x> <y> 312</y> </bend>
+ </bends> </connection> 
+<connection> <fromx>126</fromx> <fromy>234</fromy> <tox>231</tox> <toy>233</toy> <fromid>5</fromid> <toid>4</toid> <id>7</id> <endsatline>false</endsatline><downstreamport>COUNT</downstreamport><segno>0</segno></connection> 
+<connection> <fromx>128</fromx> <fromy>403</fromy> <tox>231</tox> <toy>402</toy> <fromid>6</fromid> <toid>2</toid> <id>8</id> <endsatline>false</endsatline><downstreamport>COUNT</downstreamport><segno>0</segno></connection> 
+<connection> <fromx>323</fromx> <fromy>409</fromy> <tox>431</tox> <toy>314</toy> <fromid>2</fromid> <toid>4</toid> <id>12</id> <endsatline>true</endsatline><upstreamport>OUT</upstreamport><segno>2</segno><bends> <bend> <x>430</x> <y> 409</y> </bend>
+ </bends> </connection> 
+</connections> </net> </drawfbp_file>

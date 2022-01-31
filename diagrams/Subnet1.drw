@@ -1,0 +1,17 @@
+<?xml version="1.0"?> 
+ <drawfbp_file xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:noNamespaceSchemaLocation="https://github.com/jpaulm/drawfbp/blob/master/lib/drawfbp_file.xsd">
+<net>
+<desc> </desc>
+ <blocks><block> <x> 365 </x> <y> 160 </y> <id> 9 </id> <type>B</type> <width>92</width> <height>64</height> <description>Write 
+  To
+Console</description> <compname>writetoconsnl.go</compname> <blockclassname>C:/Users/Paul/Documents/GitHub/gofbp/components/testrtn/writetoconsnl.go</blockclassname> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 111 </x> <y> 154 </y> <id> 10 </id> <type>C</type> <width>36</width> <height>28</height> <description>IN</description> <substreamsensitive>true</substreamsensitive><multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 632 </x> <y> 156 </y> <id> 13 </id> <type>D</type> <width>36</width> <height>28</height> <description>OUT</description> <substreamsensitive>true</substreamsensitive><multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+</blocks> <connections>
+<connection> <fromx>129</fromx> <fromy>156</fromy> <tox>319</tox> <toy>156</toy> <fromid>10</fromid> <toid>9</toid> <id>7</id> <endsatline>false</endsatline><upstreamport>OUT</upstreamport><downstreamport>IN</downstreamport><segno>0</segno></connection> 
+<connection> <fromx>411</fromx> <fromy>159</fromy> <tox>614</tox> <toy>158</toy> <fromid>9</fromid> <toid>13</toid> <id>11</id> <endsatline>false</endsatline><upstreamport>OUT</upstreamport><downstreamport>IN</downstreamport><segno>0</segno></connection> 
+</connections> </net> </drawfbp_file>
