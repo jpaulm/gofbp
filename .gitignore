@@ -2,5 +2,4 @@
 qs_*.*
 bak
 bin/
-*.exe
-TWY*
+*~
