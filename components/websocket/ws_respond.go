@@ -26,10 +26,10 @@ func (wsrespond *WSRespond) Execute(p *core.Process) {
 		if pkt == nil {
 			return
 		}
-		if pkt.PktType != core.OpenBracket {
-			panic("WSRespond - first IP not open bracket")
-		}
-		p.Discard(pkt)
+		//if pkt.PktType != core.OpenBracket {
+		//	panic("WSRespond - first IP not open bracket")
+		//}
+		p.Discard(pkt)                 // discard open bracket
 		pkt = p.Receive(wsrespond.ipt) // connection
 		if pkt == nil {
 			return
@@ -56,13 +56,11 @@ func (wsrespond *WSRespond) Execute(p *core.Process) {
 				p.Discard(pkt)
 			}
 			pkt = p.Receive(wsrespond.ipt)
-
-			//pkt = p.Receive(wsrespond.ipt)
 		}
 		if pkt.Contents.(string) == "@kill" {
 			conn.Close()
 			p.Discard(pkt)
+			pkt = p.Receive(wsrespond.ipt)
 		}
-		pkt = p.Receive(wsrespond.ipt)
 	}
 }
