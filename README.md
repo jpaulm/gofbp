@@ -131,6 +131,19 @@ You will occasionally see a message like `TempDir RemoveAll cleanup: remove ...\
 
 - `go test -count=1` runs them all, including `ForceDeadlock`
 
+**Test Websockets**
+
+- position to your `GitHub\gofbp\testing` directory in DOS
+- run `go test -run TestWebSocket -count=1`
+- in File Explorer, locate `GitHub\gofbp\scripts\chat2.html`
+- open with Firefox or Chrome (make sure you don't open the browser before starting the `gofbp` app)
+- enter `namelist` in the Command box, hit enter or Send
+- you should see `Server: Line1`, `Server: Line2`, `Server: Line3` show up in the box below "Send"
+- click on `Stop WS` - you will see `End of dialog` next to `Status`
+
+- you're done... 
+
+
 # Deadlocks
 
 FBP deadlocks are well understood, and are handled well by other FBP implementations on https://github.com/jpaulm .  They also seem to be well detected by the Go scheduler - unfortunately, they are not so easy to troubleshoot, as Go deadlock detection is not "FBP-aware", and occurs before the GoFBP scheduler can analyze the process states to determine where the problem is occurring.  This has been raised as an issue - #28 .
@@ -185,21 +198,6 @@ The following components are available:
 - `ws_request.go`
 - `ws_respond.go`
 - `ws_ans_req.go`  (sample component - properly belongs in test suite)
-
-**Test Websockets**
-
-- position to your `GitHub\gofbp\testing` directory in DOS
-- run `go test -run TestWebSocket -count=1`
-
-- in File Explorer, locate `GitHub\gofbp\scripts\chat2.html`
-- open with Firefox or Chrome
-- enter `namelist` in the Command box, hit enter or Send
-- you should see `Server: Line1`, `Server: Line2`, `Server: Line3` show up in the box below "Send"
-- you can repeat this multiple times, and the 3 output lines will be appended each time to the current display
-- click on `Stop WS` - you will see `End of dialog` next to `Status`
-
-- you're done... except that, right now, it's not coming down cleanly, so you will have to close the DOS session manually.  Hopefully, this will be fixed soon!
-
 
 **To dos**
 
