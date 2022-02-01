@@ -144,13 +144,12 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 
 		if x == "@kill" {
 
-			c.Close()
+			//c.Close()
 			//if err := srv.Shutdown(context.TODO()); err != nil {
 			//	panic(err) // failure/timeout shutting down the server gracefully
 			//}
 			//break
 			closed_down = true
-			continue
 		}
 
 		pkt = proc.Create(x)

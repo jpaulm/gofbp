@@ -17,9 +17,9 @@ func (wsansreq *WSAnsReq) Setup(p *core.Process) {
 func (WSAnsReq) MustRun() {}
 
 func (wsansreq *WSAnsReq) Execute(p *core.Process) {
-
+	pkt := p.Receive(wsansreq.ipt)
 	for {
-		pkt := p.Receive(wsansreq.ipt) // open bracket
+
 		if pkt == nil {
 			break
 		}
@@ -40,6 +40,12 @@ func (wsansreq *WSAnsReq) Execute(p *core.Process) {
 
 		pkt = p.Receive(wsansreq.ipt) // close bracket
 		p.Send(wsansreq.out, pkt)
+
+		pkt = p.Receive(wsansreq.ipt)
+		if pkt.Contents.(string) == "@kill" {
+			p.Send(wsansreq.out, pkt)
+			pkt = p.Receive(wsansreq.ipt)
+		}
 	}
 
 }

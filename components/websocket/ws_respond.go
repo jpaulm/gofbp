@@ -22,33 +22,46 @@ func (wsrespond *WSRespond) Setup(p *core.Process) {
 var conn websocket.Conn
 
 func (wsrespond *WSRespond) Execute(p *core.Process) {
+	pkt := p.Receive(wsrespond.ipt)
 	for {
-		pkt := p.Receive(wsrespond.ipt)
+
 		if pkt == nil {
 			return
 		}
-		if pkt.PktType == core.OpenBracket {
-			p.Discard(pkt)
-			pkt = p.Receive(wsrespond.ipt) // connection
-			if pkt == nil {
-				return
+		if pkt.PktType != core.OpenBracket {
+			panic("WSRespond - first IP not open bracket")
+		}
+		p.Discard(pkt)
+		pkt = p.Receive(wsrespond.ipt) // connection
+		if pkt == nil {
+			return
+		}
+		conn, _ = pkt.Contents.(websocket.Conn)
+		p.Discard(pkt)
+		pkt = p.Receive(wsrespond.ipt)
+
+		for {
+			if pkt.PktType == core.CloseBracket {
+				p.Discard(pkt)
+				pkt = p.Receive(wsrespond.ipt)
+				break
 			}
-			conn, _ = pkt.Contents.(websocket.Conn)
-			p.Discard(pkt)
-			continue
-		}
 
-		if pkt.PktType == core.CloseBracket {
-			p.Discard(pkt)
-			continue
-		}
+			err := conn.WriteMessage(websocket.TextMessage, []byte(pkt.Contents.(string)))
+			if err != nil {
+				log.Println("write:", err)
+				break
+			} else {
+				p.Discard(pkt)
+			}
+			pkt = p.Receive(wsrespond.ipt)
 
-		err := conn.WriteMessage(websocket.TextMessage, []byte(pkt.Contents.(string)))
-		if err != nil {
-			log.Println("write:", err)
-			break
-		} else {
-			p.Discard(pkt)
+			//pkt = p.Receive(wsrespond.ipt)
 		}
+		if pkt.Contents.(string) == "@kill" {
+			conn.Close()
+
+		}
+		pkt = p.Receive(wsrespond.ipt)
 	}
 }
