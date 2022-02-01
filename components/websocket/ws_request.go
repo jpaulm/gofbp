@@ -50,8 +50,8 @@ func (wsrequest *WSRequest) Execute(p *core.Process) {
 	srv := startHttpServer(httpServerExitDone, path)
 
 	for !closed_down {
-		log.Printf("serving for 10 seconds")
-		time.Sleep(10 * time.Second)
+		//log.Printf("serving for .5 seconds")
+		time.Sleep(500 * time.Millisecond)
 	}
 
 	log.Printf("stopping HTTP server")

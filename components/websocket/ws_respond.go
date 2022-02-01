@@ -19,37 +19,36 @@ func (wsrespond *WSRespond) Setup(p *core.Process) {
 	wsrespond.ipt = p.OpenInPort("IN")
 }
 
+var conn websocket.Conn
+
 func (wsrespond *WSRespond) Execute(p *core.Process) {
 	for {
-		pkt := p.Receive(wsrespond.ipt) // should be open bracket
+		pkt := p.Receive(wsrespond.ipt)
 		if pkt == nil {
 			return
 		}
-		p.Discard(pkt)
-
-		pkt = p.Receive(wsrespond.ipt) // connection
-		if pkt == nil {
-			return
-		}
-		conn, _ := pkt.Contents.(*websocket.Conn)
-
-		p.Discard(pkt)
-
-		for {
-			pkt = p.Receive(wsrespond.ipt)
-			if pkt.PktType == core.CloseBracket {
-				break
+		if pkt.PktType == core.OpenBracket {
+			p.Discard(pkt)
+			pkt = p.Receive(wsrespond.ipt) // connection
+			if pkt == nil {
+				return
 			}
-
-			err := conn.WriteMessage(websocket.TextMessage, []byte(pkt.Contents.(string)))
-			if err != nil {
-				log.Println("write:", err)
-				break
-			} else {
-				p.Discard(pkt)
-			}
+			conn, _ = pkt.Contents.(websocket.Conn)
+			p.Discard(pkt)
+			continue
 		}
-		p.Discard(pkt)
+
+		if pkt.PktType == core.CloseBracket {
+			p.Discard(pkt)
+			continue
+		}
+
+		err := conn.WriteMessage(websocket.TextMessage, []byte(pkt.Contents.(string)))
+		if err != nil {
+			log.Println("write:", err)
+			break
+		} else {
+			p.Discard(pkt)
+		}
 	}
-
 }
