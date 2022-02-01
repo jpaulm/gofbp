@@ -19,8 +19,6 @@ func (wsrespond *WSRespond) Setup(p *core.Process) {
 	wsrespond.ipt = p.OpenInPort("IN")
 }
 
-var conn websocket.Conn
-
 func (wsrespond *WSRespond) Execute(p *core.Process) {
 	pkt := p.Receive(wsrespond.ipt)
 	for {
@@ -36,7 +34,10 @@ func (wsrespond *WSRespond) Execute(p *core.Process) {
 		if pkt == nil {
 			return
 		}
-		conn, _ = pkt.Contents.(websocket.Conn)
+		conn, ok := pkt.Contents.(*websocket.Conn)
+		if !ok {
+			panic("WSRespond - IP after open bracket not *websocket.Conn")
+		}
 		p.Discard(pkt)
 		pkt = p.Receive(wsrespond.ipt)
 
@@ -60,7 +61,7 @@ func (wsrespond *WSRespond) Execute(p *core.Process) {
 		}
 		if pkt.Contents.(string) == "@kill" {
 			conn.Close()
-
+			p.Discard(pkt)
 		}
 		pkt = p.Receive(wsrespond.ipt)
 	}

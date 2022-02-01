@@ -98,7 +98,7 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//conn = *c
-	defer c.Close()
+	//defer c.Close()
 
 	var pkt_list []*core.Packet
 	var pkt *core.Packet
@@ -141,19 +141,14 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 			proc.Send(opt, pkt)
 			continue
 		}
-
-		if x == "@kill" {
-
-			//c.Close()
-			//if err := srv.Shutdown(context.TODO()); err != nil {
-			//	panic(err) // failure/timeout shutting down the server gracefully
-			//}
-			//break
-			closed_down = true
-		}
-
 		pkt = proc.Create(x)
-		pkt_list = append(pkt_list, pkt)
+		if x == "@kill" {
+			proc.Send(opt, pkt)
+			closed_down = true
+			break
+		} else {
+			pkt_list = append(pkt_list, pkt)
+		}
 
 	}
 }
