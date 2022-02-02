@@ -59,8 +59,10 @@ button {
 			//alert(evt.data)		
 
 			if (evt.data === "@{")  {
+				console.log('Start of substream');
 				while(container.firstChild){                      // clear container
 					container.removeChild(container.firstChild);
+					console.log('Remove child');
 				}
 			} else if (evt.data === "@}") {
 				console.log('End of substream');

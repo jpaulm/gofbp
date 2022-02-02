@@ -26,9 +26,7 @@ func (wsrespond *WSRespond) Execute(p *core.Process) {
 		if pkt == nil {
 			return
 		}
-		//if pkt.PktType != core.OpenBracket {
-		//	panic("WSRespond - first IP not open bracket")
-		//}
+
 		p.Discard(pkt)                 // discard open bracket
 		pkt = p.Receive(wsrespond.ipt) // connection
 		if pkt == nil {
@@ -39,11 +37,21 @@ func (wsrespond *WSRespond) Execute(p *core.Process) {
 			panic("WSRespond - IP after open bracket not *websocket.Conn")
 		}
 		p.Discard(pkt)
+		err := conn.WriteMessage(websocket.TextMessage, []byte("@{"))
+		if err != nil {
+			log.Println("write:", err)
+			break
+		}
 		pkt = p.Receive(wsrespond.ipt)
 
 		for {
 			if pkt.PktType == core.CloseBracket {
 				p.Discard(pkt)
+				err := conn.WriteMessage(websocket.TextMessage, []byte("@}"))
+				if err != nil {
+					log.Println("write:", err)
+					break
+				}
 				pkt = p.Receive(wsrespond.ipt)
 				break
 			}
