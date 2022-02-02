@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -30,7 +31,7 @@ func (wsrequest *WSRequest) Setup(p *core.Process) {
 
 var upgrader = websocket.Upgrader{}
 var proc *core.Process
-var closed_down bool
+var closed_down int32
 
 func (wsrequest *WSRequest) Execute(p *core.Process) {
 	icpkt := p.Receive(wsrequest.ipt)
@@ -49,8 +50,12 @@ func (wsrequest *WSRequest) Execute(p *core.Process) {
 
 	srv := startHttpServer(httpServerExitDone, path)
 
-	for !closed_down {
-		//log.Printf("serving for .5 seconds")
+	for {
+		sw := atomic.CompareAndSwapInt32(&closed_down, 0, 2)
+		if !sw {
+			break
+		}
+		atomic.CompareAndSwapInt32(&closed_down, 2, 0)
 		time.Sleep(500 * time.Millisecond)
 	}
 
@@ -144,7 +149,7 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		pkt = proc.Create(x)
 		if x == "@kill" {
 			proc.Send(opt, pkt)
-			closed_down = true
+			atomic.StoreInt32(&closed_down, 1)
 			break
 		} else {
 			pkt_list = append(pkt_list, pkt)
