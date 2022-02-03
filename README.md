@@ -20,6 +20,17 @@ DrawFBP (https://github.com/jpaulm/drawfbp) can now generate working GoFBP netwo
 ## GoFBP Network Definition Syntax and Component API:
 * https://jpaulm.github.io/fbp/gosyntax.htm
 
+Please note the addition of 
+
+```
+params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
+ ```
+ 
+ and the associated ` net.SetParams(params)` after the call to `NewNetwork`.
+
 ## Features (these are common to all FBP implementations on GitHub/jpaulm):
 
 - delayed start of goroutines (FBP processes), unless `MustRun` attribute is specified or the process has no non-IIP inputs (same as JavaFBP delayed start feature) 
