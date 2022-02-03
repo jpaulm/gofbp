@@ -85,7 +85,22 @@ These are described in Chap. 7 in "Flow-Based Programming": Composite Components
 
 **Note:** If a subnet `.go` file is in the same folder as the network `.go` file invoking it, the `NewProc` call should be written without the folder - e.g. `net.NewProc("Run___Subnet", &Subnet1{})`, but currently DrawFBP cannot detect this situation, so, when using notation `GoFBP`, this call will not be generated correctly. 
 
-## Test Cases
+## Test Websockets 
+
+- position to your `GitHub\gofbp\testing` directory in DOS
+- update `params.xml` to set tracing parameters as desired
+- run `go test -run TestWebSocket -count=1`
+- in File Explorer, locate `GitHub\gofbp\scripts\chat2.html`
+- open with Firefox or Chrome (make sure you don't open the browser before starting the `gofbp` app)
+- enter `namelist` in the Command box, hit enter or Send
+- you should see `Server: Line1`, `Server: Line2`, `Server: Line3` show up in the box below "Send"
+- click on `Stop WS` - you will see `End of dialog` next to `Status`
+
+- you're done... 
+
+
+
+## Other Test Cases
 The following test cases are now working - thanks to Egon Elbre and Emil Valeev for all their help!
 
 - 2 Senders, one Receiver - merging first come, first served
@@ -131,20 +146,8 @@ You will occasionally see a message like `TempDir RemoveAll cleanup: remove ...\
 
 - `go test -count=1` runs them all, including `ForceDeadlock`
 
-**Test Websockets**
 
-- position to your `GitHub\gofbp\testing` directory in DOS
-- run `go test -run TestWebSocket -count=1`
-- in File Explorer, locate `GitHub\gofbp\scripts\chat2.html`
-- open with Firefox or Chrome (make sure you don't open the browser before starting the `gofbp` app)
-- enter `namelist` in the Command box, hit enter or Send
-- you should see `Server: Line1`, `Server: Line2`, `Server: Line3` show up in the box below "Send"
-- click on `Stop WS` - you will see `End of dialog` next to `Status`
-
-- you're done... 
-
-
-# Deadlocks
+## Deadlocks
 
 FBP deadlocks are well understood, and are handled well by other FBP implementations on https://github.com/jpaulm .  They also seem to be well detected by the Go scheduler - unfortunately, they are not so easy to troubleshoot, as Go deadlock detection is not "FBP-aware", and occurs before the GoFBP scheduler can analyze the process states to determine where the problem is occurring.  This has been raised as an issue - #28 .
 
