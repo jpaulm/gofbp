@@ -35,6 +35,7 @@ func (c *InPort) receive(p *Process) *Packet {
 		}
 		atomic.StoreInt32(&p.status, SuspRecv)
 		WaitTr(c.condNE, "wait in recv", p)
+		//checkPending()
 		atomic.StoreInt32(&p.status, Active)
 	}
 	pkt := c.pktArray[c.ir]
@@ -68,8 +69,6 @@ func (c *InPort) incUpstream() {
 }
 
 func (c *InPort) decUpstream() {
-	//LockTr(c.condNE, "DUS L", nil)
-	//defer UnlockTr(c.condNE, "DUS U", nil)
 	c.upStrmCnt--
 }
 
@@ -78,9 +77,7 @@ func (c *InPort) Close() {
 	defer UnlockTr(c.condNE, "ClsI U", c.downStrProc)
 
 	c.closed = true
-	//c.condNE.Broadcast()
 	BdcastTr(c.condNE, "bdcast in NE", c.downStrProc)
-	//c.downStrProc.activate()
 }
 
 func (c *InPort) isDrained() bool {

@@ -159,21 +159,20 @@ func (p *Process) activate() {
 	//
 	// This function starts a goroutine if it is not started, and signal if it has been
 	//
+	LockTr(p.canGo, "act L", p)
+	//defer UnlockTr(p.canGo, "act U", p)
 
-	//LockTr(p.canGo, "start test L", p)
-	//trace(p, "test if notstarted - status: "+strconv.FormatInt(int64(p.status), 10))
 	trace(p, "Activating: status "+[...]string{"Not Started", "Active", "Dormant",
 		"SuspSend", "SuspRecv", "Terminated"}[p.status])
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		if atomic.CompareAndSwapInt32(&p.status, Dormant, Active) {
-
 			BdcastTr(p.canGo, "bdcast act", p)
 		}
-		//UnlockTr(p.canGo, "start test U", p)
+		UnlockTr(p.canGo, "act U", p)
 		return
 	}
-	//UnlockTr(p.canGo, "start test U", p)
-
+	// if status was NotStarted...
+	UnlockTr(p.canGo, "act U", p)
 	go func() { // Process goroutine
 		defer p.network.wg.Done()
 		trace(p, "Starting goroutine "+strconv.FormatUint(getGID(), 10))
@@ -216,6 +215,7 @@ func (p *Process) inputState() (bool, bool, bool) {
 
 		atomic.StoreInt32(&p.status, Dormant)
 		WaitTr(p.canGo, "wait in IS", p)
+		//checkPending()
 
 	}
 }

@@ -45,13 +45,11 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	for o.conn.isFull() { // while connection is full
 		atomic.StoreInt32(&p.status, SuspSend)
 		WaitTr(o.conn.condNF, "wait in send", p)
+		//checkPending()
 		atomic.StoreInt32(&p.status, Active)
 	}
 
 	trace(p, " Sent to "+o.portName)
-
-	trace(o.conn.downStrProc, "act from send")
-	o.conn.downStrProc.activate()
 
 	o.conn.pktArray[o.conn.is] = pkt
 	o.conn.is = (o.conn.is + 1) % len(o.conn.pktArray)
@@ -59,6 +57,10 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	p.ownedPkts--
 	pkt = nil
 	BdcastTr(o.conn.condNE, "bdcast sent", p)
+
+	trace(o.conn.downStrProc, "activated from send")
+	o.conn.downStrProc.activate()
+
 	return true
 }
 

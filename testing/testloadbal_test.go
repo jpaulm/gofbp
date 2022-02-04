@@ -8,7 +8,12 @@ import (
 )
 
 func TestLoadBal(t *testing.T) {
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("TestLoadBal")
+	net.SetParams(params)
 
 	sender := net.NewProc("Sender", &testrtn.Sender{})
 

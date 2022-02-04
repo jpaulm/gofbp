@@ -115,7 +115,7 @@ button {
 	chatClient.onclose = function(event) {
 		console.log('Client notified socket has closed', event);
         var status = document.getElementById("status");
-        status.innerHTML = "<b>End of dialog (1)</b>";
+        status.innerHTML = "<b>End of dialog</b>";
 	}
 	
 	chatClient.onerror = function(event) {

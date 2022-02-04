@@ -81,6 +81,7 @@ func WaitTr(sc *sync.Cond, s string, p *Process) {
 		fmt.Println(p.Name, s)
 	}
 	sc.Wait()
+	//checkPending()
 }
 
 func trace(p *Process, s string) {
@@ -343,9 +344,6 @@ func (n *Network) Run() {
 		var someProcsCanRun bool = false
 
 		for _, proc := range n.procs {
-
-			//LockTr(proc.canGo, "test if not started L", proc)
-			//atomic.StoreInt32(&proc.status, Notstarted)
 
 			selfStarting := true
 			if proc.inPorts != nil {
