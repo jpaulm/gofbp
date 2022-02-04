@@ -32,12 +32,12 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	if pkt.PktType != NormalPacket {
 		trace(p, " Sending to "+o.portName+" > "+
 			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
-		if tracing {
+		if p.network.tracing {
 			fmt.Print("  contents: ", pkt.Contents, "\n")
 		}
 	} else {
 		trace(p, " Sending to "+o.portName+" > ")
-		if tracing {
+		if p.network.tracing {
 			fmt.Print("  ", pkt.Contents, "\n")
 		}
 	}

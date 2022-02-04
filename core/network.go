@@ -11,18 +11,15 @@ import (
 	"sync/atomic"
 )
 
-var tracing bool
-var tracelocks bool
-var tracepkts bool
-var generateGids bool
-
 type Network struct {
-	Name  string
-	procs map[string]*Process
-	//conns  map[string]inputCommon
-	wg     sync.WaitGroup
-	mother *Process
-	//params *Params
+	Name         string
+	procs        map[string]*Process
+	wg           sync.WaitGroup
+	mother       *Process
+	tracing      bool
+	tracelocks   bool
+	tracepkts    bool
+	generateGids bool
 }
 
 func NewNetwork(name string) *Network {
@@ -56,7 +53,7 @@ func (n *Network) SetProc(p *Process, nm string) {
 }
 
 func LockTr(sc *sync.Cond, s string, p *Process) {
-	if tracelocks && p != nil {
+	if p.network.tracelocks && p != nil {
 		fmt.Println(p.Name, s)
 	}
 	sc.L.Lock()
@@ -64,20 +61,20 @@ func LockTr(sc *sync.Cond, s string, p *Process) {
 
 func UnlockTr(sc *sync.Cond, s string, p *Process) {
 	sc.L.Unlock()
-	if tracelocks && p != nil {
+	if p.network.tracelocks && p != nil {
 		fmt.Println(p.Name, s)
 	}
 }
 
 func BdcastTr(sc *sync.Cond, s string, p *Process) {
 	sc.Broadcast()
-	if tracelocks && p != nil {
+	if p.network.tracelocks && p != nil {
 		fmt.Println(p.Name, s)
 	}
 }
 
 func WaitTr(sc *sync.Cond, s string, p *Process) {
-	if tracelocks && p != nil {
+	if p.network.tracelocks && p != nil {
 		fmt.Println(p.Name, s)
 	}
 	sc.Wait()
@@ -85,13 +82,13 @@ func WaitTr(sc *sync.Cond, s string, p *Process) {
 }
 
 func trace(p *Process, s string) {
-	if tracing {
+	if p.network.tracing {
 		fmt.Print(p.Name, " "+s+"\n")
 	}
 }
 
 func traceNet(n *Network, s string) {
-	if tracing {
+	if n.tracing {
 		fmt.Print(n.Name, " "+s+"\n")
 	}
 }
@@ -313,10 +310,10 @@ func (n *Network) SetParams(p *Params) {
 	if p == nil {
 		panic("Calling SetParams with nil parameter")
 	}
-	tracing = p.Tracing
-	tracelocks = p.TraceLocks
-	tracepkts = p.TracePkts
-	generateGids = p.GenerateGIDs
+	n.tracing = p.Tracing
+	n.tracelocks = p.TraceLocks
+	n.tracepkts = p.TracePkts
+	n.generateGids = p.GenerateGIDs
 }
 
 func (n *Network) Run() {

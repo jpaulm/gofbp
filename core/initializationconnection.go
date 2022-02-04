@@ -45,7 +45,7 @@ func (c *InitializationConnection) receive(p *Process) *Packet {
 	p.ownedPkts++
 	c.Close()
 	trace(p, " Received IIP: ")
-	if tracing {
+	if p.network.tracing {
 		fmt.Print("  ", pkt.Contents, "\n")
 	}
 	return pkt

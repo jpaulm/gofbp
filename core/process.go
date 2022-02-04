@@ -28,7 +28,7 @@ type Process struct {
 	autoOutput inputCommon
 }
 
-//Nostarted const reflects current process status
+//Current process status
 const (
 	Notstarted int32 = iota
 	Active
@@ -159,7 +159,7 @@ func (p *Process) activate() {
 	//
 	// This function starts a goroutine if it is not started, and signal if it has been
 	//
-	LockTr(p.canGo, "act L", p)
+	///LockTr(p.canGo, "act L", p)
 	//defer UnlockTr(p.canGo, "act U", p)
 
 	trace(p, "Activating: status "+[...]string{"Not Started", "Active", "Dormant",
@@ -168,11 +168,11 @@ func (p *Process) activate() {
 		if atomic.CompareAndSwapInt32(&p.status, Dormant, Active) {
 			BdcastTr(p.canGo, "bdcast act", p)
 		}
-		UnlockTr(p.canGo, "act U", p)
+		///UnlockTr(p.canGo, "act U", p)
 		return
 	}
 	// if status was NotStarted...
-	UnlockTr(p.canGo, "act U", p)
+	///UnlockTr(p.canGo, "act U", p)
 	go func() { // Process goroutine
 		defer p.network.wg.Done()
 		trace(p, "Starting goroutine "+strconv.FormatUint(getGID(), 10))
@@ -227,7 +227,7 @@ func (p *Process) Run() {
 	defer trace(p, " terminated")
 	trace(p, " started")
 
-	if generateGids {
+	if p.network.generateGids {
 		fmt.Println("Goroutine", p.Name+":", "no.", getGID())
 	}
 
@@ -299,7 +299,7 @@ func (p *Process) Create(x interface{}) *Packet {
 	pkt.Contents = x
 	pkt.owner = p
 	p.ownedPkts++
-	if tracepkts {
+	if p.network.tracepkts {
 		fmt.Print(p.Name, "  Packet created <\n")
 		fmt.Println("  ", pkt.Contents)
 	}
@@ -314,7 +314,7 @@ func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 	pkt.PktType = pktType
 	pkt.owner = p
 	p.ownedPkts++
-	if tracepkts {
+	if p.network.tracepkts {
 		fmt.Print(p.Name, "  Bracket created: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
 		fmt.Println("  ", pkt.Contents)
 	}
@@ -327,7 +327,7 @@ func (p *Process) Discard(pkt *Packet) {
 		panic("Discarding nil packet")
 	}
 	p.ownedPkts--
-	if tracepkts {
+	if p.network.tracepkts {
 		if pkt.PktType != NormalPacket {
 			fmt.Print(p.Name, "  Bracket discarded: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
 			fmt.Print("  contents: ", pkt.Contents, "\n")

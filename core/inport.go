@@ -43,12 +43,12 @@ func (c *InPort) receive(p *Process) *Packet {
 	if pkt.PktType != NormalPacket {
 		trace(p, " Received from "+c.portName+" < "+
 			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
-		if tracing {
+		if p.network.tracing {
 			fmt.Print("  contents: ", pkt.Contents, "\n")
 		}
 	} else {
 		trace(p, " Received from "+c.portName+" < ")
-		if tracing {
+		if p.network.tracing {
 			fmt.Print("  ", pkt.Contents, "\n")
 		}
 	}
@@ -62,9 +62,8 @@ func (c *InPort) receive(p *Process) *Packet {
 }
 
 func (c *InPort) incUpstream() {
-	LockTr(c.condNE, "IUS L", nil)
-	defer UnlockTr(c.condNE, "IUS U", nil)
-
+	LockTr(c.condNE, "IUS L", c.downStrProc)
+	defer UnlockTr(c.condNE, "IUS U", c.downStrProc)
 	c.upStrmCnt++
 }
 
