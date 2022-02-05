@@ -162,8 +162,10 @@ func (p *Process) activate() {
 	///LockTr(p.canGo, "act L", p)
 	//defer UnlockTr(p.canGo, "act U", p)
 
+	st := atomic.LoadInt32(&p.status)
 	trace(p, "Activating: status "+[...]string{"Not Started", "Active", "Dormant",
-		"SuspSend", "SuspRecv", "Terminated"}[p.status])
+		"SuspSend", "SuspRecv", "Terminated"}[st])
+
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		if atomic.CompareAndSwapInt32(&p.status, Dormant, Active) {
 			BdcastTr(p.canGo, "bdcast act", p)
