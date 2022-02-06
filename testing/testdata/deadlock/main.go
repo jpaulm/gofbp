@@ -6,8 +6,12 @@ import (
 )
 
 func main() {
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("ForceDeadlock")
-
+	net.SetParams(params)
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 	proc2 := net.NewProc("Counter", &testrtn.Counter{})
 	proc3 := net.NewProc("Concat", &testrtn.ConcatStr{})

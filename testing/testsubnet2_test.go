@@ -11,7 +11,12 @@ import (
 )
 
 func TestSubnet2(t *testing.T) {
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("TestSubnet2")
+	net.SetParams(params)
 
 	proc1 := net.NewProc("SubstreamSender", &testrtn.SubstreamSender{}) // sends multiple substreams of varying lengths
 

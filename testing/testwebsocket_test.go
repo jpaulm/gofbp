@@ -12,10 +12,9 @@ func TestWebSocket(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	path := "localhost:8080"
-
 	net := core.NewNetwork("TestWebSocket")
 	net.SetParams(params)
+	path := "localhost:8080"
 	proc1 := net.NewProc("WSRequest", &websocket.WSRequest{})
 	proc2 := net.NewProc("AnsReq", &websocket.WSAnsReq{})
 	proc3 := net.NewProc("WSRespond", &websocket.WSRespond{})

@@ -9,7 +9,12 @@ import (
 )
 
 func TestInfQueueAsMain(t *testing.T) {
-	net := core.NewNetwork("InfQueueAsMain")
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
+	net := core.NewNetwork("TestInfQueueAsMain")
+	net.SetParams(params)
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 	proc2 := net.NewProc("WriteFile", &io.WriteFile{})

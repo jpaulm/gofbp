@@ -9,7 +9,12 @@ import (
 )
 
 func TestSubnet1(t *testing.T) {
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("TestSubnet1")
+	net.SetParams(params)
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 

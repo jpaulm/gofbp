@@ -11,7 +11,12 @@ import (
 )
 
 func TestMerge(t *testing.T) {
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("Merge")
+	net.SetParams(params)
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 	proc2 := net.NewProc("Sender2", &testrtn.Sender{})
@@ -27,7 +32,12 @@ func TestMerge(t *testing.T) {
 }
 
 func TestConcat(t *testing.T) {
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("Concat")
+	net.SetParams(params)
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
@@ -47,7 +57,12 @@ func TestConcat(t *testing.T) {
 }
 
 func TestRRDist(t *testing.T) {
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("RRDist")
+	net.SetParams(params)
 
 	proc1 := net.NewProc("Sender", &testrtn.Sender{})
 
@@ -67,7 +82,12 @@ func TestRRDist(t *testing.T) {
 }
 
 func TestCopyFile(t *testing.T) {
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("CopyFile")
+	net.SetParams(params)
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 
@@ -84,7 +104,12 @@ func TestDoSelect1(t *testing.T) {
 
 	// port REJ from proc2 is connected
 
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("DoSelect1")
+	net.SetParams(params)
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 	proc2 := net.NewProc("Select", &testrtn.Selector{})
@@ -105,7 +130,12 @@ func TestDoSelect2(t *testing.T) {
 
 	// port REJ from proc2 is NOT connected
 
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
 	net := core.NewNetwork("DoSelect2")
+	net.SetParams(params)
 
 	proc1 := net.NewProc("ReadFile", &io.ReadFile{})
 	proc2 := net.NewProc("Select", &testrtn.Selector{})
@@ -123,7 +153,12 @@ func TestDoSelect2(t *testing.T) {
 }
 func TestWriteToConsUsingNL(t *testing.T) {
 
-	net := core.NewNetwork("TestWriteToConsUsingNL")
+	params, err := core.LoadXMLParams("../params.xml")
+	if err != nil {
+		panic(err)
+	}
+	net := core.NewNetwork("WriteToConsUsingNL")
+	net.SetParams(params)
 
 	proc1 := net.NewProc("Sender1", &testrtn.Sender{})
 	proc2 := net.NewProc("Sender2", &testrtn.Sender{})
