@@ -1,5 +1,9 @@
 package websocket
 
+// The problem was to pass an extra parameter to a Handler function - I found several packages described on StackOverflow
+// which were designed for this task, but I found them all confusing or they had strange limitations!  Then I found this, which
+// was simple and easy to use, needed no additional packages, and, above all, was CLEAR!
+
 // https://www.alexedwards.net/blog/an-introduction-to-handlers-and-servemuxes-in-go
 
 import (
@@ -89,7 +93,7 @@ func startHttpServer(wg *sync.WaitGroup, path string, wsrequest *WSRequest) *htt
 		defer wg.Done() // let main know we are done cleaning up
 
 		// always returns error. ErrServerClosed on graceful close
-		if err := http.ListenAndServe(path, mux); err != http.ErrServerClosed {
+		if err := http.ListenAndServe(path, mh); err != http.ErrServerClosed {
 			// unexpected error. port in use?
 			log.Fatalf("ListenAndServe(): %v", err)
 		}
