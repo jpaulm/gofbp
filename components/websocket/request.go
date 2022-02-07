@@ -1,10 +1,11 @@
 package websocket
 
 // The problem was to pass an extra parameter to a Handler function - I found several packages described on StackOverflow
-// which were designed for this task, but I found them all confusing or they had strange limitations!  Then I found this, which
+// which were designed for this task, but I found them all confusing!  Then I found Alex's answer, which
 // was simple and easy to use, needed no additional packages, and, above all, was CLEAR!
 
 // https://www.alexedwards.net/blog/an-introduction-to-handlers-and-servemuxes-in-go
+// https://stackoverflow.com/questions/39320025/how-to-stop-http-listenandserve
 
 import (
 	"context"
@@ -103,9 +104,9 @@ func startHttpServer(wg *sync.WaitGroup, path string, wsrequest *WSRequest) *htt
 	return srv
 }
 
-func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// ServeHTTP ensures that myHandler is an instance of Handler interface{}
 
-	//func serveWs(w http.ResponseWriter, r *http.Request, wsr *WSRequest) {
+func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("upgrade")
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	c, err := upgrader.Upgrade(w, r, nil)
@@ -113,8 +114,6 @@ func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Print("upgrade:", err)
 		return
 	}
-	//conn = *c
-	//defer c.Close()
 
 	var pkt_list []*core.Packet
 	var pkt *core.Packet
