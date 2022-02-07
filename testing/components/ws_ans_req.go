@@ -1,4 +1,4 @@
-package websocket
+package components
 
 import (
 	"github.com/jpaulm/gofbp/core"
