@@ -91,12 +91,13 @@ Format of the tracing definitions file:
 ```
 The `generate-gIds` parameter is only used to assist in debugging deadlocks, so can default most of the time - see below.
 
-## Subnets
-These are described in Chap. 7 in "Flow-Based Programming": Composite Components - https://jpaulmorrison.com/fbp/compos.shtml , although we haven't implemented dynamic subnets (yet)!
+## Websockets support
 
-**Note:** If a subnet `.go` file is in the same folder as the network `.go` file invoking it, the `NewProc` call should be written without the folder - e.g. `net.NewProc("Run___Subnet", &Subnet1{})`, but currently DrawFBP cannot detect this situation, so, when using notation `GoFBP`, this call will not be generated correctly. 
+The GoFBP WebSockets support works very similarly to the corresponding `JavaFBP` facilities - see https://github.com/jpaulm/javafbp-websockets#readme - esp. the diagrams at the end.
 
-## Test Websockets 
+For information about how to use the `GoFBP` Websockets components, see https://https://jpaulm.github.io/fbp/gofbp_websockets.shtml .  In this test case, we use HTML and JavaScript as the client. 
+
+#### Testing WebSockets support:
 
 - position to your `GitHub\gofbp\testing` directory in DOS
 - update `params.xml` to set tracing parameters as desired
@@ -115,6 +116,10 @@ show up in the box below "Send"
 
 - you're done... 
 
+## Subnets
+These are described in Chap. 7 in "Flow-Based Programming": Composite Components - https://jpaulmorrison.com/fbp/compos.shtml , although we haven't implemented dynamic subnets (yet)!
+
+**Note:** If a subnet `.go` file is in the same folder as the network `.go` file invoking it, the `NewProc` call should be written without the folder - e.g. `net.NewProc("Run___Subnet", &Subnet1{})`, but currently DrawFBP cannot detect this situation, so, when using notation `GoFBP`, this call will not be generated correctly. 
 
 
 ## Other Test Cases
