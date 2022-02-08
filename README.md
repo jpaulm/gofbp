@@ -4,7 +4,7 @@ This repo contains an FBP implementation in Go.  It conforms pretty closely to t
 
 There may well be further internal changes, but I am hoping that the "external" APIs (network and component definitions) are now firm. 
 
-Current tag: **v1.0.6** .
+Current tag: **v1.0.8** .
 
 ## General
  
@@ -104,7 +104,13 @@ These are described in Chap. 7 in "Flow-Based Programming": Composite Components
 - in File Explorer, locate `GitHub\gofbp\scripts\chat2.html`
 - open with Firefox or Chrome (make sure you don't open the browser before starting the `gofbp` app)
 - enter `namelist` in the Command box, hit enter or Send
-- you should see `Server: Line1`, `Server: Line2`, `Server: Line3` show up in the box below "Send"
+- you should see 
+```
+    Server: Line1
+    Server: Line2
+    Server: Line3
+```
+show up in the box below "Send"
 - click on `Stop WS` - you will see `End of dialog` next to `Status`
 
 - you're done... 
