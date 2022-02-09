@@ -95,7 +95,7 @@ The `generate-gIds` parameter is only used to assist in debugging deadlocks, so 
 
 The GoFBP WebSockets support works very similarly to the corresponding `JavaFBP` facilities - see https://github.com/jpaulm/javafbp-websockets#readme - esp. the diagrams at the end.
 
-For information about how to use the `GoFBP` Websockets components, see https://jpaulm.github.io/fbp/gofbp_websockets.md .  In this test case, we use HTML and JavaScript as the client. 
+For information about how to use the `GoFBP` Websockets components, see https://jpaulm.github.io/fbp/gofbp_websockets.htm .  In this test case, we use HTML and JavaScript as the client. 
 
 #### Testing WebSockets support:
 
