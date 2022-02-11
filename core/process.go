@@ -308,8 +308,7 @@ func (p *Process) Create(x interface{}) *Packet {
 	return pkt
 }
 
-//CreateBracket method builds a new Packet and returns it
-// create bracket
+//CreateBracket method builds a new Bracket and returns it
 func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 	var pkt *Packet = new(Packet)
 	pkt.Contents = s
@@ -319,6 +318,19 @@ func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 	if p.network.tracepkts {
 		fmt.Print(p.Name, "  Bracket created: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
 		fmt.Println("  ", pkt.Contents)
+	}
+	return pkt
+}
+
+//CreateSignal method builds a new Signal IP and returns it
+func (p *Process) CreateSignal(s string) *Packet {
+	var pkt *Packet = new(Packet)
+	pkt.Contents = s
+	pkt.PktType = Signal
+	pkt.owner = p
+	p.ownedPkts++
+	if p.network.tracepkts {
+		fmt.Print(p.Name, "  Signal created: ", pkt.Contents)
 	}
 	return pkt
 }

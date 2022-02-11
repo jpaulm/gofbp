@@ -18,6 +18,7 @@ type InPort struct {
 	portName    string
 	fullName    string
 	downStrProc *Process
+	dropOldest  bool
 }
 
 func (c *InPort) Receive(p *Process) *Packet {
@@ -40,16 +41,23 @@ func (c *InPort) receive(p *Process) *Packet {
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
-	if pkt.PktType != NormalPacket {
+	if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
 		trace(p, " Received from "+c.portName+" < "+
 			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
 		if p.network.tracing {
 			fmt.Print("  contents: ", pkt.Contents, "\n")
 		}
 	} else {
-		trace(p, " Received from "+c.portName+" < ")
-		if p.network.tracing {
-			fmt.Print("  ", pkt.Contents, "\n")
+		if pkt.PktType == Signal {
+			x, _ := pkt.Contents.(string)
+			trace(p, " Received from "+c.portName+" < "+
+				"Signal: "+x+"\n")
+		} else {
+			trace(p, " Received from "+c.portName+" < ")
+
+			if p.network.tracing {
+				fmt.Print("  ", pkt.Contents, "\n")
+			}
 		}
 	}
 	c.ir = (c.ir + 1) % len(c.pktArray)

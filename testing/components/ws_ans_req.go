@@ -42,7 +42,7 @@ func (wsansreq *WSAnsReq) Execute(p *core.Process) {
 		p.Send(wsansreq.out, pkt)
 
 		pkt = p.Receive(wsansreq.ipt)
-		if pkt.Contents.(string) == "@kill" {
+		if pkt.PktType == core.Signal && pkt.Contents.(string) == "@kill" {
 			p.Send(wsansreq.out, pkt)
 			pkt = p.Receive(wsansreq.ipt)
 		}

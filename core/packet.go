@@ -4,6 +4,7 @@ const (
 	NormalPacket int32 = iota
 	OpenBracket
 	CloseBracket
+	Signal
 )
 
 type Packet struct {

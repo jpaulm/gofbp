@@ -150,7 +150,7 @@ func (n *Network) NewOutArrayPort() *OutArrayPort {
 	return port
 }
 
-func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) {
+func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap int) *InPort {
 
 	inPort := parsePort(in)
 
@@ -239,6 +239,7 @@ func (n *Network) Connect(p1 *Process, out string, p2 *Process, in string, cap i
 	if out == "*" {
 		p1.autoOutput = connxn
 	}
+	return connxn
 }
 
 type portDefinition struct {
@@ -314,6 +315,10 @@ func (n *Network) SetParams(p *Params) {
 	n.tracelocks = p.TraceLocks
 	n.tracepkts = p.TracePkts
 	n.generateGids = p.GenerateGIDs
+}
+
+func (n *Network) SetDropOldest(i *InPort) {
+	i.dropOldest = true
 }
 
 func (n *Network) Run() {

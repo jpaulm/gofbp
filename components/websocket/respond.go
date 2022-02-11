@@ -65,7 +65,7 @@ func (wsrespond *WSRespond) Execute(p *core.Process) {
 			}
 			pkt = p.Receive(wsrespond.ipt)
 		}
-		if pkt.Contents.(string) == "@kill" {
+		if pkt.PktType == core.Signal && pkt.Contents.(string) == "@kill" {
 			conn.Close()
 			p.Discard(pkt)
 			pkt = p.Receive(wsrespond.ipt)

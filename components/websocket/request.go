@@ -130,6 +130,13 @@ func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		x := string(message)
 
+		if x == "@kill" {
+			pkt = mh.wsr.proc.CreateSignal(x)
+			mh.wsr.proc.Send(opt, pkt)
+			atomic.StoreInt32(&mh.wsr.closed_down, 1)
+			break
+		}
+
 		if x == "@{" {
 
 			pkt_list = make([]*core.Packet, 0)
@@ -156,13 +163,8 @@ func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			mh.wsr.proc.Send(opt, pkt)
 			continue
 		}
+
 		pkt = mh.wsr.proc.Create(x)
-		if x == "@kill" {
-			mh.wsr.proc.Send(opt, pkt)
-			atomic.StoreInt32(&mh.wsr.closed_down, 1)
-			break
-		} else {
-			pkt_list = append(pkt_list, pkt)
-		}
+		pkt_list = append(pkt_list, pkt)
 	}
 }

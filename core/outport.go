@@ -29,19 +29,25 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	LockTr(o.conn.condNF, "send L", p)
 	defer UnlockTr(o.conn.condNF, "send U", p)
 
-	if pkt.PktType != NormalPacket {
+	if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
 		trace(p, " Sending to "+o.portName+" > "+
 			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
 		if p.network.tracing {
 			fmt.Print("  contents: ", pkt.Contents, "\n")
 		}
 	} else {
-		trace(p, " Sending to "+o.portName+" > ")
-		if p.network.tracing {
-			fmt.Print("  ", pkt.Contents, "\n")
+		if pkt.PktType == Signal {
+			x, _ := pkt.Contents.(string)
+			trace(p, " Sending to "+o.portName+" > "+
+				"Signal: "+x+"\n")
+		} else {
+			trace(p, " Sending to "+o.portName+" > ")
+
+			if p.network.tracing {
+				fmt.Print("  ", pkt.Contents, "\n")
+			}
 		}
 	}
-
 	for o.conn.isFull() { // while connection is full
 		atomic.StoreInt32(&p.status, SuspSend)
 		WaitTr(o.conn.condNF, "wait in send", p)
