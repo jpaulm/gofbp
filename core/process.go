@@ -163,15 +163,18 @@ func (p *Process) activate() {
 	//defer UnlockTr(p.canGo, "act U", p)
 
 	st := atomic.LoadInt32(&p.status)
-	trace(p, "Activating: status "+[...]string{"Not Started", "Active", "Dormant",
-		"SuspSend", "SuspRecv", "Terminated"}[st])
 
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		if atomic.CompareAndSwapInt32(&p.status, Dormant, Active) {
 			BdcastTr(p.canGo, "bdcast act", p)
+			trace(p, "Activating: status "+[...]string{"Not Started", "Active", "Dormant",
+				"SuspSend", "SuspRecv", "Terminated"}[st])
 		}
 		///UnlockTr(p.canGo, "act U", p)
 		return
+	} else {
+		trace(p, "Activating: status "+[...]string{"Not Started", "Active", "Dormant",
+			"SuspSend", "SuspRecv", "Terminated"}[st])
 	}
 	// if status was NotStarted...
 	///UnlockTr(p.canGo, "act U", p)
@@ -342,14 +345,42 @@ func (p *Process) Discard(pkt *Packet) {
 	}
 	p.ownedPkts--
 	if p.network.tracepkts {
-		if pkt.PktType != NormalPacket {
+		if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
 			fmt.Print(p.Name, "  Bracket discarded: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
 			fmt.Print("  contents: ", pkt.Contents, "\n")
 		} else {
-			fmt.Print(p.Name, "  Packet discarded >")
-			fmt.Println("  ", pkt.Contents)
+			if pkt.PktType == Signal {
+				fmt.Print(p.Name, "  Signal discarded: ", pkt.Contents, "\n")
+			} else {
+				fmt.Print(p.Name, "  Packet discarded >")
+				fmt.Println("  ", pkt.Contents)
+			}
 		}
 	}
+	//}
+	pkt = nil
+}
+
+//DiscardOldest method sets Packet to nil
+func (p *Process) DiscardOldest(pkt *Packet) {
+	if pkt == nil {
+		panic("Discarding nil packet (DO)")
+	}
+	p.ownedPkts--
+	if p.network.tracepkts {
+		if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
+			fmt.Print(p.Name, "  Bracket discarded (DO): ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
+			fmt.Print("  contents: ", pkt.Contents, "\n")
+		} else {
+			if pkt.PktType == Signal {
+				fmt.Print(p.Name, "  Signal discarded (DO): ", pkt.Contents, "\n")
+			} else {
+				fmt.Print(p.Name, "  Packet discarded (DO) >")
+				fmt.Println("  ", pkt.Contents)
+			}
+		}
+	}
+	//}
 	pkt = nil
 }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <runparams>
-    <tracing>false</tracing>
+    <tracing>true</tracing>
     <tracelocks>false</tracelocks>
-    <tracepkts>false</tracepkts>
+    <tracepkts>true</tracepkts>
     <generate-gIds>false</generate-gIds>
 </runparams>

@@ -26,8 +26,8 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 		panic("Sending packet not owned by this process")
 	}
 
-	LockTr(o.conn.condNF, "send L", p)
-	defer UnlockTr(o.conn.condNF, "send U", p)
+	LockTr(o.conn.condNE, "send L", p)
+	defer UnlockTr(o.conn.condNE, "send U", p)
 
 	if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
 		trace(p, " Sending to "+o.portName+" > "+
@@ -48,14 +48,21 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 			}
 		}
 	}
-	for o.conn.isFull() { // while connection is full
-		atomic.StoreInt32(&p.status, SuspSend)
-		WaitTr(o.conn.condNF, "wait in send", p)
-		//checkPending()
-		atomic.StoreInt32(&p.status, Active)
-	}
 
-	trace(p, " Sent to "+o.portName)
+	if o.conn.isFull() && o.conn.dropOldest {
+		old_pkt := o.conn.pktArray[o.conn.is]
+		//old_pkt.Contents = nil
+		//old_pkt = nil
+		o.conn.pktArray[o.conn.is] = nil
+		p.DiscardOldest(old_pkt)
+	} else {
+		for o.conn.isFull() { // while connection is full
+			atomic.StoreInt32(&p.status, SuspSend)
+			WaitTr(o.conn.condNF, "wait in send", p)
+			atomic.StoreInt32(&p.status, Active)
+			trace(p, " Sent to "+o.portName)
+		}
+	}
 
 	o.conn.pktArray[o.conn.is] = pkt
 	o.conn.is = (o.conn.is + 1) % len(o.conn.pktArray)
@@ -64,7 +71,7 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	pkt = nil
 	BdcastTr(o.conn.condNE, "bdcast sent", p)
 
-	trace(o.conn.downStrProc, "activated from send")
+	//trace(o.conn.downStrProc, "activated from send")
 	o.conn.downStrProc.activate()
 
 	return true

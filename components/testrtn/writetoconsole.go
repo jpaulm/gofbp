@@ -31,7 +31,11 @@ func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
 			if pkt.PktType == core.CloseBracket {
 				fmt.Println("Close Bracket", pkt.Contents)
 			} else {
-				fmt.Print(pkt.Contents)
+				if pkt.PktType == core.Signal {
+					fmt.Println("Signal", pkt.Contents)
+				} else {
+					fmt.Println(pkt.Contents)
+				}
 			}
 		}
 

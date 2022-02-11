@@ -26,8 +26,8 @@ func (c *InPort) Receive(p *Process) *Packet {
 }
 
 func (c *InPort) receive(p *Process) *Packet {
-	LockTr(c.condNE, "recv L", p)
-	defer UnlockTr(c.condNE, "recv U", p)
+	LockTr(c.condNF, "recv L", p)
+	defer UnlockTr(c.condNF, "recv U", p)
 	trace(p, " Receiving from "+c.portName)
 	for c.isEmptyNL() { // InPort is empty
 		if c.closed /* || c.upStrmCnt == 0  - check this! */ {

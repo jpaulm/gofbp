@@ -78,7 +78,6 @@ func WaitTr(sc *sync.Cond, s string, p *Process) {
 		fmt.Println(p.Name, s)
 	}
 	sc.Wait()
-	//checkPending()
 }
 
 func trace(p *Process, s string) {

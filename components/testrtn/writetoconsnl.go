@@ -22,7 +22,6 @@ func (writeToConsole *WriteToConsNL) Setup(p *core.Process) {
 
 func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
 
-	//for {
 	var pkt = p.Receive(writeToConsole.ipt)
 	if pkt == nil {
 		//break
@@ -34,7 +33,11 @@ func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
 		if pkt.PktType == core.CloseBracket {
 			fmt.Println("Close Bracket", pkt.Contents)
 		} else {
-			fmt.Print(pkt.Contents)
+			if pkt.PktType == core.Signal {
+				fmt.Println("Signal", pkt.Contents)
+			} else {
+				fmt.Println(pkt.Contents)
+			}
 		}
 	}
 
@@ -43,6 +46,5 @@ func (writeToConsole *WriteToConsNL) Execute(p *core.Process) {
 	} else {
 		p.Discard(pkt)
 	}
-	//}
 
 }
