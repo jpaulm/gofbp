@@ -118,6 +118,9 @@ func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var pkt_list []*core.Packet
 	var pkt *core.Packet
 
+	var cn websocket.Conn
+	cn = *c
+	c2 := &cn
 	opt := mh.wsr.proc.OpenOutPort("OUT")
 
 	for {
@@ -151,7 +154,7 @@ func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			pkt = mh.wsr.proc.CreateBracket(core.OpenBracket, "")
 			mh.wsr.proc.Send(opt, pkt)
 
-			pkt = mh.wsr.proc.Create(c) // connection
+			pkt = mh.wsr.proc.Create(c2) // connection
 			mh.wsr.proc.Send(opt, pkt)
 
 			for _, pkt := range pkt_list {

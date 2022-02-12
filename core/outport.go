@@ -66,9 +66,9 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 
 	o.conn.pktArray[o.conn.is] = pkt
 	o.conn.is = (o.conn.is + 1) % len(o.conn.pktArray)
-	//pkt.owner = nil
+	pkt.owner = nil
 	p.ownedPkts--
-	pkt = nil
+	//pkt = nil
 	BdcastTr(o.conn.condNE, "bdcast sent", p)
 
 	//trace(o.conn.downStrProc, "activated from send")
