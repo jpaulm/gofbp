@@ -391,9 +391,9 @@ func (n *Network) Run() {
 			}
 		}
 
-		p := n.mother
+		pm := n.mother
 
-		allDrained, _, _ := p.inputState()
+		allDrained, _, _ := pm.inputState()
 		if allDrained {
 			break
 		}
@@ -433,8 +433,8 @@ func (n *Network) Run() {
 	}
 
 	//if n.mother != nil {
-	p := n.mother
-	for _, v := range p.outPorts {
+	pm := n.mother
+	for _, v := range pm.outPorts {
 		_, b := v.(*OutArrayPort)
 		if b {
 			for _, w := range v.(*OutArrayPort).array {

@@ -57,6 +57,9 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 			o.conn.pktArray[o.conn.ir] = pkt
 			o.conn.ir = (o.conn.ir + 1) % len(o.conn.pktArray)
 			o.conn.is = o.conn.ir
+		} else {
+			o.conn.pktArray[o.conn.is] = pkt
+			o.conn.is = (o.conn.is + 1) % len(o.conn.pktArray)
 		}
 	} else {
 		for o.conn.isFull() { // while connection is full
