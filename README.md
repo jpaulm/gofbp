@@ -4,7 +4,7 @@ This repo contains an FBP implementation in Go.  It conforms pretty closely to t
 
 There may well be further internal changes, but I am hoping that the "external" APIs (network and component definitions) are now firm. 
 
-Current tag: **v1.0.8** .
+Current tag: **v1.0.9** .
 
 ## General
  
@@ -29,7 +29,7 @@ params, err := core.LoadXMLParams("../params.xml")
 	}
  ```
  
- and the associated ` net.SetParams(params)` after the call to `NewNetwork`.
+ and the associated ` net.SetParams(params)` after the call to `NewNetwork`. Of course, if you are happy with these parameters all set to `false`, these statements can be omitted.
 
 ## Features (these are common to all FBP implementations on GitHub/jpaulm):
 
@@ -56,6 +56,8 @@ Command to run your network, e.g.:
 ```
 go run Merge.go
 ```
+
+If you want to run the `WebSocket` sample network, you will need `require github.com/gorilla/websocket vx.y.z` in `go.mod` - see above.
 
 A number of test cases are in the `testing` folder, and can be run as follows:
 
