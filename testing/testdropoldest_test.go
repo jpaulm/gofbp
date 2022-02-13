@@ -7,7 +7,7 @@ import (
 	"github.com/jpaulm/gofbp/core"
 )
 
-func TestDropOldest_test(t *testing.T) {
+func TestDropOldest(t *testing.T) {
 	params, err := core.LoadXMLParams("../params.xml")
 	if err != nil {
 		panic(err)

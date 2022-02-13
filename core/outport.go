@@ -29,32 +29,35 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	LockTr(o.conn.condNE, "send L", p)
 	defer UnlockTr(o.conn.condNE, "send U", p)
 
+	x := fmt.Sprint(pkt.Contents)
 	if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
 		trace(p, " Sending to "+o.portName+" > "+
-			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
-		if p.network.tracing {
-			fmt.Print("  contents: ", pkt.Contents, "\n")
-		}
+			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket "+x)
+		//if p.network.tracing {
+		//	fmt.Print("  contents: ", pkt.Contents, "\n")
+		//}
 	} else {
 		if pkt.PktType == Signal {
-			x, _ := pkt.Contents.(string)
+			//x, _ := pkt.Contents.(string)
 			trace(p, " Sending to "+o.portName+" > "+
-				"Signal: "+x+"\n")
+				"Signal: "+x)
 		} else {
-			trace(p, " Sending to "+o.portName+" > ")
+			trace(p, " Sending to "+o.portName+" > "+x)
 
-			if p.network.tracing {
-				fmt.Print("  ", pkt.Contents, "\n")
-			}
+			//if p.network.tracing {
+			//	fmt.Print("  ", pkt.Contents, "\n")
+			//}
 		}
 	}
 
-	if o.conn.isFull() && o.conn.dropOldest {
-		old_pkt := o.conn.pktArray[o.conn.is]
-		//old_pkt.Contents = nil
-		//old_pkt = nil
-		o.conn.pktArray[o.conn.is] = nil
-		p.DiscardOldest(old_pkt)
+	if o.conn.dropOldest {
+		if o.conn.isFull() { // if connection is full
+			old_pkt := o.conn.pktArray[o.conn.ir]
+			p.DiscardOldest(old_pkt)
+			o.conn.pktArray[o.conn.ir] = pkt
+			o.conn.ir = (o.conn.ir + 1) % len(o.conn.pktArray)
+			o.conn.is = o.conn.ir
+		}
 	} else {
 		for o.conn.isFull() { // while connection is full
 			atomic.StoreInt32(&p.status, SuspSend)
@@ -62,10 +65,9 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 			atomic.StoreInt32(&p.status, Active)
 			trace(p, " Sent to "+o.portName)
 		}
+		o.conn.pktArray[o.conn.is] = pkt
+		o.conn.is = (o.conn.is + 1) % len(o.conn.pktArray)
 	}
-
-	o.conn.pktArray[o.conn.is] = pkt
-	o.conn.is = (o.conn.is + 1) % len(o.conn.pktArray)
 	pkt.owner = nil
 	p.ownedPkts--
 	//pkt = nil

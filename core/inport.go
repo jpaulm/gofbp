@@ -41,23 +41,24 @@ func (c *InPort) receive(p *Process) *Packet {
 	}
 	pkt := c.pktArray[c.ir]
 	c.pktArray[c.ir] = nil
+	x := fmt.Sprint(pkt.Contents)
 	if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
 		trace(p, " Received from "+c.portName+" < "+
-			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket")
-		if p.network.tracing {
-			fmt.Print("  contents: ", pkt.Contents, "\n")
-		}
+			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket "+x)
+		//if p.network.tracing {
+		//	fmt.Print("  contents: ", pkt.Contents, "\n")
+		//}
 	} else {
 		if pkt.PktType == Signal {
-			x, _ := pkt.Contents.(string)
+			//x, _ := pkt.Contents.(string)
 			trace(p, " Received from "+c.portName+" < "+
 				"Signal: "+x+"\n")
 		} else {
-			trace(p, " Received from "+c.portName+" < ")
+			trace(p, " Received from "+c.portName+" < "+x)
 
-			if p.network.tracing {
-				fmt.Print("  ", pkt.Contents, "\n")
-			}
+			//if p.network.tracing {
+			//	fmt.Print("  ", pkt.Contents, "\n")
+			//}
 		}
 	}
 	c.ir = (c.ir + 1) % len(c.pktArray)
