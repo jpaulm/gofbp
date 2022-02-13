@@ -1,7 +1,8 @@
-package testrtn
+package components
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/jpaulm/gofbp/core"
@@ -24,8 +25,8 @@ func (receiver *DelayedReceiver) Execute(p *core.Process) {
 		if pkt == nil {
 			break
 		}
-		time.Sleep(500 * time.Millisecond)
-		fmt.Println("Input to DelayedReceiver:", p.Name, ">", pkt.Contents)
+		time.Sleep(time.Duration(rand.Int31n(500)) * time.Millisecond)
+		fmt.Println("DelayedReceiver input:", p.Name, ">", pkt.Contents)
 		p.Discard(pkt)
 	}
 
