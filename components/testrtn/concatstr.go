@@ -19,17 +19,15 @@ func (concatstr *ConcatStr) Execute(p *core.Process) {
 	for i := 0; i < concatstr.ipt.ArrayLength(); i++ {
 
 		for {
-			conn := concatstr.ipt.GetArrayItem(i)
-			if conn == nil {
+			inPort := concatstr.ipt.GetArrayItem(i)
+			if inPort == nil {
 				continue
 			}
-			var pkt = p.Receive(conn)
+			var pkt = p.Receive(inPort)
 			if pkt == nil {
 				break
 			}
-			//fmt.Println("Output: ", pkt.Contents)
 			p.Send(concatstr.opt, pkt)
 		}
 	}
-
 }
