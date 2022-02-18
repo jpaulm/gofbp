@@ -224,7 +224,7 @@ The following components are available:
 "websocket" folder (for instructions, see below):
 - `ws_request.go`
 - `ws_respond.go`
-- `ws_ans_req.go`  (sample component - properly belongs in test suite)
+- `ws_ans_req.go`  (sample component - has been moved to `testing/components`)
 
 **To dos**
 
