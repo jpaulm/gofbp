@@ -95,9 +95,9 @@ func (o *OutPort) GetArrayItem(i int) *OutPort {
 
 func (o *OutPort) SetArrayItem(op *OutPort, i int) {}
 
-func (o *OutPort) ArrayLength() int {
-	return 0
-}
+// func (o *OutPort) ArrayLength() int {
+//	return 0
+//}
 
 func (o *OutPort) Close() {
 	LockTr(o.conn.condNF, "close L", o.sender)

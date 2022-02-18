@@ -22,4 +22,5 @@ type InputArrayConn interface {
 	GetArrayItem(i int) *InPort
 	setArrayItem(c *InPort, i int)
 	ArrayLength() int
+	GetArray() []*InPort
 }

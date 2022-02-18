@@ -16,10 +16,8 @@ func (concatstr *ConcatStr) Setup(p *core.Process) {
 
 func (concatstr *ConcatStr) Execute(p *core.Process) {
 
-	for i := 0; i < concatstr.ipt.ArrayLength(); i++ {
-
+	for _, inPort := range concatstr.ipt.GetArray() {
 		for {
-			inPort := concatstr.ipt.GetArrayItem(i)
 			if inPort == nil {
 				continue
 			}

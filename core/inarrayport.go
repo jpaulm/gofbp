@@ -16,6 +16,10 @@ type InArrayPort struct {
 	//downStrProc *Process
 }
 
+func (c *InArrayPort) GetArray() []*InPort {
+	return c.array
+}
+
 func (c *InArrayPort) isDrained() bool {
 	for _, v := range c.array {
 		if !v.isDrained() {

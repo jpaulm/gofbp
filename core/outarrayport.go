@@ -18,6 +18,10 @@ type OutArrayPort struct {
 
 func (o *OutArrayPort) send(p *Process, pkt *Packet) bool { panic("send on array port") }
 
+func (o *OutArrayPort) GetArray() []*OutPort {
+	return o.array
+}
+
 func (o *OutArrayPort) GetArrayItem(i int) *OutPort {
 	if i >= len(o.array) {
 		return nil
