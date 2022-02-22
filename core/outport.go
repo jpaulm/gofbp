@@ -53,7 +53,7 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	if o.conn.dropOldest {
 		if o.conn.isFull() { // if connection is full
 			old_pkt := o.conn.pktArray[o.conn.ir]
-			p.DiscardOldest(old_pkt)
+			p.discardOldest(old_pkt)
 			o.conn.pktArray[o.conn.ir] = pkt
 			o.conn.ir = (o.conn.ir + 1) % len(o.conn.pktArray)
 			o.conn.is = o.conn.ir

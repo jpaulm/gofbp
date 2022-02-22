@@ -364,7 +364,7 @@ func (p *Process) Discard(pkt *Packet) {
 }
 
 //DiscardOldest method sets Packet to nil
-func (p *Process) DiscardOldest(pkt *Packet) {
+func (p *Process) discardOldest(pkt *Packet) {
 	if pkt == nil {
 		panic("Discarding nil packet (DO)")
 	}
@@ -385,6 +385,70 @@ func (p *Process) DiscardOldest(pkt *Packet) {
 	}
 	//}
 	pkt = nil
+}
+
+// Attach `subpkt` to `pkt` via chain named `name`
+func (p *Process) attach(pkt *Packet, name string, subpkt *Packet) {
+	if pkt == nil {
+		panic("Attaching to nil packet")
+	}
+	if pkt.owner != p {
+		panic("Attaching to packet not owned by this process")
+	}
+	if subpkt == nil {
+		panic("Attaching nil packet")
+	}
+	if subpkt.owner != p {
+		panic("Attaching packet not owned by this process")
+	}
+	if pkt.chains == nil {
+		pkt.chains = make(map[string]*ChainHdr)
+	}
+	x := pkt.chains[name]
+	if x == nil {
+		x := new(ChainHdr)
+		x.name = name
+		x.first = subpkt
+		pkt.chains[name] = x
+	} else {
+		p := x.last
+		p.next = subpkt
+	}
+	x.last = subpkt
+	subpkt.owner = pkt
+	p.ownedPkts--
+}
+
+// Detach `subpkt` from `pkt` via chain named `name`
+func (p *Process) detach(pkt *Packet, name string, subpkt *Packet) {
+	if pkt == nil {
+		panic("Detaching from nil packet")
+	}
+	if pkt.owner != p {
+		panic("Detaching from packet not owned by this process")
+	}
+	if subpkt == nil {
+		panic("Detaching nil packet")
+	}
+	if subpkt.owner != pkt {
+		panic("Detaching packet not owned by first referenced packet")
+	}
+	x := pkt.chains[name]
+	pt := x.first
+	pt2 := pt
+	for {
+		if pt == nil {
+			break
+		}
+		if pt == subpkt {
+			pt2.next = nil
+			break
+		}
+		pt2 = pt
+		pt = pt.next
+		subpkt.owner = p
+		p.ownedPkts++ // check this!
+	}
 }
 
 //https://blog.sgmansfield.com/2015/12/goroutine-ids/

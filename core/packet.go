@@ -10,5 +10,13 @@ const (
 type Packet struct {
 	Contents interface{}
 	PktType  int32
-	owner    *Process
+	owner    interface{} // must be *Process or *Packet
+	chains   map[string]*ChainHdr
+	next     *Packet
+}
+
+type ChainHdr struct {
+	name  string
+	first *Packet
+	last  *Packet
 }
