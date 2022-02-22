@@ -435,19 +435,25 @@ func (p *Process) detach(pkt *Packet, name string, subpkt *Packet) {
 	}
 	x := pkt.chains[name]
 	pt := x.first
+	if pt == subpkt {
+		x.first = pt.next
+		subpkt.owner = p
+		p.ownedPkts++
+		return
+	}
 	pt2 := pt
 	for {
 		if pt == nil {
-			break
+			panic("Packet being detached not found")
 		}
 		if pt == subpkt {
-			pt2.next = nil
+			pt2.next = pt.next
+			subpkt.owner = p
+			p.ownedPkts++
 			break
 		}
 		pt2 = pt
 		pt = pt.next
-		subpkt.owner = p
-		p.ownedPkts++ // check this!
 	}
 }
 
