@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"regexp"
+	"runtime"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 )
@@ -22,14 +24,24 @@ type Network struct {
 	generateGids bool
 }
 
-func NewNetwork(name string) *Network {
+func NewNetwork(name ...string) *Network {
 	net := &Network{
-		Name:  name,
+		//Name:  name[0],
 		procs: make(map[string]*Process),
 		wg:    sync.WaitGroup{},
 		//params: pms,
 	}
-
+	if len(name) > 0 {
+		net.Name = name[0]
+	} else {
+		slice := make([]uintptr, 5)
+		no := runtime.Callers(1, slice)
+		if no > 0 {
+			//frames := runtime.CallersFrames(slice)
+			funcName := runtime.FuncForPC(slice[1]).Name()
+			net.Name = funcName[strings.LastIndex(funcName, ".")+1:]
+		}
+	}
 	return net
 }
 

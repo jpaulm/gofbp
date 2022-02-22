@@ -388,13 +388,13 @@ func (p *Process) discardOldest(pkt *Packet) {
 }
 
 // Attach `subpkt` to `pkt` via chain named `name`
-func (p *Process) attach(pkt *Packet, name string, subpkt *Packet) {
+func (p *Process) Attach(pkt *Packet, name string, subpkt *Packet) {
 	if pkt == nil {
 		panic("Attaching to nil packet")
 	}
-	if pkt.owner != p {
-		panic("Attaching to packet not owned by this process")
-	}
+	//if pkt.owner != p {
+	//	panic("Attaching to packet not owned by this process")
+	//}
 	if subpkt == nil {
 		panic("Attaching nil packet")
 	}
@@ -406,13 +406,13 @@ func (p *Process) attach(pkt *Packet, name string, subpkt *Packet) {
 	}
 	x := pkt.chains[name]
 	if x == nil {
-		x := new(ChainHdr)
+		x = &ChainHdr{}
 		x.name = name
 		x.first = subpkt
 		pkt.chains[name] = x
 	} else {
-		p := x.last
-		p.next = subpkt
+		pt := x.last
+		pt.next = subpkt
 	}
 	x.last = subpkt
 	subpkt.owner = pkt
@@ -420,7 +420,7 @@ func (p *Process) attach(pkt *Packet, name string, subpkt *Packet) {
 }
 
 // Detach `subpkt` from `pkt` via chain named `name`
-func (p *Process) detach(pkt *Packet, name string, subpkt *Packet) {
+func (p *Process) Detach(pkt *Packet, name string, subpkt *Packet) {
 	if pkt == nil {
 		panic("Detaching from nil packet")
 	}
