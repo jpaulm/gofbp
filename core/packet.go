@@ -12,12 +12,12 @@ type Packet struct {
 	PktType  int32
 	owner    interface{} // must be *Process or *Packet
 	chains   map[string]*Chain
-	next     *Packet
+	Next     *Packet
 }
 
 type Chain struct {
 	name  string
 	owner *Packet
-	first *Packet
-	last  *Packet
+	First *Packet
+	Last  *Packet
 }

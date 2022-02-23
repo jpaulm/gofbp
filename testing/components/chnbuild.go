@@ -15,7 +15,7 @@ func (cb *ChainBuild) Setup(p *core.Process) {
 func (cb *ChainBuild) Execute(p *core.Process) {
 
 	pkt := p.Create("One")
-	chn := p.NewChain("chain1")
+	chn := p.NewChain(pkt, "chain1")
 	pkt2 := p.Create("Two")
 	pkt3 := p.Create("Three")
 	pkt4 := p.Create("Four")

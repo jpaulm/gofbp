@@ -389,7 +389,7 @@ func (p *Process) discardOldest(pkt *Packet) {
 
 func (p *Process) NewChain(pkt *Packet, name string) *Chain {
 	if pkt == nil {
-		panic("Attaching to nil packet")
+		panic("Creating chain onto nil packet")
 	}
 	if pkt.chains == nil {
 		pkt.chains = make(map[string]*Chain)
@@ -398,6 +398,20 @@ func (p *Process) NewChain(pkt *Packet, name string) *Chain {
 	x.name = name
 	pkt.chains[name] = x
 	x.owner = pkt
+	return x
+}
+
+func (p *Process) GetChain(pkt *Packet, name string) *Chain {
+	if pkt == nil {
+		panic("Getting chain from nil packet")
+	}
+	if pkt.chains == nil {
+		panic("No chains attached to packet")
+	}
+	x := pkt.chains[name]
+	if x == nil {
+		panic("No chain found with that name")
+	}
 	return x
 }
 
@@ -410,35 +424,30 @@ func (p *Process) Attach(c *Chain, subpkt *Packet) {
 	if subpkt.owner != p {
 		panic("Attaching packet not owned by this process")
 	}
-	if c.first == nil {
-		c.first = subpkt
+	if c.First == nil {
+		c.First = subpkt
 	}
-	if c.last != nil {
-		c.last.next = subpkt
+	if c.Last != nil {
+		c.Last.Next = subpkt
 	}
-	c.last = subpkt
-	subpkt.owner = c.owner
+	c.Last = subpkt
+	subpkt.owner = c
 	p.ownedPkts--
 }
 
 // Detach `subpkt` from `pkt` via chain named `name`
-func (p *Process) Detach(pkt *Packet, name string, subpkt *Packet) {
-	if pkt == nil {
-		panic("Detaching from nil packet")
-	}
-	if pkt.owner != p {
-		panic("Detaching from packet not owned by this process")
-	}
+func (p *Process) Detach(chn *Chain, subpkt *Packet) {
+
 	if subpkt == nil {
 		panic("Detaching nil packet")
 	}
-	if subpkt.owner != pkt {
-		panic("Detaching packet not owned by first referenced packet")
+	if subpkt.owner != chn {
+		panic("Detaching packet not owned by this chain")
 	}
-	x := pkt.chains[name]
-	pt := x.first
+
+	pt := chn.First
 	if pt == subpkt {
-		x.first = pt.next
+		chn.First = pt.Next
 		subpkt.owner = p
 		p.ownedPkts++
 		return
@@ -449,13 +458,16 @@ func (p *Process) Detach(pkt *Packet, name string, subpkt *Packet) {
 			panic("Packet being detached not found")
 		}
 		if pt == subpkt {
-			pt2.next = pt.next
+			pt2.Next = pt.Next
+			if chn.Last == pt {
+				chn.Last = pt2
+			}
 			subpkt.owner = p
 			p.ownedPkts++
 			break
 		}
 		pt2 = pt
-		pt = pt.next
+		pt = pt.Next
 	}
 }
 
