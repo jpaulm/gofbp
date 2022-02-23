@@ -6,6 +6,7 @@ import (
 	//"github.com/jpaulm/gofbp/components/io"
 	"github.com/jpaulm/gofbp/components/testrtn"
 	"github.com/jpaulm/gofbp/core"
+	"github.com/jpaulm/gofbp/testing/components"
 )
 
 func TestChaining(t *testing.T) {
@@ -15,7 +16,7 @@ func TestChaining(t *testing.T) {
 	}
 	net := core.NewNetwork()
 	net.SetParams(params)
-	proc1 := net.NewProc("ChainBuild", &testrtn.ChainBuild{})
+	proc1 := net.NewProc("ChainBuild", &components.ChainBuild{})
 	proc2 := net.NewProc("Discard", &testrtn.Discard{})
 
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
