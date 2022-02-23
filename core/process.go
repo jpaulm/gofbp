@@ -387,21 +387,25 @@ func (p *Process) discardOldest(pkt *Packet) {
 	pkt = nil
 }
 
-func (p *Process) NewChain(pkt *Packet, name string) *Chain {
+func (p *Process) NewChain(pkt *Packet, name string) (*Chain, bool) {
 	if pkt == nil {
 		panic("Creating chain onto nil packet")
 	}
 	if pkt.chains == nil {
 		pkt.chains = make(map[string]*Chain)
 	}
-	x := &Chain{}
+	x := pkt.chains[name]
+	if x != nil {
+		return x, false
+	}
+	x = &Chain{}
 	x.name = name
 	pkt.chains[name] = x
 	x.owner = pkt
-	return x
+	return x, true
 }
 
-func (p *Process) GetChain(pkt *Packet, name string) *Chain {
+func (p *Process) GetChain(pkt *Packet, name string) (*Chain, bool) {
 	if pkt == nil {
 		panic("Getting chain from nil packet")
 	}
@@ -410,9 +414,9 @@ func (p *Process) GetChain(pkt *Packet, name string) *Chain {
 	}
 	x := pkt.chains[name]
 	if x == nil {
-		panic("No chain found with that name")
+		return x, false
 	}
-	return x
+	return x, true
 }
 
 // Attach `subpkt` to `pkt` via chain named `name`

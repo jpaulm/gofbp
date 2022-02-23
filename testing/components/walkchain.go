@@ -19,7 +19,10 @@ func (wc *WalkChain) Setup(p *core.Process) {
 func (wc *WalkChain) Execute(p *core.Process) {
 
 	var pkt = p.Receive(wc.ipt)
-	chn := p.GetChain(pkt, "chain1")
+	chn, ok := p.GetChain(pkt, "chain1")
+	if !ok {
+		panic("Chain 'chain1' not found")
+	}
 	x := chn.First
 	for x != nil {
 		fmt.Println(x.Contents)
