@@ -108,6 +108,7 @@ func startHttpServer(wg *sync.WaitGroup, path string, wsrequest *WSRequest) *htt
 
 func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("upgrade")
+	//fmt.Printf("%+v\n", w)
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -149,7 +150,7 @@ func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		if x == "@}" {
 
-			// send out "connection" IPs, then IPs stored in pkt_list ... all surrounded by bracket IPs
+			// send out "connection" IPs, then IPs retrieved from pkt_list ... all surrounded by bracket IPs
 
 			pkt = mh.wsr.proc.CreateBracket(core.OpenBracket, "")
 			mh.wsr.proc.Send(opt, pkt)

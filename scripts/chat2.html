@@ -85,8 +85,10 @@ button {
 		var message = document.getElementById("message");
 		var jarfile = document.getElementById("jarfile");
 		//debugger;
-		if (!(message.value.trim() == "namelist") ) {
-		 alert("Command must be 'namelist'");
+		if (!(message.value.trim() == "namelist") ) {		
+		 //alert("Command must be 'namelist'");
+		 var status = document.getElementById("status");
+        	 status.innerHTML = "<b>Command must be 'namelist'</b>";		 
 		  return;
 		}
 		
