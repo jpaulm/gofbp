@@ -18,6 +18,8 @@ func TestLoadBal(t *testing.T) {
 
 	sender := net.NewProc("Sender", &testrtn.Sender{})
 
+	proc1 := net.NewProc("DispFields", &testrtn.DisplayFieldNames{})
+
 	proc2 := net.NewProc("LoadBalance", &testrtn.LoadBalance{})
 
 	proc3a := net.NewProc("Receiver0", &testrtn.Receiver{})
@@ -25,7 +27,8 @@ func TestLoadBal(t *testing.T) {
 	proc3c := net.NewProc("Receiver2", &components.DelayedReceiver{})
 
 	net.Initialize("40", sender, "COUNT")
-	net.Connect(sender, "OUT", proc2, "IN", 6)
+	net.Connect(sender, "OUT", proc1, "IN", 6)
+	net.Connect(proc1, "OUT", proc2, "IN", 6)
 	net.Connect(proc2, "OUT[0]", proc3a, "IN", 6)
 	net.Connect(proc2, "OUT[1]", proc3b, "IN", 6)
 	net.Connect(proc2, "OUT[2]", proc3c, "IN", 6)

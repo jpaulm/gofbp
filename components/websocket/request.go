@@ -86,9 +86,9 @@ type myHandler struct {
 func startHttpServer(wg *sync.WaitGroup, path string, wsrequest *WSRequest) *http.Server {
 	srv := &http.Server{Addr: path}
 
-	mux := http.NewServeMux()
+	//mux := http.NewServeMux()
 	mh := myHandler{wsr: wsrequest}
-	mux.Handle("/ws", mh)
+	//mux.Handle("/ws", mh)
 
 	go func() {
 		defer wg.Done() // let main know we are done cleaning up
