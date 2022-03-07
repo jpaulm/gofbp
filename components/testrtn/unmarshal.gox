@@ -1,0 +1,36 @@
+package json_marshal
+
+import (
+	"github.com/jpaulm/gofbp/core"
+)
+
+type UnMarshal struct {
+	ipt core.InputConn
+	out core.OutputConn
+}
+
+func (unmarshal *UnMarshal) Setup(p *core.Process) {
+	unmarshal.ipt = p.OpenInPort("IN")
+	unmarshal.out = p.OpenOutPort("OUT")
+}
+
+func (UnMarshal) MustRun() {}
+
+func (unmarshal *UnMarshal) Execute(p *core.Process) {
+
+	for {
+		var pkt = p.Receive(unmarshal.ipt)
+		if pkt == nil {
+			break
+		}
+		if pkt.PktType == core.OpenBracket || pkt.PktType == core.CloseBracket || pkt.PktType == core.Signal {
+			p.Send(unmarshal.out, pkt)
+		} else {
+			emp := &testing.Employee
+			//json, _ := json.UnMarshal(pkt.Contents)
+			//p.Send(unmarshal.out, p.Create(string(json)))
+			p.Discard(pkt)
+		}
+	}
+
+}
