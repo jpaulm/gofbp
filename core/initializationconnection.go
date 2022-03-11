@@ -1,7 +1,7 @@
 package core
 
 import (
-	"fmt"
+	//"fmt"
 	"sync"
 )
 
@@ -44,11 +44,9 @@ func (c *InitializationConnection) receive(p *Process) *Packet {
 	pkt.owner = p
 	p.ownedPkts++
 	c.Close()
-	x := fmt.Sprint(pkt.Contents)
-	trace(p, " Received IIP: "+x)
-	//if p.network.tracing {
-	//	fmt.Print("  ", pkt.Contents, "\n")
-	//}
+	//x := fmt.Sprint(pkt.Contents)
+	trace(p, " Received IIP: ", pkt.Contents)
+
 	return pkt
 }
 

@@ -25,11 +25,11 @@ func (cb *ChainBrkUp) Execute(p *core.Process) {
 	}
 	x := chn.First
 	for x != nil {
-		fmt.Println(x.Contents)
+		fmt.Print(x.Contents, "\n")
 		p.Detach(chn, x)
 		p.Send(cb.opt, x)
 		x = chn.First
 	}
-	fmt.Println(pkt.Contents)
+	fmt.Print(pkt.Contents, "\n")
 	p.Send(cb.opt, pkt)
 }

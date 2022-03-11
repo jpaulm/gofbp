@@ -92,15 +92,15 @@ func WaitTr(sc *sync.Cond, s string, p *Process) {
 	sc.Wait()
 }
 
-func trace(p *Process, s string) {
+func trace(p *Process, s ...interface{}) {
 	if p.network.tracing {
-		fmt.Print(p.Name, " "+s+"\n")
+		fmt.Print(p.Name, s, "\n")
 	}
 }
 
-func traceNet(n *Network, s string) {
+func traceNet(n *Network, s ...interface{}) {
 	if n.tracing {
-		fmt.Print(n.Name, " "+s+"\n")
+		fmt.Print(n.Name, s, "\n")
 	}
 }
 

@@ -17,7 +17,8 @@ func TestMarshal(t *testing.T) {
 	net := core.NewNetwork("TestMarshal")
 	net.SetParams(params)
 
-	emp1 := &structs.Employee{Name: "Rachel", Age: 24, Salary: 344444}
+	name1 := &structs.Name{FirstName: "John", MidInit: "Q", LastName: "Smith"}
+	emp1 := &structs.Employee{Name: name1, Age: 24, Salary: 344444}
 
 	sender := net.NewProc("EmpSender", &components.EmpSender{})
 

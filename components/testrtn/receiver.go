@@ -24,7 +24,7 @@ func (receiver *Receiver) Execute(p *core.Process) {
 			break
 		}
 
-		fmt.Println("Input to Receiver:", p.Name, ">", pkt.Contents)
+		fmt.Print("Input to Receiver:", p.Name, ">", pkt.Contents, "\n")
 		p.Discard(pkt)
 	}
 

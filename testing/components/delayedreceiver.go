@@ -26,7 +26,7 @@ func (receiver *DelayedReceiver) Execute(p *core.Process) {
 			break
 		}
 		time.Sleep(time.Duration(rand.Int31n(500)) * time.Millisecond)
-		fmt.Println("DelayedReceiver input:", p.Name, ">", pkt.Contents)
+		fmt.Print("DelayedReceiver input:", p.Name, ">", pkt.Contents,  "\n")
 		p.Discard(pkt)
 	}
 

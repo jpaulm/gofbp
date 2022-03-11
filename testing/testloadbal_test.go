@@ -16,7 +16,7 @@ func TestLoadBal(t *testing.T) {
 	net := core.NewNetwork("TestLoadBal")
 	net.SetParams(params)
 
-	sender := net.NewProc("EmpSender", &components.EmpSender{})
+	sender := net.NewProc("Sender", &testrtn.Sender{})
 
 	proc1 := net.NewProc("DispFields", &testrtn.Marshal{})
 

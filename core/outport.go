@@ -1,7 +1,7 @@
 package core
 
 import (
-	"fmt"
+	//"fmt"
 	"sync/atomic"
 )
 
@@ -29,20 +29,18 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	LockTr(o.conn.condNE, "send L", p)
 	defer UnlockTr(o.conn.condNE, "send U", p)
 
-	x := fmt.Sprint(pkt.Contents)
+	//x := fmt.Sprint(pkt.Contents)
 	if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
 		trace(p, " Sending to "+o.portName+" > "+
-			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket "+x)
-		//if p.network.tracing {
-		//	fmt.Print("  contents: ", pkt.Contents, "\n")
-		//}
+			[...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket ", pkt.Contents, "\n")
+
 	} else {
 		if pkt.PktType == Signal {
 			//x, _ := pkt.Contents.(string)
 			trace(p, " Sending to "+o.portName+" > "+
-				"Signal: "+x)
+				"Signal: ", pkt.Contents, "\n")
 		} else {
-			trace(p, " Sending to "+o.portName+" > "+x)
+			trace(p, " Sending to "+o.portName+" > ", pkt.Contents, "\n")
 
 			//if p.network.tracing {
 			//	fmt.Print("  ", pkt.Contents, "\n")

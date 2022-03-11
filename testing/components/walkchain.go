@@ -25,7 +25,7 @@ func (wc *WalkChain) Execute(p *core.Process) {
 	}
 	x := chn.First
 	for x != nil {
-		fmt.Println(x.Contents)
+		fmt.Print(x.Contents, "\n")
 		x = x.Next
 	}
 

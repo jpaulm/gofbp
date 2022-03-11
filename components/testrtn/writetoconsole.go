@@ -34,7 +34,7 @@ func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
 				if pkt.PktType == core.Signal {
 					fmt.Println("Signal", pkt.Contents)
 				} else {
-					fmt.Println(pkt.Contents)
+					fmt.Print(pkt.Contents, "\n")
 				}
 			}
 		}

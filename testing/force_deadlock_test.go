@@ -28,7 +28,7 @@ func TestForceDeadlock(t *testing.T) {
 	out, err := run.CombinedOutput()
 	s = string(out)
 	t.Log(s)
-	fmt.Println(s)
+	fmt.Print(s, "\n")
 	if !strings.Contains(s, "deadlock") &&
 		!strings.Contains(s, "Deadlock") {
 		t.Error("expected output to mention a deadlock")

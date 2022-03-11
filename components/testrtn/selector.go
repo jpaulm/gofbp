@@ -42,7 +42,7 @@ func (selector *Selector) Execute(p *core.Process) {
 		if pkt == nil {
 			break
 		}
-		fmt.Println(pkt.Contents)
+		fmt.Print(pkt.Contents, "\n")
 
 		s := pkt.Contents.(string)
 		if i > len(s) {

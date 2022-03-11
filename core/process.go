@@ -304,9 +304,9 @@ func (p *Process) Create(x interface{}) *Packet {
 	pkt.Contents = x
 	pkt.owner = p
 	p.ownedPkts++
-	y := fmt.Sprint(x)
+	//y := fmt.Sprint(x)
 	if p.network.tracepkts {
-		fmt.Println(p.Name, "  Packet created < "+y)
+		fmt.Print(p.Name, "  Packet created < ", pkt.Contents, "\n")
 		//fmt.Println("  ", pkt.Contents)
 	}
 	return pkt
@@ -320,8 +320,8 @@ func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 	pkt.owner = p
 	p.ownedPkts++
 	if p.network.tracepkts {
-		fmt.Println(p.Name, "  Bracket created: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket "+s)
-		//fmt.Println("  ", pkt.Contents)
+		fmt.Print(p.Name, "  Bracket created: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket ",
+			pkt.Contents, "\n")
 	}
 	return pkt
 }
@@ -334,7 +334,7 @@ func (p *Process) CreateSignal(s string) *Packet {
 	pkt.owner = p
 	p.ownedPkts++
 	if p.network.tracepkts {
-		fmt.Println(p.Name, "  Signal created: ", pkt.Contents)
+		fmt.Print(p.Name, "  Signal created: ", pkt.Contents, "\n")
 	}
 	return pkt
 }
@@ -346,16 +346,15 @@ func (p *Process) Discard(pkt *Packet) {
 	}
 	p.ownedPkts--
 	if p.network.tracepkts {
-		x := fmt.Sprint(pkt.Contents)
+		//x := fmt.Sprint(pkt.Contents)
 		if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
-			fmt.Println(p.Name, "  Bracket discarded: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket "+x)
-			//fmt.Print("  contents: ", pkt.Contents, "\n")
+			fmt.Print(p.Name, "  Bracket discarded: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket ", pkt.Contents, "\n")
+
 		} else {
 			if pkt.PktType == Signal {
-				fmt.Println(p.Name, "  Signal discarded: ", pkt.Contents)
+				fmt.Print(p.Name, "  Signal discarded: ", pkt.Contents, "\n")
 			} else {
-				fmt.Println(p.Name, "  Packet discarded > "+x)
-				//fmt.Println("  ", pkt.Contents)
+				fmt.Print(p.Name, "  Packet discarded > ", pkt.Contents, "\n")
 			}
 		}
 	}
@@ -370,16 +369,14 @@ func (p *Process) discardOldest(pkt *Packet) {
 	}
 	p.ownedPkts--
 	if p.network.tracepkts {
-		x := fmt.Sprint(pkt.Contents)
+		//x := fmt.Sprint(pkt.Contents)
 		if pkt.PktType == OpenBracket || pkt.PktType == CloseBracket {
-			fmt.Println(p.Name, "  Bracket discarded (DO): ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket "+x)
-			//fmt.Print("  contents: ", pkt.Contents, "\n")
+			fmt.Print(p.Name, "  Bracket discarded (DO): ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket ", pkt.Contents, "\n")
 		} else {
 			if pkt.PktType == Signal {
-				fmt.Println(p.Name, "  Signal discarded (DO): ", pkt.Contents)
+				fmt.Print(p.Name, "  Signal discarded (DO): ", pkt.Contents, "\n")
 			} else {
-				fmt.Println(p.Name, "  Packet discarded (DO) > "+x)
-				//fmt.Println("  ", pkt.Contents)
+				fmt.Print(p.Name, "  Packet discarded (DO) > ", pkt.Contents, "\n")
 			}
 		}
 	}

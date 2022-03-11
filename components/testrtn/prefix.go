@@ -35,7 +35,7 @@ func (prefix *Prefix) Execute(p *core.Process) {
 		if pkt == nil {
 			break
 		}
-		fmt.Println(pkt.Contents)
+		fmt.Print(pkt.Contents, "\n")
 
 		s, ok := pkt.Contents.(string)
 		if !ok {
