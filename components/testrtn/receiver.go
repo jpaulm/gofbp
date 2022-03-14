@@ -1,8 +1,6 @@
 package testrtn
 
 import (
-	"fmt"
-
 	"github.com/jpaulm/gofbp/core"
 )
 
@@ -24,7 +22,7 @@ func (receiver *Receiver) Execute(p *core.Process) {
 			break
 		}
 
-		fmt.Print("Input to Receiver:", p.Name, ">", pkt.Contents, "\n")
+		//fmt.Print("Input to Receiver:", p.Name, ">", pkt.Contents, "\n")
 		p.Discard(pkt)
 	}
 

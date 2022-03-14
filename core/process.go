@@ -320,8 +320,8 @@ func (p *Process) CreateBracket(pktType int32, s string) *Packet {
 	pkt.owner = p
 	p.ownedPkts++
 	if p.network.tracepkts {
-		fmt.Print(p.Name, "  Bracket created: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket ",
-			pkt.Contents, "\n")
+		trace(p, "  Bracket created: ", [...]string{"", "Open", "Close"}[pkt.PktType]+" Bracket ",
+			pkt.Contents)
 	}
 	return pkt
 }
@@ -354,11 +354,10 @@ func (p *Process) Discard(pkt *Packet) {
 			if pkt.PktType == Signal {
 				fmt.Print(p.Name, "  Signal discarded: ", pkt.Contents, "\n")
 			} else {
-				fmt.Print(p.Name, "  Packet discarded > ", pkt.Contents, "\n")
+				trace(p, "  Packet discarded > ", pkt.Contents)
 			}
 		}
 	}
-	//}
 	pkt = nil
 }
 
@@ -376,7 +375,7 @@ func (p *Process) discardOldest(pkt *Packet) {
 			if pkt.PktType == Signal {
 				fmt.Print(p.Name, "  Signal discarded (DO): ", pkt.Contents, "\n")
 			} else {
-				fmt.Print(p.Name, "  Packet discarded (DO) > ", pkt.Contents, "\n")
+				trace(p, "  Packet discarded (DO) > ", pkt.Contents)
 			}
 		}
 	}

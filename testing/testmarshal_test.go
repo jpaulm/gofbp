@@ -27,7 +27,7 @@ func TestMarshal(t *testing.T) {
 	proc3 := net.NewProc("Show", &testrtn.WriteToConsole{})
 
 	net.Initialize("20", sender, "COUNT")
-	net.Initialize(emp1, sender, "DATA")
+	net.Initialize(&emp1, sender, "DATA")
 	net.Connect(sender, "OUT", proc2, "IN", 6)
 	net.Connect(proc2, "OUT", proc3, "IN", 6)
 	net.Run()

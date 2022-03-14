@@ -29,14 +29,14 @@ func (empsender *EmpSender) Execute(p *core.Process) {
 	p.Discard(icpkt)
 	p.Close(empsender.cnt)
 
-	icpkt = p.Receive(empsender.data)
-	emp := icpkt.Contents
-	p.Discard(icpkt)
+	pkt := p.Receive(empsender.data)
+	emp := pkt.Contents
+	p.Discard(pkt)
 	p.Close(empsender.data)
 
-	var pkt *core.Packet
+	//var pkt *core.Packet
 	for i := 0; i < j; i++ {
-		pkt = p.Create(emp)
+		pkt = p.Create(&emp)
 		p.Send(empsender.opt, pkt)
 	}
 

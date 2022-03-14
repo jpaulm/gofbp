@@ -1,7 +1,6 @@
 package testrtn
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/jpaulm/gofbp/core"
@@ -42,7 +41,7 @@ func (selector *Selector) Execute(p *core.Process) {
 		if pkt == nil {
 			break
 		}
-		fmt.Print(pkt.Contents, "\n")
+		//fmt.Print(pkt.Contents, "\n")
 
 		s := pkt.Contents.(string)
 		if i > len(s) {

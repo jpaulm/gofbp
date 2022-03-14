@@ -1,7 +1,6 @@
 package components
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -26,7 +25,7 @@ func (receiver *DelayedReceiver) Execute(p *core.Process) {
 			break
 		}
 		time.Sleep(time.Duration(rand.Int31n(500)) * time.Millisecond)
-		fmt.Print("DelayedReceiver input:", p.Name, ">", pkt.Contents,  "\n")
+		//fmt.Print("DelayedReceiver input:", p.Name, ">", pkt.Contents,  "\n")
 		p.Discard(pkt)
 	}
 

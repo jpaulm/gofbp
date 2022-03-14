@@ -1,8 +1,6 @@
 package testrtn
 
 import (
-	"fmt"
-
 	"github.com/jpaulm/gofbp/core"
 )
 
@@ -35,7 +33,7 @@ func (prefix *Prefix) Execute(p *core.Process) {
 		if pkt == nil {
 			break
 		}
-		fmt.Print(pkt.Contents, "\n")
+		//fmt.Print(pkt.Contents, "\n")
 
 		s, ok := pkt.Contents.(string)
 		if !ok {
