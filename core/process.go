@@ -167,20 +167,20 @@ func (p *Process) activate() {
 	if !atomic.CompareAndSwapInt32(&p.status, Notstarted, Active) {
 		if atomic.CompareAndSwapInt32(&p.status, Dormant, Active) {
 			BdcastTr(p.canGo, "bdcast act", p)
-			trace(p, "Activating: from status "+[...]string{"Not Started", "Active", "Dormant",
+			trace(p, " Activating: from status "+[...]string{"Not Started", "Active", "Dormant",
 				"SuspSend", "SuspRecv", "Terminated"}[st])
 		}
 		///UnlockTr(p.canGo, "act U", p)
 		return
 	} else {
-		trace(p, "Activating: from status "+[...]string{"Not Started", "Active", "Dormant",
+		trace(p, " Activating: from status "+[...]string{"Not Started", "Active", "Dormant",
 			"SuspSend", "SuspRecv", "Terminated"}[st])
 	}
 	// if status was NotStarted...
 	///UnlockTr(p.canGo, "act U", p)
 	go func() { // Process goroutine
 		defer p.network.wg.Done()
-		trace(p, "Starting goroutine "+strconv.FormatUint(getGID(), 10))
+		trace(p, " Starting goroutine "+strconv.FormatUint(getGID(), 10))
 		p.Run() //   <-------
 	}()
 

@@ -64,7 +64,7 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 			atomic.StoreInt32(&p.status, SuspSend)
 			WaitTr(o.conn.condNF, "wait in send", p)
 			atomic.StoreInt32(&p.status, Active)
-			trace(p, " Sent to "+o.portName)
+			trace(p, " Sent to ", o.portName)
 		}
 		o.conn.pktArray[o.conn.is] = pkt
 		o.conn.is = (o.conn.is + 1) % len(o.conn.pktArray)

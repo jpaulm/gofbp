@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -92,15 +93,25 @@ func WaitTr(sc *sync.Cond, s string, p *Process) {
 	sc.Wait()
 }
 
-func trace(p *Process, s ...interface{}) {
+func trace(p *Process, t string, s ...interface{}) {
 	if p.network.tracing {
-		fmt.Print(p.Name, s, "\n")
+		if len(s) == 0 {
+			fmt.Print(p.Name, t, "\n")
+		} else {
+			json, _ := json.Marshal(s)
+			fmt.Print(p.Name, t, string(json), "\n")
+		}
 	}
 }
 
-func traceNet(n *Network, s ...interface{}) {
+func traceNet(n *Network, t string, s ...interface{}) {
 	if n.tracing {
-		fmt.Print(n.Name, s, "\n")
+		if len(s) == 0 {
+			fmt.Print(n.Name, t, "\n")
+		} else {
+			json, _ := json.Marshal(s)
+			fmt.Print(n.Name, t, string(json), "\n")
+		}
 	}
 }
 
@@ -373,7 +384,7 @@ func (n *Network) Run() {
 				continue
 			}
 			//atomic.StoreInt32(&proc.status, Notstarted)
-			trace(proc, "act from start")
+			trace(proc, " act from start")
 			proc.activate()
 			someProcsCanRun = true
 			//UnlockTr(proc.canGo, "test if not started U", proc)

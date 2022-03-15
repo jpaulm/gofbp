@@ -31,7 +31,7 @@ func (c *InPort) receive(p *Process) *Packet {
 	trace(p, " Receiving from "+c.portName)
 	for c.isEmptyNL() { // InPort is empty
 		if c.closed /* || c.upStrmCnt == 0  - check this! */ {
-			trace(p, " Received end of stream from "+c.portName)
+			trace(p, " Received end of stream from ", c.portName)
 			return nil
 		}
 		atomic.StoreInt32(&p.status, SuspRecv)

@@ -1,6 +1,7 @@
 package testrtn
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/jpaulm/gofbp/core"
@@ -34,7 +35,8 @@ func (writeToConsole *WriteToConsole) Execute(p *core.Process) {
 				if pkt.PktType == core.Signal {
 					fmt.Println("Signal", pkt.Contents)
 				} else {
-					fmt.Print(pkt.Contents, "\n")
+					json, _ := json.Marshal(pkt.Contents)
+					fmt.Print("> ", string(json), "\n")
 				}
 			}
 		}
