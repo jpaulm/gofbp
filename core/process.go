@@ -306,7 +306,7 @@ func (p *Process) Create(x interface{}) *Packet {
 	p.ownedPkts++
 	//y := fmt.Sprint(x)
 	if p.network.tracepkts {
-		trace(p, "  Packet created < ", pkt.Contents, "\n")
+		trace(p, "  Packet created < ", pkt.Contents)
 		//fmt.Println("  ", pkt.Contents)
 	}
 	return pkt

@@ -36,7 +36,7 @@ func (empsender *EmpSender) Execute(p *core.Process) {
 
 	//var pkt *core.Packet
 	for i := 0; i < j; i++ {
-		pkt = p.Create(&emp)
+		pkt = p.Create(emp)
 		p.Send(empsender.opt, pkt)
 	}
 

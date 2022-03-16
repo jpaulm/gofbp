@@ -52,7 +52,7 @@ func (c *InPort) receive(p *Process) *Packet {
 			trace(p, " Received from "+c.portName+" < "+
 				"Signal: ", pkt.Contents, "\n")
 		} else {
-			trace(p, " Received from "+c.portName+" < ", pkt.Contents, "\n")
+			trace(p, " Received from "+c.portName+" < ", pkt.Contents)
 
 		}
 	}
