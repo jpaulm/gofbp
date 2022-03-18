@@ -6,7 +6,8 @@ import (
 	"log"
 	"net"
 	"os"
-	"sync"
+
+	//"sync"
 
 	"github.com/jpaulm/gofbp/core"
 )
@@ -18,15 +19,15 @@ type ReadFromSocket struct {
 	iptIP core.InputConn
 	opt   core.OutputConn
 	p     *core.Process
-	rc    bool
-	wg    *sync.WaitGroup
+	//rc    bool
+	//wg    *sync.WaitGroup
 }
 
 func (readFromSocket *ReadFromSocket) Setup(p *core.Process) {
 	readFromSocket.iptIP = p.OpenInPort("PORT")
 	readFromSocket.opt = p.OpenOutPort("OUT")
 	readFromSocket.p = p
-	readFromSocket.wg = &sync.WaitGroup{}
+	//readFromSocket.wg = &sync.WaitGroup{}
 }
 
 func (ReadFromSocket) MustRun() {}
@@ -58,20 +59,21 @@ func (readFromSocket *ReadFromSocket) Execute(p *core.Process) {
 			os.Exit(1)
 		}
 
-		readFromSocket.rc = false
+		//readFromSocket.rc = false
 
-		readFromSocket.wg.Add(1)
-		go readFromSocket.handleRequest(conn)
-		readFromSocket.wg.Wait()
-		if readFromSocket.rc {
+		//readFromSocket.wg.Add(1)
+		/*go */
+		rc := readFromSocket.handleRequest(conn)
+		//readFromSocket.wg.Wait()
+		if rc {
 			break
 		}
 	}
 }
 
 // Handles incoming requests.
-func (rfs *ReadFromSocket) handleRequest(conn net.Conn) {
-	defer rfs.wg.Done()
+func (rfs *ReadFromSocket) handleRequest(conn net.Conn) bool {
+	//defer rfs.wg.Done()
 	defer conn.Close()
 	buffer := make([]byte, 1024)
 	//j := 0
@@ -80,8 +82,9 @@ func (rfs *ReadFromSocket) handleRequest(conn net.Conn) {
 
 		if err != nil {
 			log.Println(err)
-			rfs.rc = err == io.EOF // true if EOF
-			return
+			//rfs.rc = err == io.EOF // true if EOF
+			//return
+			return err == io.EOF
 		}
 		//j := 1
 		if n > 0 || err == io.EOF {
@@ -89,24 +92,8 @@ func (rfs *ReadFromSocket) handleRequest(conn net.Conn) {
 			message := string(buffer[:n])
 			pkt := rfs.p.Create(message)
 			rfs.p.Send(rfs.opt, pkt)
-			_, err = conn.Write([]byte("\u0006"))
-			/*
-				for {
-					for i := 1; i < n; i++ {
-						if data[i:i+1] == "}" {
-							message := data[j:i]
-							pkt := rfs.p.Create(message)
-							rfs.p.Send(rfs.opt, pkt)
-							i = i + 2
-							// j = i
-						}
-					}
-				}
-			*/
+			conn.Write([]byte("\u0006")) // ACK character
 		}
-		//if rfs.rc {
-		//	return
-		//}
 	}
 
 }

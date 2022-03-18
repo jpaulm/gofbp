@@ -72,7 +72,7 @@ func (o *OutPort) send(p *Process, pkt *Packet) bool {
 	//pkt = nil
 	BdcastTr(o.conn.condNE, "bdcast sent", p)
 
-	//trace(o.conn.downStrProc, "activated from send")
+	//trace(o.conn.downStrProc, " activated from send")
 	o.conn.downStrProc.activate()
 
 	return true
@@ -104,7 +104,7 @@ func (o *OutPort) Close() {
 	if o.conn.upStrmCnt == 0 {
 		o.conn.closed = true
 		BdcastTr(o.conn.condNE, "bdcast out", o.sender)
-		trace(o.conn.downStrProc, "activated from close")
+		trace(o.conn.downStrProc, " activated from close")
 		o.conn.downStrProc.activate()
 	}
 }
