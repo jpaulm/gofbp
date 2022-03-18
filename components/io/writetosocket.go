@@ -38,13 +38,14 @@ func (writeToSocket *WriteToSocket) Execute(p *core.Process) {
 	p.Discard(icpkt)
 	p.Close(writeToSocket.iptIP)
 
-	con, err := net.Dial("tcp", port)
+	conn, err := net.Dial("tcp", port)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer con.Close()
+	defer conn.Close()
+	buffer := make([]byte, 10)
 
 	for {
 		var pkt = p.Receive(writeToSocket.ipt)
@@ -52,12 +53,15 @@ func (writeToSocket *WriteToSocket) Execute(p *core.Process) {
 			break
 		}
 		data := fmt.Sprint(pkt.Contents)
-		_, err = con.Write([]byte(data))
+		_, err = conn.Write([]byte(data))
 
 		if err != nil {
 			log.Fatal(err)
 		}
-
+		_, err := conn.Read(buffer)
+		if err != nil {
+			log.Fatal(err)
+		}
 		if !writeToSocket.opt.IsConnected() {
 			p.Discard(pkt)
 		} else {
