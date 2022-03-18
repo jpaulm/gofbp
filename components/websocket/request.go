@@ -48,13 +48,27 @@ func (wsrequest *WSRequest) Execute(p *core.Process) {
 
 	log.Printf("main: starting HTTP server")
 
-	httpServerExitDone := &sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
 
-	httpServerExitDone.Add(1)
+	wg.Add(1)
 
-	srv := startHttpServer(httpServerExitDone, path, wsrequest)
+	//srv := startHttpServer(wg, path, wsrequest)
+	srv := &http.Server{Addr: path}
+	mh := myHandler{wsr: wsrequest}
 
-	//for !wsrequest.closed_down {
+	go func() {
+		defer wg.Done() // let main know we are done cleaning up
+
+		// always returns error. ErrServerClosed on graceful close
+		if err := http.ListenAndServe(path, mh); err != http.ErrServerClosed {
+			// unexpected error. port in use?
+			log.Fatalf("ListenAndServe(): %v", err)
+		}
+	}()
+
+	// returning reference so caller can call Shutdown()
+	//return srv
+
 	for {
 		if atomic.CompareAndSwapInt32(&wsrequest.closed_down, 1, 1) {
 			break
@@ -70,10 +84,10 @@ func (wsrequest *WSRequest) Execute(p *core.Process) {
 	if err := srv.Shutdown(context.TODO()); err != nil {
 		panic(err) // failure/timeout shutting down the server gracefully
 	}
-	httpServerExitDone.Done()
+	wg.Done()
 
 	// wait for goroutine started in startHttpServer() to stop
-	httpServerExitDone.Wait()
+	wg.Wait()
 
 	log.Printf("done. exiting")
 
@@ -83,6 +97,7 @@ type myHandler struct {
 	wsr *WSRequest
 }
 
+/*
 func startHttpServer(wg *sync.WaitGroup, path string, wsrequest *WSRequest) *http.Server {
 	srv := &http.Server{Addr: path}
 
@@ -103,6 +118,7 @@ func startHttpServer(wg *sync.WaitGroup, path string, wsrequest *WSRequest) *htt
 	// returning reference so caller can call Shutdown()
 	return srv
 }
+*/
 
 // ServeHTTP ensures that myHandler is an instance of Handler interface{}
 
