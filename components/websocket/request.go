@@ -97,29 +97,6 @@ type myHandler struct {
 	wsr *WSRequest
 }
 
-/*
-func startHttpServer(wg *sync.WaitGroup, path string, wsrequest *WSRequest) *http.Server {
-	srv := &http.Server{Addr: path}
-
-	//mux := http.NewServeMux()
-	mh := myHandler{wsr: wsrequest}
-	//mux.Handle("/ws", mh)
-
-	go func() {
-		defer wg.Done() // let main know we are done cleaning up
-
-		// always returns error. ErrServerClosed on graceful close
-		if err := http.ListenAndServe(path, mh); err != http.ErrServerClosed {
-			// unexpected error. port in use?
-			log.Fatalf("ListenAndServe(): %v", err)
-		}
-	}()
-
-	// returning reference so caller can call Shutdown()
-	return srv
-}
-*/
-
 // ServeHTTP ensures that myHandler is an instance of Handler interface{}
 
 func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -135,8 +112,8 @@ func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var pkt_list []*core.Packet
 	var pkt *core.Packet
 
-	var cn websocket.Conn
-	cn = *c
+	//var cn websocket.Conn
+	cn := *c
 	c2 := &cn
 	opt := mh.wsr.proc.OpenOutPort("OUT")
 

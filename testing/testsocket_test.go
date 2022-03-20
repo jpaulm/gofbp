@@ -21,8 +21,8 @@ func TestSocket(t *testing.T) {
 	proc4 := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
 
 	net.Initialize("20", proc1, "COUNT")
-	net.Initialize(":4444", proc2, "PORT")
-	net.Initialize(":4444", proc3, "PORT")
+	net.Initialize("localhost:4444", proc2, "PORT")
+	net.Initialize("localhost:4444", proc3, "PORT")
 	net.Connect(proc1, "OUT", proc2, "IN", 6)
 	net.Connect(proc3, "OUT", proc4, "IN", 6)
 	net.Run()
