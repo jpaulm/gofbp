@@ -1,5 +1,9 @@
 *.tmp
 qs_*.*
 bak
+<<<<<<< Updated upstream
 bin/
 *~
+=======
+bin
+>>>>>>> Stashed changes

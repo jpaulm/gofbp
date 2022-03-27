@@ -14,12 +14,16 @@ func (subnet *Subnet1) Execute(p *core.Process) {
 
 	proc1 := net.NewProc("SubIn", &core.SubIn{})
 
-	proc2 := net.NewProc("WriteToConsole1", &testrtn.WriteToConsole{})
+	proc1a := net.NewProc("Prefix", &testrtn.Prefix{})
+
+	proc2 := net.NewProc("WriteToConsole", &testrtn.WriteToConsole{})
 
 	proc3 := net.NewProc("SubOut", &core.SubOut{})
 
 	net.Initialize("IN", proc1, "NAME")
-	net.Connect(proc1, "OUT", proc2, "IN", 6)
+	net.Connect(proc1, "OUT", proc1a, "IN", 6)
+	net.Initialize("X-", proc1a, "PARAM")
+	net.Connect(proc1a, "OUT", proc2, "IN", 6)
 	net.Connect(proc2, "OUT", proc3, "IN", 6)
 	net.Initialize("OUT", proc3, "NAME")
 

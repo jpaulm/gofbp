@@ -1,9 +1,8 @@
 package testing
 
 import (
-	"testing"
-
 	"path/filepath"
+	"testing"
 
 	"github.com/jpaulm/gofbp/components/io"
 	"github.com/jpaulm/gofbp/components/testrtn"

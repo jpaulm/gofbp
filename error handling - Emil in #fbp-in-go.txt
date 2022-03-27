@@ -1,0 +1,7 @@
+Sure. Here's a list of articles about error handling in Go:
+
+- https://golang.org/doc/tutorial/handle-errors
+- https://go.dev/blog/error-handling-and-go
+- https://go.dev/blog/errors-are-values
+
+In the next post I'm going to give a small TLDR of this topic

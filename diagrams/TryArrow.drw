@@ -1,0 +1,22 @@
+<?xml version="1.0"?> 
+ <drawfbp_file xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:noNamespaceSchemaLocation="https://github.com/jpaulm/drawfbp/blob/master/lib/drawfbp_file.xsd">
+<net>
+<desc> </desc>
+ <blocks><block> <x> 224 </x> <y> 198 </y> <id> 2 </id> <type>B</type> <width>92</width> <height>64</height> <description>a</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 309 </x> <y> 480 </y> <id> 4 </id> <type>B</type> <width>92</width> <height>64</height> <description>b</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 880 </x> <y> 198 </y> <id> 6 </id> <type>B</type> <width>92</width> <height>64</height> <description>c</description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+<block> <x> 735 </x> <y> 531 </y> <id> 15 </id> <type>B</type> <width>92</width> <height>64</height> <description></description> <multiplex>false</multiplex><invisible>false</invisible><issubnet>false</issubnet> 
+</block> 
+</blocks> <connections>
+<connection> <fromx>270</fromx> <fromy>198</fromy> <tox>834</tox> <toy>197</toy> <fromid>2</fromid> <toid>6</toid> <id>5</id> <endsatline>false</endsatline><upstreamport>OUT</upstreamport><downstreamport>IN</downstreamport><segno>0</segno></connection> 
+<connection> <fromx>355</fromx> <fromy>481</fromy> <tox>608</tox> <toy>197</toy> <fromid>4</fromid> <toid>5</toid> <id>6</id> <endsatline>true</endsatline><upstreamport>OUT</upstreamport><segno>0</segno><bends> <bend> <x>608</x> <y> 480</y> </bend>
+ </bends> </connection> 
+<connection> <fromx>781</fromx> <fromy>530</fromy> <tox>746</tox> <toy>197</toy> <fromid>15</fromid> <toid>5</toid> <id>9</id> <endsatline>true</endsatline><upstreamport>OUT</upstreamport><segno>0</segno><bends> <bend> <x>1031</x> <y> 530</y> </bend>
+ <bend> <x>1031</x> <y> 305</y> </bend>
+ <bend> <x>746</x> <y> 305</y> </bend>
+ </bends> </connection> 
+</connections> </net> </drawfbp_file>
